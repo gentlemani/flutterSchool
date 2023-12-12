@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: Container(
         margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
         child: BottomNavigationBar(
-            backgroundColor: const Color.fromARGB(146, 129, 165, 202),
+            backgroundColor: const Color.fromARGB(145, 129, 165, 202),
             unselectedItemColor:
                 const Color.fromARGB(255, 204, 38, 38).withOpacity(1),
             items: const [
