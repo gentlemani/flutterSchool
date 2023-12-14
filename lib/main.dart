@@ -1,5 +1,6 @@
 import 'package:eatsily/sesion/login.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -126,15 +127,17 @@ class _MyHomePageState extends State<MyHomePage> {
               const Padding(
                 padding: EdgeInsets.all(25.0),
                 child: TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Usuario',
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(
+                    decoration: InputDecoration(
+                      labelText: 'Usuario',
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    style: TextStyle(
                         color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+                        fontSize: 22)),
               ),
               const Padding(
                 padding: EdgeInsets.all(25.0),
@@ -147,6 +150,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontSize: 22,
                           fontWeight: FontWeight.bold)),
                   obscureText: true,
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255), fontSize: 22),
                 ),
               ),
               Padding(
@@ -155,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: null,
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 28, 165, 24),
+                        const Color.fromARGB(255, 200, 195, 39),
                       ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -169,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       'Ingresar',
                       style: TextStyle(
                         fontSize: 20.0,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                   ),
@@ -184,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 28, 165, 24),
+                        const Color.fromARGB(255, 200, 195, 39),
                       ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -198,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       'Registrar',
                       style: TextStyle(
                         fontSize: 20.0,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                   ),
