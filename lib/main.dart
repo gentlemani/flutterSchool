@@ -38,7 +38,7 @@ class MyHome extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 40.0,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 255, 255, 255)),
+                        color: Color.fromARGB(255, 254, 250, 250)),
                   )),
               const Padding(
                   padding: EdgeInsets.symmetric(vertical: 0.0),
