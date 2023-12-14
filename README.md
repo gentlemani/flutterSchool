@@ -1,4 +1,4 @@
-# eatsily
+# Eatsily
 
 A new Flutter project.
 
