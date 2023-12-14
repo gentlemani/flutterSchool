@@ -32,11 +32,20 @@ class MyHome extends StatelessWidget {
             children: <Widget>[
               SizedBox(height: MediaQuery.of(context).padding.top),
               const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  padding: EdgeInsets.symmetric(vertical: 0.0),
                   child: Text(
-                    'Eatsily. Come seguro',
+                    'Eatsily',
                     style: TextStyle(
-                        fontSize: 24.0,
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 255, 255, 255)),
+                  )),
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.0),
+                  child: Text(
+                    'Come seguro',
+                    style: TextStyle(
+                        fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Color.fromARGB(255, 255, 255, 255)),
                   )),
@@ -76,7 +85,7 @@ class MyHome extends StatelessWidget {
                   onPressed: null,
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 200, 195, 39),
+                        Color.fromARGB(255, 217, 210, 20),
                       ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -89,7 +98,7 @@ class MyHome extends StatelessWidget {
                     child: const Text(
                       'Ingresar',
                       style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 22.0,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
@@ -121,7 +130,7 @@ class MyHome extends StatelessWidget {
                     child: const Text(
                       'Registrar',
                       style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 22.0,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
