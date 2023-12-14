@@ -53,7 +53,8 @@ class MyHome extends StatelessWidget {
                 padding: EdgeInsets.all(25.0),
                 child: TextField(
                     decoration: InputDecoration(
-                      labelText: 'User300',
+
+                      labelText: 'User1',
                       border: OutlineInputBorder(),
                       labelStyle: TextStyle(
                           color: Color.fromARGB(255, 255, 255, 255),
