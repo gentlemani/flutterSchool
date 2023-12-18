@@ -9,7 +9,7 @@ class Fondo extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               image: const DecorationImage(
-                image: AssetImage('../assets/Fondo4.jpg'),
+                image: AssetImage('assets/Fondo4.jpg'),
                 fit: BoxFit.cover,
               ),
               border: Border.all(
