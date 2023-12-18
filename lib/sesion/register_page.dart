@@ -2,14 +2,14 @@ import 'package:eatsily/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginState extends State<Login> {
+class _SignUpPageState extends State<SignUpPage> {
   String? errorMessage = '';
   bool isLogin = true;
 
