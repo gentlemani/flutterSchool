@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1069689220180",
+    "project_id": "fluttereatsily",
+    "storage_bucket": "fluttereatsily.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069689220180:android:d34b7890edb8bedfc8d1c1",
+        "android_client_info": {
+          "package_name": "com.example.eatsily"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyn9fP4yxBkGbsh0Eha_wq9DUd2Pxc7CI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069689220180:android:523d97c0b689a427c8d1c1",
+        "android_client_info": {
+          "package_name": "com.example.flutter_prueba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyn9fP4yxBkGbsh0Eha_wq9DUd2Pxc7CI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
