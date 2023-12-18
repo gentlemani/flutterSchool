@@ -16,9 +16,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
+  Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().signInWithEmailAndPassword(
+      await Auth().createUserWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -64,9 +64,16 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-        onPressed: signInWithEmailAndPassword,
-        child: Text(isLogin ? 'Login' : 'Register'));
+    return OutlinedButton(
+        onPressed: createUserWithEmailAndPassword,
+        style: const ButtonStyle(
+            textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 20)),
+            backgroundColor:
+                MaterialStatePropertyAll(Color.fromARGB(255, 7, 82, 132))),
+        child: const Text(
+          'Registrar',
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ));
   }
 
   @override
@@ -80,8 +87,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 backgroundColor: const Color.fromARGB(224, 246, 246, 246),
                 body: SingleChildScrollView(
                     child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 100, horizontal: 50),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 100, horizontal: 50),
                         child: Column(
                           children: <Widget>[
                             const Text(
@@ -106,19 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             const SizedBox(
                               height: 70,
                             ),
-                            const OutlinedButton(
-                                onPressed: null,
-                                style: ButtonStyle(
-                                    textStyle: MaterialStatePropertyAll(
-                                        TextStyle(fontSize: 20)),
-                                    backgroundColor: MaterialStatePropertyAll(
-                                        Color.fromARGB(255, 7, 82, 132))),
-                                child: Text(
-                                  'Registrar',
-                                  style: TextStyle(
-                                      color:
-                                          Color.fromARGB(255, 255, 255, 255)),
-                                )),
+                            _submitButton(),
                           ],
                         ))))));
   }

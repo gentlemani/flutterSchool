@@ -1,5 +1,5 @@
 import 'package:eatsily/auth.dart';
-import 'package:eatsily/sesion/register_page.dart';
+import 'package:eatsily/sesion/login_page.dart';
 import 'package:eatsily/sesion/verifyEmail_page.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class _WidgetTreeState extends State<WidgetTree> {
         if (snapshot.hasData) {
           return const VerifyEmailPage();
         } else {
-          return const SignUpPage();
+          return const SignInPage();
         }
       },
     );

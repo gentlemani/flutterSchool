@@ -1,6 +1,7 @@
 import 'package:eatsily/Fondos/login_fondo.dart';
 import 'package:eatsily/firebase_options.dart';
 import 'package:eatsily/sesion/login_page.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        home: Scaffold(
-          body: Stack(
-            children: [Fondo(), SignInPage()],
-          ),
-        ),
+        // home: Scaffold(
+        //   body: Stack(
+        //     children: [Fondo(), SignInPage()],
+        //   ),
+        // ),
+        home: WidgetTree(),
         debugShowCheckedModeBanner: false);
   }
 }
