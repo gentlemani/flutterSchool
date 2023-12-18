@@ -1,4 +1,4 @@
-import 'package:eatsily/Fondos/loginFondo.dart';
+import 'package:eatsily/Fondos/login_fondo.dart';
 import 'package:eatsily/firebase_options.dart';
 import 'package:eatsily/sesion/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
