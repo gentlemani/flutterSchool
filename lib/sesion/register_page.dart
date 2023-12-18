@@ -77,18 +77,18 @@ class _SignUpPageState extends State<SignUpPage> {
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 10.0)),
             child: Scaffold(
-                backgroundColor: Color.fromARGB(224, 246, 246, 246),
+                backgroundColor: const Color.fromARGB(224, 246, 246, 246),
                 body: SingleChildScrollView(
                     child: Padding(
                         padding:
-                            EdgeInsets.symmetric(vertical: 100, horizontal: 50),
+                            const EdgeInsets.symmetric(vertical: 100, horizontal: 50),
                         child: Column(
                           children: <Widget>[
-                            Text(
+                            const Text(
                               'Registrate',
                               style: TextStyle(fontSize: 30),
                             ),
-                            TextField(
+                            const TextField(
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
                                 alignLabelWithHint: true,
@@ -103,10 +103,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             _entryPasswordField(_controllerPassword),
                             _entryEmailField(_controllerEmail),
-                            SizedBox(
+                            const SizedBox(
                               height: 70,
                             ),
-                            OutlinedButton(
+                            const OutlinedButton(
                                 onPressed: null,
                                 style: ButtonStyle(
                                     textStyle: MaterialStatePropertyAll(
