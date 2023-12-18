@@ -118,87 +118,97 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(height: MediaQuery.of(context).padding.top),
-                const SizedBox(height: 30),
-                const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0.0),
-                    child: Text(
-                      'Eatsily',
+        body: Stack(children: [
+      Container(
+        decoration: BoxDecoration(
+            image: const DecorationImage(
+              image: AssetImage('assets/Fondo4.jpg'),
+              fit: BoxFit.cover,
+            ),
+            border: Border.all(
+              color: Colors.black,
+              width: 5.0,
+            )),
+      ),
+      SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: MediaQuery.of(context).padding.top),
+              const SizedBox(height: 30),
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.0),
+                  child: Text(
+                    'Eatsily',
+                    style: TextStyle(
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 254, 250, 250)),
+                  )),
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.0),
+                  child: Text(
+                    'Come seguro',
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 255, 255, 255)),
+                  )),
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: _entryEmailField(_controllerEmail),
+              ),
+              Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+                  child: _entryPasswordField(_controllerPassword)),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: _submitButton(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: TextButton(
+                  onPressed: () {
+                    // Navegar a la pantalla de login.dart
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPage()),
+                    );
+                  },
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color.fromARGB(255, 200, 195, 39),
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(200.0),
+                              side: const BorderSide(
+                                  color: Color.fromARGB(255, 255, 255, 255))))),
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Registrar',
                       style: TextStyle(
-                          fontSize: 40.0,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 254, 250, 250)),
-                    )),
-                const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0.0),
-                    child: Text(
-                      'Come seguro',
-                      style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 255, 255, 255)),
-                    )),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: _entryEmailField(_controllerEmail),
-                ),
-                Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
-                    child: _entryPasswordField(_controllerPassword)),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: _submitButton(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: TextButton(
-                    onPressed: () {
-                      // Navegar a la pantalla de login.dart
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignUpPage()),
-                      );
-                    },
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color.fromARGB(255, 200, 195, 39),
-                        ),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200.0),
-                                    side: const BorderSide(
-                                        color: Color.fromARGB(
-                                            255, 255, 255, 255))))),
-                    child: Container(
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Registrar',
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
+                        fontSize: 22.0,
+                        color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        backgroundColor: Colors.transparent);
+      ),
+    ]));
   }
 }
