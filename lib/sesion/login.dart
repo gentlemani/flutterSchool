@@ -1,7 +1,73 @@
+import 'package:eatsily/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  String? errorMessage = '';
+  bool isLogin = true;
+
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerPassword = TextEditingController();
+
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      await Auth().signInWithEmailAndPassword(
+          email: _controllerEmail.text, password: _controllerPassword.text);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
+  Widget _entryEmailField(
+    TextEditingController controller,
+  ) {
+    return TextField(
+      controller: controller,
+      textAlign: TextAlign.center,
+      decoration: const InputDecoration(
+        alignLabelWithHint: true,
+        labelText: 'Correo electronico',
+        contentPadding: EdgeInsets.only(top: 30),
+        labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+      ),
+      style: const TextStyle(fontSize: 25),
+    );
+  }
+
+  Widget _entryPasswordField(
+    TextEditingController controller,
+  ) {
+    return TextField(
+        controller: controller,
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(
+          alignLabelWithHint: true,
+          labelText: 'Contraseña',
+          contentPadding: EdgeInsets.only(top: 30),
+          labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+        ),
+        style: const TextStyle(fontSize: 25),
+        obscureText: true);
+  }
+
+  Widget _errorMessage() {
+    return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
+  }
+
+  Widget _submitButton() {
+    return ElevatedButton(
+        onPressed: signInWithEmailAndPassword,
+        child: Text(isLogin ? 'Login' : 'Register'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +76,7 @@ class Login extends StatelessWidget {
         child: Container(
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 10.0)),
-            child: const Scaffold(
+            child: Scaffold(
                 backgroundColor: Color.fromARGB(224, 246, 246, 246),
                 body: SingleChildScrollView(
                     child: Padding(
@@ -35,28 +101,8 @@ class Login extends StatelessWidget {
                                 fontSize: 25,
                               ),
                             ),
-                            TextField(
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  alignLabelWithHint: true,
-                                  labelText: 'Contraseña',
-                                  contentPadding: EdgeInsets.only(top: 30),
-                                  labelStyle: TextStyle(
-                                      fontSize: 25, color: Colors.black),
-                                ),
-                                style: TextStyle(fontSize: 25),
-                                obscureText: true),
-                            TextField(
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                alignLabelWithHint: true,
-                                labelText: 'Correo electronico',
-                                contentPadding: EdgeInsets.only(top: 30),
-                                labelStyle: TextStyle(
-                                    fontSize: 25, color: Colors.black),
-                              ),
-                              style: TextStyle(fontSize: 25),
-                            ),
+                            _entryPasswordField(_controllerPassword),
+                            _entryEmailField(_controllerEmail),
                             SizedBox(
                               height: 70,
                             ),
