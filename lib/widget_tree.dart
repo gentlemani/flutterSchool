@@ -1,6 +1,6 @@
 import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/login_page.dart';
-import 'package:eatsily/sesion/verifyEmail_page.dart';
+import 'package:eatsily/sesion/verify_email_page.dart';
 import 'package:flutter/material.dart';
 
 class WidgetTree extends StatefulWidget {
