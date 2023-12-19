@@ -1,7 +1,7 @@
 name: Build & upload to Firebase App Distribution
 
 on:
-  push:
+  pull_request:
     branches:
       - master
 
