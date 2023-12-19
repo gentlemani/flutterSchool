@@ -16,9 +16,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
+  Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().signInWithEmailAndPassword(
+      await Auth().createUserWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -64,9 +64,16 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-        onPressed: signInWithEmailAndPassword,
-        child: Text(isLogin ? 'Login' : 'Register'));
+    return OutlinedButton(
+        onPressed: createUserWithEmailAndPassword,
+        style: const ButtonStyle(
+            textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 20)),
+            backgroundColor:
+                MaterialStatePropertyAll(Color.fromARGB(255, 7, 82, 132))),
+        child: const Text(
+          'Registrar',
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ));
   }
 
   @override
@@ -77,18 +84,18 @@ class _SignUpPageState extends State<SignUpPage> {
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 10.0)),
             child: Scaffold(
-                backgroundColor: Color.fromARGB(224, 246, 246, 246),
+                backgroundColor: const Color.fromARGB(224, 246, 246, 246),
                 body: SingleChildScrollView(
                     child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 100, horizontal: 50),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 100, horizontal: 50),
                         child: Column(
                           children: <Widget>[
-                            Text(
+                            const Text(
                               'Registrate',
                               style: TextStyle(fontSize: 30),
                             ),
-                            TextField(
+                            const TextField(
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
                                 alignLabelWithHint: true,
@@ -103,22 +110,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             _entryPasswordField(_controllerPassword),
                             _entryEmailField(_controllerEmail),
-                            SizedBox(
+                            const SizedBox(
                               height: 70,
                             ),
-                            OutlinedButton(
-                                onPressed: null,
-                                style: ButtonStyle(
-                                    textStyle: MaterialStatePropertyAll(
-                                        TextStyle(fontSize: 20)),
-                                    backgroundColor: MaterialStatePropertyAll(
-                                        Color.fromARGB(255, 7, 82, 132))),
-                                child: Text(
-                                  'Registrar',
-                                  style: TextStyle(
-                                      color:
-                                          Color.fromARGB(255, 255, 255, 255)),
-                                )),
+                            _submitButton(),
                           ],
                         ))))));
   }
