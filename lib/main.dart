@@ -1,5 +1,4 @@
 import 'package:eatsily/firebase_options.dart';
-import 'package:eatsily/sesion/login_page.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
