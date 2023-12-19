@@ -59,9 +59,9 @@ class _SignUpPageState extends State<SignUpPage> {
         obscureText: true);
   }
 
-  Widget _errorMessage() {
-    return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
-  }
+  // Widget _errorMessage() {
+  //   return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
+  // }
 
   Widget _submitButton() {
     return OutlinedButton(

@@ -39,10 +39,6 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
-  Widget _title() {
-    return const Text('Firebase Auth');
-  }
-
   Widget _entryPasswordField(
     TextEditingController controller,
   ) {
@@ -75,9 +71,9 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _errorMessage() {
-    return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
-  }
+  // Widget _errorMessage() {
+  //   return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
+  // }
 
   Widget _submitButton() {
     return TextButton(
@@ -103,16 +99,6 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     );
-  }
-
-  Widget _loginOrRegisterButton() {
-    return TextButton(
-        onPressed: () {
-          setState(() {
-            isLogin = !isLogin;
-          });
-        },
-        child: Text(isLogin ? 'Register instead' : 'Login instead'));
   }
 
   @override

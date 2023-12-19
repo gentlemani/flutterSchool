@@ -45,7 +45,9 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     try {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
-    } catch (e) {}
+    } catch (e) {
+      return Text(e.toString());
+    }
   }
 
   @override
