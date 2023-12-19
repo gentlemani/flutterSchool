@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Debugging
-  run: |
-    echo "Firebase App ID: ${{secrets.APPID}}"
-    echo "Firebase Token: ${{secrets.TOKEN}}"
-    echo "Firebase Groups: pre-tester"
+        run: |
+          echo "Firebase App ID: ${{secrets.APPID}}"
+          echo "Firebase Token: ${{secrets.TOKEN}}"
+          echo "Firebase Groups: pre-tester"
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
