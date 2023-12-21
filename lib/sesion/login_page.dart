@@ -49,9 +49,11 @@ class _SignInPageState extends State<SignInPage> {
           alignLabelWithHint: true,
           labelText: 'Contraseña',
           contentPadding: EdgeInsets.only(top: 30),
-          labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+          labelStyle: TextStyle(
+              fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
         ),
-        style: const TextStyle(fontSize: 25),
+        style: const TextStyle(
+            fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
         obscureText: true);
   }
 
@@ -65,9 +67,11 @@ class _SignInPageState extends State<SignInPage> {
         alignLabelWithHint: true,
         labelText: 'Correo electronico',
         contentPadding: EdgeInsets.only(top: 30),
-        labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+        labelStyle:
+            TextStyle(fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
       ),
-      style: const TextStyle(fontSize: 25),
+      style: const TextStyle(
+          fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
     );
   }
 
@@ -94,6 +98,7 @@ class _SignInPageState extends State<SignInPage> {
           'Ingresar',
           style: TextStyle(
             fontSize: 22.0,
+            fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 0, 0, 0),
           ),
         ),
@@ -171,7 +176,7 @@ class _SignInPageState extends State<SignInPage> {
                   },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 200, 195, 39),
+                        const Color.fromARGB(255, 217, 210, 20),
                       ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -185,6 +190,7 @@ class _SignInPageState extends State<SignInPage> {
                       'Registrar',
                       style: TextStyle(
                         fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
