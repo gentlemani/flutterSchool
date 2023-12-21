@@ -137,7 +137,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _Fondo() {
+  Widget fondo() {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -156,7 +156,7 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(children: [
-      _Fondo(),
+      fondo(),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 50),
         child: Center(
