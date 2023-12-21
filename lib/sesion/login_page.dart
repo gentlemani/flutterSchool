@@ -106,6 +106,39 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+  Widget _registerButton() {
+    return TextButton(
+      onPressed: () {
+        // Navegar a la pantalla de login.dart
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SignUpPage()),
+        );
+      },
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+            const Color.fromARGB(255, 217, 210, 20),
+          ),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(200.0),
+                  side: const BorderSide(
+                      color: Color.fromARGB(255, 255, 255, 255))))),
+      child: Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: const Text(
+          'Registrar',
+          style: TextStyle(
+            fontSize: 22.0,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,37 +198,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: TextButton(
-                  onPressed: () {
-                    // Navegar a la pantalla de login.dart
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignUpPage()),
-                    );
-                  },
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 217, 210, 20),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(200.0),
-                              side: const BorderSide(
-                                  color: Color.fromARGB(255, 255, 255, 255))))),
-                  child: Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Registrar',
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                    ),
-                  ),
-                ),
+                child: _registerButton(),
               ),
             ],
           ),
