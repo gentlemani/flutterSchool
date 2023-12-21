@@ -76,6 +76,19 @@ class _SignUpPageState extends State<SignUpPage> {
         ));
   }
 
+  Widget linklogin() {
+    return Center(
+        child: GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      child: const Text(
+        '¿Ya tienes cuenta?',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -111,9 +124,11 @@ class _SignUpPageState extends State<SignUpPage> {
                             _entryPasswordField(_controllerPassword),
                             _entryEmailField(_controllerEmail),
                             const SizedBox(
-                              height: 70,
+                              height: 30,
                             ),
                             _submitButton(),
+                            const SizedBox(height: 5),
+                            linklogin(),
                           ],
                         ))))));
   }
