@@ -76,15 +76,58 @@ class _SignUpPageState extends State<SignUpPage> {
         ));
   }
 
+  Widget linklogin() {
+    return Center(
+        child: GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      child: const Text(
+        '¿Ya tienes cuenta?',
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+    ));
+  }
+
+  Widget userText() {
+    return const TextField(
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        alignLabelWithHint: true,
+        labelText: 'Usuario',
+        contentPadding: EdgeInsets.only(top: 30),
+        labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+      ),
+      style: TextStyle(
+        fontSize: 25,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
         borderRadius: BorderRadius.circular(45.0),
         child: Container(
             decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color.fromARGB(
+                        162, 26, 134, 222), // Color de las barras azules
+                    const Color.fromARGB(255, 255, 255, 255),
+                    const Color.fromARGB(
+                        255, 255, 255, 255), // Color de las barras azules
+                    const Color.fromARGB(162, 26, 134, 222)
+                        .withOpacity(0.8), // Color de las barras azules
+                  ],
+                  stops: const [0.1, 0.25, 0.6, 1],
+                ),
                 border: Border.all(color: Colors.black, width: 10.0)),
             child: Scaffold(
-                backgroundColor: const Color.fromARGB(224, 246, 246, 246),
+                backgroundColor: Colors.transparent,
                 body: SingleChildScrollView(
                     child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -95,25 +138,15 @@ class _SignUpPageState extends State<SignUpPage> {
                               'Registrate',
                               style: TextStyle(fontSize: 30),
                             ),
-                            const TextField(
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                alignLabelWithHint: true,
-                                labelText: 'Usuario',
-                                contentPadding: EdgeInsets.only(top: 30),
-                                labelStyle: TextStyle(
-                                    fontSize: 25, color: Colors.black),
-                              ),
-                              style: TextStyle(
-                                fontSize: 25,
-                              ),
-                            ),
+                            userText(),
                             _entryPasswordField(_controllerPassword),
                             _entryEmailField(_controllerEmail),
                             const SizedBox(
-                              height: 70,
+                              height: 30,
                             ),
                             _submitButton(),
+                            const SizedBox(height: 5),
+                            linklogin(),
                           ],
                         ))))));
   }
