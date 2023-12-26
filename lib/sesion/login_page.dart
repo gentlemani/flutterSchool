@@ -1,3 +1,4 @@
+import 'package:eatsily/Interface_pages/primary_page.dart';
 import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,6 +29,7 @@ class _SignInPageState extends State<SignInPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
+      // Si la autenticación es exitosa, realizar la navegación
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -86,7 +88,24 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _submitButton() {
     return TextButton(
-      onPressed: signInWithEmailAndPassword,
+      onPressed: () {
+        try {
+          signInWithEmailAndPassword;
+          if (_controllerEmail.text.isEmpty ||
+              _controllerPassword.text.isEmpty) {
+            setState(() {
+              errorMessage = 'Por favor, completa todos los campos.';
+            });
+            return; // Detener la función si algún campo está vacío
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const FirstPage()),
+            );
+          }
+        } catch (e) {
+          Text('Error al iniciar sesión: $e');
+        }
+      },
       style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(
             const Color.fromARGB(255, 217, 210, 20),
