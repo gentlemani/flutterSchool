@@ -15,8 +15,12 @@ class FirstPageState extends State<FirstPage> {
         child: Text('c'),
       ),
       bottomNavigationBar: BottomNavigationBar(items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 's'),
-        BottomNavigationBarItem(icon: Icon(Icons.alarm), label: 'd')
+        BottomNavigationBarItem(
+            icon: Icon(Icons.star_border_sharp), label: 'Mejores\nplatillos'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.soup_kitchen_sharp), label: 'Cocina'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle), label: 'Perfil'),
       ]),
     );
   }
