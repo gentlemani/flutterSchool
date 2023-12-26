@@ -18,6 +18,13 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _controllerPassword = TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
+    // Verificar que los campos no estén vacíos
+    if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Por favor, completa todos los campos.';
+      });
+      return; // Detener la función si algún campo está vacío
+    }
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
@@ -183,6 +190,14 @@ class _SignInPageState extends State<SignInPage> {
               _entryEmailField(_controllerEmail),
               _entryPasswordField(_controllerPassword),
               const SizedBox(height: 20),
+              if (errorMessage != null && errorMessage!.isNotEmpty)
+                Text(
+                  errorMessage!,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 16,
+                  ),
+                ),
               _submitButton(),
               const SizedBox(
                 height: 20,
