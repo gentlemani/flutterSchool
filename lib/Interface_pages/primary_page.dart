@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'account_page.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -18,18 +19,29 @@ class _FirstPageState extends State<FirstPage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _currentIndex = index;
+      if (index != 2) {
+        _currentIndex = index;
+      } else {
+        // Si se selecciona la tercera opción (index = 2), muestra el contenido del perfil
+        _currentIndex = index;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget currentPage;
+    if (_currentIndex != 2) {
+      currentPage = _pages[_currentIndex];
+    } else {
+      currentPage = const AccountPage();
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Bienvenido')),
         automaticallyImplyLeading: false,
       ),
-      body: _pages[_currentIndex],
+      body: currentPage,
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.black,
         unselectedItemColor: const Color.fromARGB(255, 25, 97, 27),
