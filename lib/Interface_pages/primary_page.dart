@@ -37,10 +37,6 @@ class _FirstPageState extends State<FirstPage> {
       currentPage = const AccountPage();
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text('Bienvenido')),
-        automaticallyImplyLeading: false,
-      ),
       body: currentPage,
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.black,
