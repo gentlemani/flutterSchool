@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -8,6 +10,20 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  File? _imageFile;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _imageFile = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -39,7 +55,23 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                   ],
                 ),
-                body: const Column(),
+                body: Container(
+                  padding: const EdgeInsets.only(top: 40),
+                  alignment: Alignment.topCenter,
+                  child: GestureDetector(
+                    onTap: () {
+                      getImage();
+                    },
+                    child: CircleAvatar(
+                      radius: 80,
+                      backgroundColor: Colors.white,
+                      backgroundImage: _imageFile != null
+                          ? FileImage(_imageFile!)
+                          : const AssetImage('assets/iconoP.png') as ImageProvider<
+                              Object>?, // Imagen predeterminada si no hay ninguna seleccionada
+                    ),
+                  ),
+                ),
                 backgroundColor: const Color.fromARGB(255, 255, 255, 255))));
   }
 }
