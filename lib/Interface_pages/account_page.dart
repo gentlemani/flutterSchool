@@ -18,8 +18,6 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
-      } else {
-        print('No image selected.');
       }
     });
   }
