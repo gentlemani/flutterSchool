@@ -22,7 +22,7 @@ class _SignInPageState extends State<SignInPage> {
     // Verificar que los campos no estén vacíos
     if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
       setState(() {
-        errorMessage = 'Por favor, completa todos los campos.';
+        errorMessage = 'Campos vacios';
       });
       return; // Detener la función si algún campo está vacío
     }
@@ -90,7 +90,6 @@ class _SignInPageState extends State<SignInPage> {
     return TextButton(
       onPressed: () {
         try {
-          signInWithEmailAndPassword;
           if (_controllerEmail.text.isEmpty ||
               _controllerPassword.text.isEmpty) {
             setState(() {
@@ -98,6 +97,7 @@ class _SignInPageState extends State<SignInPage> {
             });
             return; // Detener la función si algún campo está vacío
           } else {
+            signInWithEmailAndPassword();
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const FirstPage()),
             );
