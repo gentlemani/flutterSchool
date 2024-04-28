@@ -39,8 +39,8 @@ class _FirstPageState extends State<FirstPage> {
     return Scaffold(
       body: currentPage,
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.black,
-        unselectedItemColor: const Color.fromARGB(255, 25, 97, 27),
+        unselectedItemColor: Colors.black,
+        selectedItemColor: const Color.fromARGB(255, 25, 97, 27),
         selectedFontSize: 15,
         unselectedFontSize: 13,
         iconSize: 25,
