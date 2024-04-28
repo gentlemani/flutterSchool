@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'account_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -16,6 +17,23 @@ class _FirstPageState extends State<FirstPage> {
     Screen(color: Color.fromARGB(255, 244, 54, 120)),
     Screen(color: Color.fromARGB(255, 54, 114, 244)),
   ];
+
+  List<String> docIDs = [];
+
+  Future getDocId() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((snapshot) => snapshot.docs.forEach((element) {
+              print(element.reference);
+            }));
+  }
+
+  @override
+  void initState() {
+    getDocId();
+    super.initState();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -45,23 +63,24 @@ class _FirstPageState extends State<FirstPage> {
         unselectedFontSize: 13,
         iconSize: 25,
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        selectedLabelStyle:
-            const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        selectedLabelStyle: const TextStyle(
+            color: Color.fromARGB(255, 25, 97, 27),
+            fontWeight: FontWeight.bold),
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.star_rounded, color: Colors.green),
+            icon: Icon(Icons.star_rounded, color: Colors.blueGrey),
             activeIcon: Icon(Icons.star_border_outlined),
             label: 'Mejores\nplatillos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.green),
+            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.blueGrey),
             activeIcon: Icon(Icons.soup_kitchen_outlined),
             label: 'Cocina',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle, color: Colors.green),
+            icon: Icon(Icons.account_circle, color: Colors.blueGrey),
             activeIcon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',
           ),

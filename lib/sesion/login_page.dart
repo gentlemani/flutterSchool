@@ -1,10 +1,9 @@
 import 'package:eatsily/Interface_pages/primary_page.dart';
 import 'package:eatsily/auth.dart';
+// import 'package:eatsily/sesion/home_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_core/firebase_core.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -37,7 +36,7 @@ class _SignInPageState extends State<SignInPage> {
       isAuthenticated = true;
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message;
+        errorMessage = _mapFirebaseAuthErrorCode(e.code);
       });
     }
     return isAuthenticated; // Devolver falso si algún campo está vacío
@@ -49,8 +48,19 @@ class _SignInPageState extends State<SignInPage> {
           email: _controllerEmail.text, password: _controllerPassword.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message;
+        errorMessage = _mapFirebaseAuthErrorCode(e.code);
       });
+    }
+  }
+
+// Change default error messages
+  String _mapFirebaseAuthErrorCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return 'Formato de correo incorrecto';
+      // Poner codigo para correo existente
+      default:
+        return 'Correo o contraseña incorrecta';
     }
   }
 
@@ -88,10 +98,6 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  // Widget _errorMessage() {
-  //   return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
-  // }
-
   Widget _submitButton() {
     return TextButton(
       onPressed: () {
@@ -110,13 +116,15 @@ class _SignInPageState extends State<SignInPage> {
                 );
                 // Autenticación exitosa: realizar alguna acción, como navegar a otra pantalla
               } else {
-                Text(
-                    'Error al iniciar sesión: '); // Autenticación fallida: mostrar un mensaje de error al usuario
+                const Text(
+                    'Error al iniciar sesión:'); // Autenticación fallida: mostrar un mensaje de error al usuario
               }
             });
           }
         } catch (e) {
-          Text('Error al iniciar sesión: $e');
+          setState(() {
+            errorMessage = 'Error al iniciar sesión: $e';
+          });
         }
       },
       style: ButtonStyle(
