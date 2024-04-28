@@ -3,8 +3,8 @@ import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
