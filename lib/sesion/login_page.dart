@@ -20,23 +20,27 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
+  Future<bool> signInWithEmailAndPassword() async {
+    // Variable para indicar si la autenticación fue exitosa
+    bool isAuthenticated = false;
     // Verificar que los campos no estén vacíos
     if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
       setState(() {
         errorMessage = 'Campos vacios';
       });
-      return; // Detener la función si algún campo está vacío
+      return isAuthenticated; // Devolver falso si algún campo está vacío
     }
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-      // Si la autenticación es exitosa, realizar la navegación
+      // Si no se lanzó una excepción, la autenticación fue exitosa
+      isAuthenticated = true;
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
+    return isAuthenticated; // Devolver falso si algún campo está vacío
   }
 
   Future<void> createUserWithEmailAndPassword() async {
@@ -99,10 +103,17 @@ class _SignInPageState extends State<SignInPage> {
             });
             return; // Detener la función si algún campo está vacío
           } else {
-            signInWithEmailAndPassword();
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const FirstPage()),
-            );
+            signInWithEmailAndPassword().then((isAuthenticated) {
+              if (isAuthenticated) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const FirstPage()),
+                );
+                // Autenticación exitosa: realizar alguna acción, como navegar a otra pantalla
+              } else {
+                Text(
+                    'Error al iniciar sesión: '); // Autenticación fallida: mostrar un mensaje de error al usuario
+              }
+            });
           }
         } catch (e) {
           Text('Error al iniciar sesión: $e');
