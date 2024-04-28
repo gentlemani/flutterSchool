@@ -3,6 +3,8 @@ import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -22,7 +24,7 @@ class _SignInPageState extends State<SignInPage> {
     // Verificar que los campos no estén vacíos
     if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
       setState(() {
-        errorMessage = 'Por favor, completa todos los campos.';
+        errorMessage = 'Campos vacios';
       });
       return; // Detener la función si algún campo está vacío
     }
@@ -90,7 +92,6 @@ class _SignInPageState extends State<SignInPage> {
     return TextButton(
       onPressed: () {
         try {
-          signInWithEmailAndPassword;
           if (_controllerEmail.text.isEmpty ||
               _controllerPassword.text.isEmpty) {
             setState(() {
@@ -98,6 +99,7 @@ class _SignInPageState extends State<SignInPage> {
             });
             return; // Detener la función si algún campo está vacío
           } else {
+            signInWithEmailAndPassword();
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const FirstPage()),
             );
