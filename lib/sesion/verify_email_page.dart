@@ -52,7 +52,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? FirstPage()
+      ? const FirstPage()
       : Scaffold(
           appBar: AppBar(
             title: const Text('Verify Email'),
