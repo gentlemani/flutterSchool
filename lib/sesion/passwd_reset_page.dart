@@ -32,9 +32,20 @@ class _PasswdResetState extends State<PasswdReset> {
       controller: controller,
       textAlign: TextAlign.left,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (email) => email != null && !EmailValidator.validate(email)
-          ? 'Ingresa un correo válido'
-          : null,
+      validator: (email) {
+        if (email == null || email.isEmpty) {
+          return 'Por favor, ingresa tu correo electrónico';
+        }
+        if (!EmailValidator.validate(email)) {
+          return 'Ingresa un correo válido';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          errorMessage = null;
+        });
+      },
       decoration: const InputDecoration(
         alignLabelWithHint: true,
         labelText: 'Correo',
@@ -66,9 +77,10 @@ class _PasswdResetState extends State<PasswdReset> {
   Widget _submitButton() {
     return TextButton(
       onPressed: () {
-        if (_controllerEmail.text.isEmpty) {
+        if (_controllerEmail.text.isEmpty ||
+            !EmailValidator.validate(_controllerEmail.text.trim())) {
           setState(() {
-            errorMessage = 'Por favor, completa todos los campos.';
+            errorMessage = 'Por favor escribe un correo';
           });
           return; // Detener la función si algún campo está vacío
         }
@@ -131,6 +143,7 @@ class _PasswdResetState extends State<PasswdReset> {
       default:
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const SignInPage()));
+        showSimpleSnackBar(context, 'Exitoso :)');
         showSimpleSnackBar(context, sendedMail);
     }
   }
@@ -191,7 +204,7 @@ class _PasswdResetState extends State<PasswdReset> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   _entryEmailField(_controllerEmail),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   _submitButton(),
                   const SizedBox(height: 20),
                   _linklogin(context),
