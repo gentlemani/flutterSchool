@@ -54,7 +54,7 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
-// Custom default error messages
+// Change default error messages
   String _mapFirebaseAuthErrorCode(String code) {
     switch (code) {
       case 'invalid-email':

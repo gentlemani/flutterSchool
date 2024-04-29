@@ -1,5 +1,4 @@
 import 'package:eatsily/auth.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +12,6 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   String? errorMessage = '';
   bool isLogin = true;
-  // Password criteria
-  // At least one lowercase letter, one uppercase letter, one number and one special symbol
-  // Minimum length 6
-  RegExp regex =
-      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{6,}$');
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -28,7 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
           email: _controllerEmail.text, password: _controllerPassword.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = _mapFirebaseAuthErrorCode(e.code);
+        errorMessage = e.message;
       });
     }
   }
@@ -36,24 +30,9 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _entryEmailField(
     TextEditingController controller,
   ) {
-    return TextFormField(
+    return TextField(
       controller: controller,
       textAlign: TextAlign.center,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (email) {
-        if (email == null || email.isEmpty) {
-          return 'Por favor, ingresa tu correo electrónico';
-        }
-        if (!EmailValidator.validate(email)) {
-          return 'Ingresa un correo válido';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          errorMessage = null;
-        });
-      },
       decoration: const InputDecoration(
         alignLabelWithHint: true,
         labelText: 'Correo electronico',
@@ -67,27 +46,11 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _entryPasswordField(
     TextEditingController controller,
   ) {
-    return TextFormField(
+    return TextField(
         controller: controller,
         textAlign: TextAlign.center,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (passwd) {
-          if (passwd == null || passwd.isEmpty) {
-            return 'Por favor, ingresa una contraseña';
-          }
-          if (!regex.hasMatch(passwd)) {
-            return 'Ingresa mínimo un Número, una letra Mayúscula, una Minúscula y un Carácter especial';
-          }
-          return null;
-        },
-        onChanged: (passwd) {
-          setState(() {
-            errorMessage = null;
-          });
-        },
         decoration: const InputDecoration(
           alignLabelWithHint: true,
-          errorMaxLines: 2,
           labelText: 'Contraseña',
           contentPadding: EdgeInsets.only(top: 30),
           labelStyle: TextStyle(fontSize: 25, color: Colors.black),
@@ -95,6 +58,10 @@ class _SignUpPageState extends State<SignUpPage> {
         style: const TextStyle(fontSize: 25),
         obscureText: true);
   }
+
+  // Widget _errorMessage() {
+  //   return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
+  // }
 
   Widget _submitButton() {
     return OutlinedButton(
@@ -138,19 +105,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  String? _mapFirebaseAuthErrorCode(String code) {
-    switch (code) {
-      case 'invalid-email':
-        return 'Correo incorrecto';
-      case 'email-already-in-use':
-        return 'Usuario ya existente';
-      case 'weak-password':
-        return 'Contraseña debil, por favor utilice 6 o más caracteres';
-      default:
-        return 'Error';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -189,18 +143,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             _entryEmailField(_controllerEmail),
                             const SizedBox(
                               height: 30,
-                            ),
-                            if (errorMessage != null &&
-                                errorMessage!.isNotEmpty)
-                              Text(
-                                errorMessage!,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            const SizedBox(
-                              height: 10,
                             ),
                             _submitButton(),
                             const SizedBox(height: 5),
