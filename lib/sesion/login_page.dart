@@ -1,6 +1,6 @@
 import 'package:eatsily/Interface_pages/primary_page.dart';
 import 'package:eatsily/auth.dart';
-// import 'package:eatsily/sesion/home_page.dart';
+import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +86,7 @@ class _SignInPageState extends State<SignInPage> {
   ) {
     return TextField(
       controller: controller,
-      textAlign: TextAlign.center,
+      textAlign: TextAlign.left,
       decoration: const InputDecoration(
         alignLabelWithHint: true,
         labelText: 'Correo electronico',
@@ -96,6 +96,25 @@ class _SignInPageState extends State<SignInPage> {
       style: const TextStyle(
           fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
     );
+  }
+
+  Widget _passwdResetText(context) {
+    return Center(
+        child: GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PasswdReset()),
+        );
+      },
+      child: const Text(
+        '¿Contraseña olvidada?',
+        style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 255, 255, 255)),
+      ),
+    ));
   }
 
   Widget _submitButton() {
@@ -243,6 +262,10 @@ class _SignInPageState extends State<SignInPage> {
                 height: 20,
               ),
               _registerButton(),
+              const SizedBox(
+                height: 20,
+              ),
+              _passwdResetText(context),
             ],
           ),
         ),
