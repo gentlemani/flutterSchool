@@ -2,6 +2,7 @@ import 'package:eatsily/Interface_pages/primary_page.dart';
 import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -67,9 +68,21 @@ class _SignInPageState extends State<SignInPage> {
   Widget _entryPasswordField(
     TextEditingController controller,
   ) {
-    return TextField(
+    return TextFormField(
         controller: controller,
         textAlign: TextAlign.center,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (passwd) {
+          if (passwd == null || passwd.isEmpty) {
+            return 'Por favor, ingresa tu contraseña';
+          }
+          return null;
+        },
+        onChanged: (value) {
+          setState(() {
+            errorMessage = null;
+          });
+        },
         decoration: const InputDecoration(
           alignLabelWithHint: true,
           labelText: 'Contraseña',
@@ -84,9 +97,24 @@ class _SignInPageState extends State<SignInPage> {
   Widget _entryEmailField(
     TextEditingController controller,
   ) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       textAlign: TextAlign.left,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (email) {
+        if (email == null || email.isEmpty) {
+          return 'Por favor, ingresa tu correo electrónico';
+        }
+        if (!EmailValidator.validate(email)) {
+          return 'Ingresa un correo válido';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          errorMessage = null;
+        });
+      },
       decoration: const InputDecoration(
         alignLabelWithHint: true,
         labelText: 'Correo electronico',
