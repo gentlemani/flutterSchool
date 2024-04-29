@@ -13,7 +13,8 @@ class PasswdReset extends StatefulWidget {
 class _PasswdResetState extends State<PasswdReset> {
   final _controllerEmail = TextEditingController();
   String? errorMessage = '';
-
+  static const String sendedMail =
+      'Exitoso. Si el correo está registrado, se enviará un correo para restablecer la contraseña.';
   @override
   void dispose() {
     _controllerEmail.dispose();
@@ -72,8 +73,6 @@ class _PasswdResetState extends State<PasswdReset> {
           return; // Detener la función si algún campo está vacío
         }
         resetPassword(context);
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const SignInPage()));
       },
       style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(
@@ -103,8 +102,9 @@ class _PasswdResetState extends State<PasswdReset> {
     try {
       await FirebaseAuth.instance
           .sendPasswordResetEmail(email: _controllerEmail.text.trim())
-          .then((_) => showSimpleSnackBar(
-              context, 'Password reset email sent successfully!'));
+          .then((_) => showSimpleSnackBar(context, sendedMail))
+          .then((_) => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SignInPage())));
     } on FirebaseAuthException catch (e) {
       setState(() {
         _mapFirebaseAuthErrorCode(context, e.code);
@@ -117,7 +117,7 @@ class _PasswdResetState extends State<PasswdReset> {
       SnackBar(
         content: Text(message),
         duration:
-            const Duration(seconds: 2), // Display the snack bar for 2 seconds
+            const Duration(seconds: 6), // Display the snack bar for 6 seconds
       ),
     );
   }
@@ -129,7 +129,9 @@ class _PasswdResetState extends State<PasswdReset> {
       case 'too-many-requests':
         showSimpleSnackBar(context, 'Demasiadas peticiones');
       default:
-        showSimpleSnackBar(context, 'Password reset email sent successfully!');
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const SignInPage()));
+        showSimpleSnackBar(context, sendedMail);
     }
   }
 
