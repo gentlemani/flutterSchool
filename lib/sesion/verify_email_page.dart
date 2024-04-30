@@ -1,9 +1,7 @@
 import 'dart:async';
-
-import 'package:eatsily/Interface_pages/primary_page.dart';
-import 'package:eatsily/sesion/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:eatsily/sesion/login_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
@@ -13,8 +11,40 @@ class VerifyEmailPage extends StatefulWidget {
 }
 
 class _VerifyEmailPageState extends State<VerifyEmailPage> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   bool isEmailVerified = false;
   Timer? timer;
+
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
+
+  Future checkEmailVerified() async {
+    await FirebaseAuth.instance.currentUser!.reload();
+    setState(() {
+      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    });
+    if (isEmailVerified) timer?.cancel();
+  }
+
+  Future sendVerificationEmail() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser!;
+      await user.sendEmailVerification();
+    } catch (e) {
+      return Text(e.toString());
+    }
+  }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   void initState() {
@@ -34,26 +64,9 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     super.dispose();
   }
 
-  Future checkEmailVerified() async {
-    await FirebaseAuth.instance.currentUser!.reload();
-    setState(() {
-      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    });
-    if (isEmailVerified) timer?.cancel();
-  }
-
-  Future sendVerificationEmail() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser!;
-      await user.sendEmailVerification();
-    } catch (e) {
-      return Text(e.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? HomePage()
+      ? const SignInPage()
       : Scaffold(
           appBar: AppBar(
             title: const Text('Verify Email'),

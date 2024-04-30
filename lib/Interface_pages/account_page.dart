@@ -11,8 +11,18 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   File? _imageFile;
   final picker = ImagePicker();
+
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
 
   Future getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -23,12 +33,49 @@ class _AccountPageState extends State<AccountPage> {
     });
   }
 
-  Widget _buttom() {
-    return FloatingActionButton.extended(
-      onPressed: () async {
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cerrar sesión'),
+          content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(
+                    false); // Cerrar el cuadro de diálogo sin cerrar sesión
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Cerrar el cuadro de diálogo y cerrar sesión
+              },
+              child: const Text('Sí'),
+            ),
+          ],
+        );
+      },
+    ).then((confirmed) {
+      if (confirmed == true) {
         Auth auth = Auth();
-        await auth.signOut();
+        auth.signOut(); // Cerrar sesión si el usuario confirma
         Navigator.pop(context);
+      }
+    });
+  }
+
+/*     |---------------|
+       |    Buttons    |
+       |---------------|
+*/
+
+  Widget _buttom(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: () {
+        _showLogoutDialog(context);
       },
       backgroundColor: const Color.fromARGB(255, 200, 4, 34),
       icon: const Icon(
@@ -39,6 +86,11 @@ class _AccountPageState extends State<AccountPage> {
           style: TextStyle(fontSize: 20, color: Colors.white)),
     );
   }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +144,7 @@ class _AccountPageState extends State<AccountPage> {
               const SizedBox(
                 height: 450,
               ),
-              _buttom()
+              _buttom(context)
             ])),
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'account_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -10,30 +10,42 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  int _currentIndex = 0;
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
 
+  int _currentIndex = 0;
   final List<Widget> _pages = const [
     Screen(color: Colors.red),
     Screen(color: Color.fromARGB(255, 244, 54, 120)),
     Screen(color: Color.fromARGB(255, 54, 114, 244)),
   ];
+//List<String> docIDs = [];
 
-  List<String> docIDs = [];
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
 
-  Future getDocId() async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((snapshot) => snapshot.docs.forEach((element) {
-              print(element.reference);
-            }));
+  /* No se usa de momento pero funciona
+  Future<void> getDocId() async {
+  final QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .get();
+
+  // No imprime los documentos, solo itera sobre ellos
+  for (final QueryDocumentSnapshot doc in snapshot.docs) {
+    // No hay código de impresión aquí
   }
+}
 
   @override
   void initState() {
     getDocId();
     super.initState();
   }
+  */
 
   void _onItemTapped(int index) {
     setState(() {
@@ -45,6 +57,11 @@ class _FirstPageState extends State<FirstPage> {
       }
     });
   }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +107,11 @@ class _FirstPageState extends State<FirstPage> {
     );
   }
 }
+
+/*     |-------------------------------------------------------|
+       |          Extending class for screen operation         |
+       |-------------------------------------------------------|
+*/
 
 class Screen extends StatelessWidget {
   final Color color;
