@@ -14,11 +14,21 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   String? errorMessage = '';
   bool isLogin = true;
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
 
   Future<bool> signInWithEmailAndPassword() async {
     // Variable para indicar si la autenticación fue exitosa
@@ -64,6 +74,11 @@ class _SignInPageState extends State<SignInPage> {
         return 'Correo o contraseña incorrecta';
     }
   }
+
+/*     |-------------------|
+       |    text fields    |
+       |-------------------|
+*/
 
   Widget _entryPasswordField(
     TextEditingController controller,
@@ -126,6 +141,11 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+/*     |----------------------------|
+       |          Link text         |
+       |----------------------------|
+*/
+
   Widget _passwdResetText(context) {
     return Center(
         child: GestureDetector(
@@ -144,6 +164,11 @@ class _SignInPageState extends State<SignInPage> {
       ),
     ));
   }
+
+/*     |---------------|
+       |    Buttons    |
+       |---------------|
+*/
 
   Widget _submitButton() {
     return TextButton(
@@ -231,6 +256,11 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+/*     |-----------------------------|
+       |          background         |
+       |-----------------------------|
+*/
+
   Widget fondo() {
     return Container(
       decoration: BoxDecoration(
@@ -245,6 +275,11 @@ class _SignInPageState extends State<SignInPage> {
       ),
     );
   }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   Widget build(BuildContext context) {

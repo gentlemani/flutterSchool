@@ -11,15 +11,26 @@ class PasswdReset extends StatefulWidget {
 }
 
 class _PasswdResetState extends State<PasswdReset> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   final _controllerEmail = TextEditingController();
   String? errorMessage = '';
   static const String sendedMail =
       'Exitoso. Si el correo está registrado, se enviará un correo para restablecer la contraseña.';
+
   @override
   void dispose() {
     _controllerEmail.dispose();
     super.dispose();
   }
+
+/*     |-------------------|
+       |    text fields    |
+       |-------------------|
+*/
 
   Widget _title() {
     return const Text('Volver');
@@ -55,14 +66,16 @@ class _PasswdResetState extends State<PasswdReset> {
     );
   }
 
+/*     |----------------------------|
+       |          Link text         |
+       |----------------------------|
+*/
+
   Widget _linklogin(context) {
     return Center(
         child: GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SignInPage()),
-        );
+        Navigator.pop(context);
       },
       child: const Text(
         '¿Ya tienes cuenta?',
@@ -73,6 +86,11 @@ class _PasswdResetState extends State<PasswdReset> {
       ),
     ));
   }
+
+/*     |---------------|
+       |    Buttons    |
+       |---------------|
+*/
 
   Widget _submitButton() {
     return TextButton(
@@ -109,6 +127,11 @@ class _PasswdResetState extends State<PasswdReset> {
       ),
     );
   }
+
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
 
   Future resetPassword(BuildContext context) async {
     try {
@@ -148,6 +171,11 @@ class _PasswdResetState extends State<PasswdReset> {
     }
   }
 
+/*     |-----------------------------|
+       |          background         |
+       |-----------------------------|
+*/
+
   Widget background() {
     return Container(
       decoration: BoxDecoration(
@@ -162,6 +190,11 @@ class _PasswdResetState extends State<PasswdReset> {
       ),
     );
   }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   Widget build(BuildContext context) {

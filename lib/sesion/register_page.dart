@@ -11,6 +11,11 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   String? errorMessage = '';
   bool isLogin = true;
   // Password criteria
@@ -21,6 +26,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
@@ -33,34 +43,36 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  Widget _entryEmailField(
-    TextEditingController controller,
-  ) {
-    return TextFormField(
-      controller: controller,
+  String? _mapFirebaseAuthErrorCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return 'Correo incorrecto';
+      case 'email-already-in-use':
+        return 'Usuario ya existente';
+      case 'weak-password':
+        return 'Contraseña debil, por favor utilice 6 o más caracteres';
+      default:
+        return 'Error';
+    }
+  }
+
+/*     |-------------------|
+       |    text fields    |
+       |-------------------|
+*/
+
+  Widget userText() {
+    return const TextField(
       textAlign: TextAlign.center,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (email) {
-        if (email == null || email.isEmpty) {
-          return 'Por favor, ingresa tu correo electrónico';
-        }
-        if (!EmailValidator.validate(email)) {
-          return 'Ingresa un correo válido';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          errorMessage = null;
-        });
-      },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         alignLabelWithHint: true,
-        labelText: 'Correo electronico',
+        labelText: 'Usuario',
         contentPadding: EdgeInsets.only(top: 30),
         labelStyle: TextStyle(fontSize: 25, color: Colors.black),
       ),
-      style: const TextStyle(fontSize: 25),
+      style: TextStyle(
+        fontSize: 25,
+      ),
     );
   }
 
@@ -96,6 +108,42 @@ class _SignUpPageState extends State<SignUpPage> {
         obscureText: true);
   }
 
+  Widget _entryEmailField(
+    TextEditingController controller,
+  ) {
+    return TextFormField(
+      controller: controller,
+      textAlign: TextAlign.center,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (email) {
+        if (email == null || email.isEmpty) {
+          return 'Por favor, ingresa tu correo electrónico';
+        }
+        if (!EmailValidator.validate(email)) {
+          return 'Ingresa un correo válido';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          errorMessage = null;
+        });
+      },
+      decoration: const InputDecoration(
+        alignLabelWithHint: true,
+        labelText: 'Correo electronico',
+        contentPadding: EdgeInsets.only(top: 30),
+        labelStyle: TextStyle(fontSize: 25, color: Colors.black),
+      ),
+      style: const TextStyle(fontSize: 25),
+    );
+  }
+
+/*     |---------------|
+       |    Buttons    |
+       |---------------|
+*/
+
   Widget _submitButton() {
     return OutlinedButton(
         onPressed: createUserWithEmailAndPassword,
@@ -108,6 +156,11 @@ class _SignUpPageState extends State<SignUpPage> {
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ));
   }
+
+/*     |----------------------------|
+       |          Link text         |
+       |----------------------------|
+*/
 
   Widget linklogin() {
     return Center(
@@ -123,33 +176,10 @@ class _SignUpPageState extends State<SignUpPage> {
     ));
   }
 
-  Widget userText() {
-    return const TextField(
-      textAlign: TextAlign.center,
-      decoration: InputDecoration(
-        alignLabelWithHint: true,
-        labelText: 'Usuario',
-        contentPadding: EdgeInsets.only(top: 30),
-        labelStyle: TextStyle(fontSize: 25, color: Colors.black),
-      ),
-      style: TextStyle(
-        fontSize: 25,
-      ),
-    );
-  }
-
-  String? _mapFirebaseAuthErrorCode(String code) {
-    switch (code) {
-      case 'invalid-email':
-        return 'Correo incorrecto';
-      case 'email-already-in-use':
-        return 'Usuario ya existente';
-      case 'weak-password':
-        return 'Contraseña debil, por favor utilice 6 o más caracteres';
-      default:
-        return 'Error';
-    }
-  }
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
 
   @override
   Widget build(BuildContext context) {
