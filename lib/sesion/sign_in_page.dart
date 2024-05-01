@@ -1,4 +1,4 @@
-import 'package:eatsily/Interface_pages/sign_in_page.dart';
+import 'package:eatsily/Interface_pages/home_page.dart';
 import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
@@ -194,7 +194,7 @@ class _SignInPageState extends State<SignInPage> {
             signInWithEmailAndPassword().then((isAuthenticated) {
               if (isAuthenticated) {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const FirstPage()),
+                  MaterialPageRoute(builder: (context) => const HomePage()),
                 );
                 // Autenticación exitosa: realizar alguna acción, como navegar a otra pantalla
               } else {
