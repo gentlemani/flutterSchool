@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:eatsily/auth.dart';
@@ -50,8 +51,12 @@ class _AccountPageState extends State<AccountPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pop(true); // Cerrar el cuadro de diálogo y cerrar sesión
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            const WidgetTree())); // Cerrar el cuadro de diálogo y cerrar sesión
               },
               child: const Text('Sí'),
             ),
