@@ -62,17 +62,6 @@ class _SignInPageState extends State<SignInPage> {
       });
     }
   }
-// ELIMINAR
-  // Future<void> checkUserLoggin(BuildContext context) async {
-  //   FirebaseAuth.instance.userChanges().listen((User? user) {
-  //     if (user != null) {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const SignInPage()),
-  //       );
-  //     }
-  //   });
-  // }
 
 // Change default error messages
   String _mapFirebaseAuthErrorCode(String code) {
@@ -293,7 +282,6 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    // checkUserLoggin(context); //ELIMINAR
     return Scaffold(
         body: Stack(children: [
       _backgorund(),
