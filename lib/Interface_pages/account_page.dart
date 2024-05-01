@@ -141,7 +141,7 @@ class _AccountPageState extends State<AccountPage> {
                           Object>?, // Imagen predeterminada si no hay ninguna seleccionada
                 ),
               ),
-              Expanded(
+              const Expanded(
                 child: SizedBox(), // Use Expanded to occupy remaining space
               ),
               Padding(
