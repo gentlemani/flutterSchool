@@ -16,13 +16,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-
-        // home: Scaffold(
-        //   body: Stack(
-        //     children: [Fondo(), SignInPage()],
-        //   ),
-        // ),
-        home: WidgetTree(),
-        debugShowCheckedModeBanner: false);
+        home: WidgetTree(), debugShowCheckedModeBanner: false);
   }
 }
