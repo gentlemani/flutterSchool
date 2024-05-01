@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'account_page.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirstPage extends StatefulWidget {
-  const FirstPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<FirstPage> createState() => _FirstPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _FirstPageState extends State<FirstPage> {
+class _HomePageState extends State<HomePage> {
 /*     |-----------------|
        |    Variables    |
        |-----------------|

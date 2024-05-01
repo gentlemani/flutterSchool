@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:eatsily/sesion/login_page.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:email_validator/email_validator.dart';
 
 class PasswdReset extends StatefulWidget {
