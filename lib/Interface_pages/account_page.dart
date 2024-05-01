@@ -34,6 +34,10 @@ class _AccountPageState extends State<AccountPage> {
     });
   }
 
+  Future<void> signOut() async {
+    await Auth().signOut();
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -51,6 +55,7 @@ class _AccountPageState extends State<AccountPage> {
             ),
             TextButton(
               onPressed: () {
+                signOut();
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 Navigator.pushReplacement(
                     context,
