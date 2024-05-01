@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'account_page.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirstPage extends StatefulWidget {
-  const FirstPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<FirstPage> createState() => _FirstPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _FirstPageState extends State<FirstPage> {
+class _HomePageState extends State<HomePage> {
 /*     |-----------------|
        |    Variables    |
        |-----------------|
@@ -87,17 +87,17 @@ class _FirstPageState extends State<FirstPage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.star_rounded, color: Colors.blueGrey),
+            icon: Icon(Icons.star_rounded, color: Colors.black),
             activeIcon: Icon(Icons.star_border_outlined),
             label: 'Mejores\nplatillos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.blueGrey),
+            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.black),
             activeIcon: Icon(Icons.soup_kitchen_outlined),
             label: 'Cocina',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle, color: Colors.blueGrey),
+            icon: Icon(Icons.account_circle, color: Colors.black),
             activeIcon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',
           ),

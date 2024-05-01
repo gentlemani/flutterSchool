@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'package:eatsily/Interface_pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:eatsily/sesion/login_page.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
@@ -66,7 +67,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? const SignInPage()
+      ? const HomePage()
       : Scaffold(
           appBar: AppBar(
             title: const Text('Verify Email'),
