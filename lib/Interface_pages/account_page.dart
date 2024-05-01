@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:eatsily/widget_tree.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:eatsily/auth.dart';
@@ -55,12 +55,8 @@ class _AccountPageState extends State<AccountPage> {
             ),
             TextButton(
               onPressed: () {
-                signOut();
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            const WidgetTree())); // Cerrar el cuadro de diálogo y cerrar sesión
+                Navigator.of(context)
+                    .pop(true); // Cerrar el cuadro de diálogo y cerrar sesión
               },
               child: const Text('Sí'),
             ),
@@ -69,9 +65,11 @@ class _AccountPageState extends State<AccountPage> {
       },
     ).then((confirmed) {
       if (confirmed == true) {
-        Auth auth = Auth();
-        auth.signOut(); // Cerrar sesión si el usuario confirma
-        Navigator.pop(context);
+        signOut(); // Cerrar sesión si el usuario confirma
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const SignInPage()));
       }
     });
   }
