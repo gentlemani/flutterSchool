@@ -1,4 +1,4 @@
-import 'package:eatsily/Interface_pages/primary_page.dart';
+import 'package:eatsily/Interface_pages/sign_in_page.dart';
 import 'package:eatsily/auth.dart';
 import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
@@ -20,7 +20,6 @@ class _SignInPageState extends State<SignInPage> {
 */
 
   String? errorMessage = '';
-  bool isLogin = true;
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -63,6 +62,17 @@ class _SignInPageState extends State<SignInPage> {
       });
     }
   }
+// ELIMINAR
+  // Future<void> checkUserLoggin(BuildContext context) async {
+  //   FirebaseAuth.instance.userChanges().listen((User? user) {
+  //     if (user != null) {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const SignInPage()),
+  //       );
+  //     }
+  //   });
+  // }
 
 // Change default error messages
   String _mapFirebaseAuthErrorCode(String code) {
@@ -76,7 +86,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 
 /*     |-------------------|
-       |    text fields    |
+       |    Text fields    |
        |-------------------|
 */
 
@@ -257,11 +267,11 @@ class _SignInPageState extends State<SignInPage> {
   }
 
 /*     |-----------------------------|
-       |          background         |
+       |          Background         |
        |-----------------------------|
 */
 
-  Widget fondo() {
+  Widget _backgorund() {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -283,9 +293,10 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    // checkUserLoggin(context); //ELIMINAR
     return Scaffold(
         body: Stack(children: [
-      fondo(),
+      _backgorund(),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 50),
         child: Center(

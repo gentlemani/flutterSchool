@@ -87,17 +87,17 @@ class _FirstPageState extends State<FirstPage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.star_rounded, color: Colors.blueGrey),
+            icon: Icon(Icons.star_rounded, color: Colors.black),
             activeIcon: Icon(Icons.star_border_outlined),
             label: 'Mejores\nplatillos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.blueGrey),
+            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.black),
             activeIcon: Icon(Icons.soup_kitchen_outlined),
             label: 'Cocina',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle, color: Colors.blueGrey),
+            icon: Icon(Icons.account_circle, color: Colors.black),
             activeIcon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',
           ),
