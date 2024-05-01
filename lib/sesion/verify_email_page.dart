@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:eatsily/Interface_pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
