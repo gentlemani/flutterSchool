@@ -56,7 +56,6 @@ class _AccountPageState extends State<AccountPage> {
             TextButton(
               onPressed: () {
                 signOut();
-                Navigator.of(context).popUntil((route) => route.isFirst);
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
