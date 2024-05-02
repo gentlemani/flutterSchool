@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'account_page.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,12 +13,11 @@ class _HomePageState extends State<HomePage> {
        |    Variables    |
        |-----------------|
 */
-
   int _currentIndex = 0;
-  final List<Widget> _pages = const [
-    Screen(color: Colors.red),
-    Screen(color: Color.fromARGB(255, 244, 54, 120)),
-    Screen(color: Color.fromARGB(255, 54, 114, 244)),
+  final List<Color> _pageBackground = [
+    Colors.red,
+    const Color.fromARGB(255, 244, 54, 120),
+    const Color.fromARGB(255, 54, 114, 244),
   ];
 //List<String> docIDs = [];
 
@@ -65,14 +63,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget currentPage;
-    if (_currentIndex != 2) {
-      currentPage = _pages[_currentIndex];
-    } else {
-      currentPage = const AccountPage();
-    }
     return Scaffold(
-      body: currentPage,
+      backgroundColor: _pageBackground[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         unselectedItemColor: Colors.black,
         selectedItemColor: const Color.fromARGB(255, 25, 97, 27),
@@ -104,24 +96,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       extendBody: true,
-    );
-  }
-}
-
-/*     |-------------------------------------------------------|
-       |          Extending class for screen operation         |
-       |-------------------------------------------------------|
-*/
-
-class Screen extends StatelessWidget {
-  final Color color;
-
-  const Screen({super.key, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: color,
     );
   }
 }
