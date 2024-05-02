@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:eatsily/auth.dart';
 
-class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+class AccountHome extends StatefulWidget {
+  const AccountHome({super.key});
 
   @override
-  State<AccountPage> createState() => _AccountPageState();
+  State<AccountHome> createState() => _AccountHomeState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountHomeState extends State<AccountHome> {
 /*     |-----------------|
        |    Variables    |
        |-----------------|
