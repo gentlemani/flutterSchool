@@ -42,3 +42,23 @@
        |          Background         |
        |-----------------------------|
 */
+
+//List<String> docIDs = [];
+  /* No se usa de momento pero funciona
+  Future<void> getDocId() async {
+  final QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .get();
+
+  // No imprime los documentos, solo itera sobre ellos
+  for (final QueryDocumentSnapshot doc in snapshot.docs) {
+    // No hay código de impresión aquí
+  }
+}
+
+  @override
+  void initState() {
+    getDocId();
+    super.initState();
+  }
+  */
