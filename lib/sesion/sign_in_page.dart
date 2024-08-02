@@ -198,17 +198,12 @@ class _SignInPageState extends State<SignInPage> {
           });
         }
       },
-      style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-              return const Color.fromARGB(255, 217, 210, 20);
-            },
-          ),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(200.0),
-                  side: const BorderSide(
-                      color: Color.fromARGB(255, 255, 255, 255))))),
+      style: TextButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 217, 210, 20),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0),
+              side:
+                  const BorderSide(color: Color.fromARGB(255, 255, 255, 255)))),
       child: Container(
         width: double.infinity,
         alignment: Alignment.center,
