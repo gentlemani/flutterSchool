@@ -147,10 +147,9 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _submitButton() {
     return OutlinedButton(
         onPressed: createUserWithEmailAndPassword,
-        style: const ButtonStyle(
-            textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 20)),
-            backgroundColor:
-                MaterialStatePropertyAll(Color.fromARGB(255, 7, 82, 132))),
+        style: TextButton.styleFrom(
+            textStyle: const TextStyle(fontSize: 20),
+            backgroundColor: const Color.fromARGB(255, 7, 82, 132)),
         child: const Text(
           'Registrar',
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),

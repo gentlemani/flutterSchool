@@ -104,15 +104,11 @@ class _PasswdResetState extends State<PasswdReset> {
         }
         resetPassword(context);
       },
-      style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
-            const Color.fromARGB(255, 217, 210, 20),
-          ),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(200.0),
-                  side: const BorderSide(
-                      color: Color.fromARGB(255, 255, 255, 255))))),
+      style: TextButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 217, 210, 20),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0)),
+          side: const BorderSide(color: Color.fromARGB(255, 255, 255, 255))),
       child: Container(
         width: double.infinity,
         alignment: Alignment.center,
