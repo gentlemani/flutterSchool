@@ -199,8 +199,10 @@ class _SignInPageState extends State<SignInPage> {
         }
       },
       style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
-            const Color.fromARGB(255, 217, 210, 20),
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              return const Color.fromARGB(255, 217, 210, 20);
+            },
           ),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
