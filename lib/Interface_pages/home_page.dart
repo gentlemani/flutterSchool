@@ -53,30 +53,34 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: page(),
       bottomNavigationBar: BottomNavigationBar(
-        unselectedItemColor: Colors.black,
-        selectedItemColor: const Color.fromARGB(255, 25, 97, 27),
-        selectedFontSize: 15,
-        unselectedFontSize: 13,
+        unselectedItemColor: const Color.fromARGB(255, 26, 92, 114),
+        selectedItemColor: const Color.fromARGB(255, 0, 0, 0),
+        selectedFontSize: 14,
+        unselectedFontSize: 16,
         iconSize: 25,
+        backgroundColor: const Color.fromARGB(251, 174, 171, 171),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedLabelStyle: const TextStyle(
-            color: Color.fromARGB(255, 25, 97, 27),
+            color: Color.fromARGB(255, 26, 92, 114),
             fontWeight: FontWeight.bold),
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.star_rounded, color: Colors.black),
+            icon: Icon(Icons.star_rounded,
+                color: Color.fromARGB(255, 26, 92, 114)),
             activeIcon: Icon(Icons.star_border_outlined),
             label: 'Mejores\nplatillos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.soup_kitchen_sharp, color: Colors.black),
+            icon: Icon(Icons.soup_kitchen_sharp,
+                color: Color.fromARGB(255, 26, 92, 114)),
             activeIcon: Icon(Icons.soup_kitchen_outlined),
             label: 'Cocina',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle, color: Colors.black),
+            icon: Icon(Icons.account_circle,
+                color: Color.fromARGB(255, 26, 92, 114)),
             activeIcon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',
           ),
