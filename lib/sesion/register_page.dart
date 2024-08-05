@@ -1,4 +1,4 @@
-import 'package:eatsily/auth.dart';
+import 'package:eatsily/sesion/services/database.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +15,14 @@ class _SignUpPageState extends State<SignUpPage> {
        |    Variables    |
        |-----------------|
 */
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? errorMessage = '';
   bool isLogin = true;
   // Password criteria
   // At least one lowercase letter, one uppercase letter, one number and one special symbol
   // Minimum length 6
-  RegExp regex =
-      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{6,}$');
+  // RegExp regex =
+  //     RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{6,}$');
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -34,8 +34,17 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().createUserWithEmailAndPassword(
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
+      User? user = result.user;
+      if (user != null) {
+        await DatabaseService(uid: user.uid).inicializeUserFrequencyRecord();
+      } else {
+        throw FirebaseAuthException(
+          code: 'user-null',
+          message: 'User creation returned a null user object.',
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = _mapFirebaseAuthErrorCode(e.code);
@@ -86,9 +95,6 @@ class _SignUpPageState extends State<SignUpPage> {
         validator: (passwd) {
           if (passwd == null || passwd.isEmpty) {
             return 'Por favor, ingresa una contraseña';
-          }
-          if (!regex.hasMatch(passwd)) {
-            return 'Ingresa mínimo un Número, una letra Mayúscula, una Minúscula y un Carácter especial';
           }
           return null;
         },
