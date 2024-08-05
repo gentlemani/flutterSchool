@@ -8,27 +8,50 @@ class DishHome extends StatefulWidget {
 }
 
 class _DishHomeState extends State<DishHome> {
+/*     |-----------------|
+       |    Variables    |
+       |-----------------|
+*/
+
   final String imagePath = 'assets/Fondo2.jpg';
   final int likesCount = 4;
 
-  Widget scrollplat() {
-    return ListWheelScrollView(
-      itemExtent: 300,
-      diameterRatio: 5,
-      useMagnifier: true,
-      magnification: 1.1,
+/*     |----------------|
+       |    Functions   |
+       |----------------|
+*/
+
+  Widget beastMeals() {
+    return Column(
       children: [
-        _sdsubmitButton(),
-        _sdsubmitButton(),
-        _sdsubmitButton(),
-        _sdsubmitButton(),
-        _sdsubmitButton(),
-        _sdsubmitButton()
+        const Padding(padding: EdgeInsets.all(18.0)),
+        Expanded(
+            child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [foodInformation(), foodInformation()],
+        )),
+        const Text(
+          "Top rating",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const Padding(padding: EdgeInsets.all(12.0)),
+        Expanded(
+          child: ListWheelScrollView(
+            itemExtent: 300,
+            diameterRatio: 5,
+            useMagnifier: true,
+            magnification: 1.1,
+            children: [
+              foodInformation(),
+              foodInformation(),
+            ],
+          ),
+        )
       ],
     );
   }
 
-  Widget _sdsubmitButton() {
+  Widget foodInformation() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -84,11 +107,22 @@ class _DishHomeState extends State<DishHome> {
     );
   }
 
+  Widget recommended() {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+    );
+  }
+
+/*     |----------------------------------------------|
+       |          Main interface construction         |
+       |----------------------------------------------|
+*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-          child: scrollplat(),
+          child: beastMeals(),
         ),
         backgroundColor: const Color.fromARGB(219, 155, 97, 200));
     //backgroundColor: Color.fromARGB(0, 255, 193, 7));
