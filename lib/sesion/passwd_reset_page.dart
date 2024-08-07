@@ -132,21 +132,10 @@ class _PasswdResetState extends State<PasswdReset> {
   Future resetPassword(BuildContext context) async {
     try {
       await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: _controllerEmail.text.trim());
-
-      // Verificar si el widget sigue montado antes de usar el BuildContext
-      if (!mounted) return;
-
-      // Mostrar mensaje después de enviar el correo de restablecimiento
-      showSimpleSnackBar(context, sendedMail);
-
-      // Verificar si el widget sigue montado antes de navegar
-      if (!mounted) return;
-
-      // Navegar a la página de inicio de sesión
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const SignInPage()),
-      );
+          .sendPasswordResetEmail(email: _controllerEmail.text.trim())
+          .then((_) => showSimpleSnackBar(context, sendedMail))
+          .then((_) => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SignInPage())));
     } on FirebaseAuthException catch (e) {
       setState(() {
         _mapFirebaseAuthErrorCode(context, e.code);
@@ -165,16 +154,12 @@ class _PasswdResetState extends State<PasswdReset> {
   }
 
   void _mapFirebaseAuthErrorCode(BuildContext context, String code) {
-    if (!mounted) return;
     switch (code) {
       case 'network-request-failed':
         showSimpleSnackBar(context, 'Conexión falló');
-        break;
       case 'too-many-requests':
         showSimpleSnackBar(context, 'Demasiadas peticiones');
-        break;
       default:
-        if (!mounted) return;
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const SignInPage()));
         showSimpleSnackBar(context, 'Exitoso :)');

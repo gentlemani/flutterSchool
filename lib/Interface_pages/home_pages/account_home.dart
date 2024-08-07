@@ -63,21 +63,15 @@ class _AccountHomeState extends State<AccountHome> {
           ],
         );
       },
-    ).then((confirmed) async {
+    ).then((confirmed) {
       if (confirmed == true) {
-        await _handleLogout();
+        signOut(); // Cerrar sesión si el usuario confirma
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const SignInPage()));
       }
     });
-  }
-
-  Future<void> _handleLogout() async {
-    await signOut(); // Cerrar sesión si el usuario confirma
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => const SignInPage()));
   }
 
 /*     |---------------|
