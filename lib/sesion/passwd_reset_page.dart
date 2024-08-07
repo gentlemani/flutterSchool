@@ -133,9 +133,14 @@ class _PasswdResetState extends State<PasswdReset> {
     try {
       await FirebaseAuth.instance
           .sendPasswordResetEmail(email: _controllerEmail.text.trim())
-          .then((_) => showSimpleSnackBar(context, sendedMail))
-          .then((_) => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SignInPage())));
+          .then((_) {
+        if (!mounted) return;
+        showSimpleSnackBar(context, sendedMail);
+      }).then((_) {
+        if (!mounted) return;
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const SignInPage()));
+      });
     } on FirebaseAuthException catch (e) {
       setState(() {
         _mapFirebaseAuthErrorCode(context, e.code);
