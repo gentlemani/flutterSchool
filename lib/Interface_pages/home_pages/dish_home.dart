@@ -32,7 +32,7 @@ class _DishHomeState extends State<DishHome> {
        |----------------|
 */
 
-  /*Widget beastMeals() {
+  Widget beastMeals() {
     return Column(
       children: [
         const Padding(padding: EdgeInsets.all(kPaddingValue)),
@@ -143,7 +143,7 @@ class _DishHomeState extends State<DishHome> {
       ],
     );
   }
-*/
+
 /*     |----------------------------------------------|
        |          Main interface construction         |
        |----------------------------------------------|
@@ -151,14 +151,13 @@ class _DishHomeState extends State<DishHome> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-        body: Center(child: Text("data")
-            //beastMeals(),
-            ),
+    return Scaffold(
+        body: Center(
+          child: beastMeals(),
+        ),
         backgroundColor: kBackgroundColor);
   }
 }
-/*
 
 BoxDecoration boxDecoration() {
   return BoxDecoration(
@@ -177,4 +176,3 @@ BoxDecoration boxDecoration() {
     ],
   );
 }
-*/
