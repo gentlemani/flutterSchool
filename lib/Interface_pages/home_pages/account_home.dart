@@ -57,28 +57,24 @@ class _AccountHomeState extends State<AccountHome> {
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); // Cerrar el cuadro de diálogo y cerrar sesión
+                _handleLogout(context);
               },
               child: const Text('Sí'),
             ),
           ],
         );
       },
-    ).then((confirmed) {
-      if (confirmed == true) {
-        signOutFunction(); // Cerrar sesión si el usuario confirmar
-        if (Navigator.canPop(context)) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => const SignInPage()));
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SignInPage()),
-          );
-        }
-      }
-    });
+    );
+  }
+
+  void _handleLogout(BuildContext context) {
+    signOutFunction();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const SignInPage(),
+      ),
+    );
   }
 
 /*     |---------------|
