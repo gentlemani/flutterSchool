@@ -165,6 +165,7 @@ class _PasswdResetState extends State<PasswdReset> {
   }
 
   void _mapFirebaseAuthErrorCode(BuildContext context, String code) {
+    if (!mounted) return;
     switch (code) {
       case 'network-request-failed':
         showSimpleSnackBar(context, 'Conexión falló');
