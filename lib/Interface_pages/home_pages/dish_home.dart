@@ -65,7 +65,24 @@ class _DishHomeState extends State<DishHome> {
               "Nueces",
               style: TextStyle(fontSize: 20),
             ),
-            FormatImage(imagePath: imagePath),
+            Container(
+              width:
+                  260, // Slightly larger than image to accommodate the border
+              height:
+                  190, // Slightly larger than image to accommodate the border
+              decoration: boxDecoration(),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                    kBorderRadius), // Clip the image inside rounded corners
+                child: Image.asset(
+                  imagePath,
+                  width: kImageWidth,
+                  height: kImageHeight,
+                  alignment: Alignment.center,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             const SizedBox(height: 8), //space between text and image
             buildDescriptionText()
           ],
@@ -139,35 +156,6 @@ class _DishHomeState extends State<DishHome> {
           child: beastMeals(),
         ),
         backgroundColor: kBackgroundColor);
-  }
-}
-
-class FormatImage extends StatelessWidget {
-  const FormatImage({
-    super.key,
-    required this.imagePath,
-  });
-
-  final String imagePath;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 260, // Slightly larger than image to accommodate the border
-      height: 190, // Slightly larger than image to accommodate the border
-      decoration: boxDecoration(),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-            kBorderRadius), // Clip the image inside rounded corners
-        child: Image.asset(
-          imagePath,
-          width: kImageWidth,
-          height: kImageHeight,
-          alignment: Alignment.center,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
   }
 }
 
