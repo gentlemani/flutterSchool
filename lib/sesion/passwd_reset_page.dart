@@ -132,10 +132,15 @@ class _PasswdResetState extends State<PasswdReset> {
   Future resetPassword(BuildContext context) async {
     try {
       await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: _controllerEmail.text.trim())
-          .then((_) => showSimpleSnackBar(context, sendedMail))
-          .then((_) => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SignInPage())));
+          .sendPasswordResetEmail(email: _controllerEmail.text.trim());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showSimpleSnackBar(context, sendedMail);
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const SignInPage()),
+          );
+        }
+      });
     } on FirebaseAuthException catch (e) {
       setState(() {
         _mapFirebaseAuthErrorCode(context, e.code);

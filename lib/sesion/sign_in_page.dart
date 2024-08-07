@@ -171,7 +171,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _submitButton() {
     return TextButton(
-      onPressed: () {
+      onPressed: () async {
         try {
           if (_controllerEmail.text.isEmpty ||
               _controllerPassword.text.isEmpty) {
@@ -180,17 +180,17 @@ class _SignInPageState extends State<SignInPage> {
             });
             return; // Detener la función si algún campo está vacío
           } else {
-            signInWithEmailAndPassword().then((isAuthenticated) {
+            bool isAuthenticated = await signInWithEmailAndPassword();
+            if (mounted) {
               if (isAuthenticated) {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                 );
-                // Autenticación exitosa: realizar alguna acción, como navegar a otra pantalla
-              } else {
-                const Text(
-                    'Error al iniciar sesión:'); // Autenticación fallida: mostrar un mensaje de error al usuario
               }
-            });
+            } else {
+              const Text(
+                  'Error al iniciar sesión:'); // Autenticación fallida: mostrar un mensaje de error al usuario
+            }
           }
         } catch (e) {
           setState(() {
