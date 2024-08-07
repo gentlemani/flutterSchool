@@ -34,14 +34,13 @@ class _AccountHomeState extends State<AccountHome> {
     });
   }
 
-  Future<void> signOut() async {
+  Future<void> signOutFunction() async {
     await Auth().signOut();
   }
 
-  void _showLogoutDialog(BuildContext context) async {
-    final currentContext = context;
+  void _showLogoutDialog(BuildContext context) {
     showDialog(
-      context: currentContext,
+      context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Cerrar sesión'),
@@ -66,11 +65,18 @@ class _AccountHomeState extends State<AccountHome> {
       },
     ).then((confirmed) {
       if (confirmed == true) {
-        signOut(); // Cerrar sesión si el usuario confirma
-        Navigator.pushReplacement(
-            currentContext,
-            MaterialPageRoute(
-                builder: (BuildContext context) => const SignInPage()));
+        signOutFunction(); // Cerrar sesión si el usuario confirmar
+        if (Navigator.canPop(context)) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => const SignInPage()));
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SignInPage()),
+          );
+        }
       }
     });
   }
