@@ -38,9 +38,10 @@ class _AccountHomeState extends State<AccountHome> {
     await Auth().signOut();
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context) async {
+    final currentContext = context;
     showDialog(
-      context: context,
+      context: currentContext,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Cerrar sesión'),
@@ -67,7 +68,7 @@ class _AccountHomeState extends State<AccountHome> {
       if (confirmed == true) {
         signOut(); // Cerrar sesión si el usuario confirma
         Navigator.pushReplacement(
-            context,
+            currentContext,
             MaterialPageRoute(
                 builder: (BuildContext context) => const SignInPage()));
       }
