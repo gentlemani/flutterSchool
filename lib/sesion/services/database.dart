@@ -28,3 +28,15 @@ class DatabaseService {
     return await userFrecuencyCollection.doc(uid).set(frecuencyValues);
   }
 }
+
+class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Future<List<Map<String, dynamic>>> getRecipes(int limit) async {
+    QuerySnapshot snapshot = await _db.collection('Recetas').limit(limit).get();
+
+    return snapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+  }
+}
