@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eatsily/sesion/services/database.dart';
 
 //Constant
 const double kPaddingValue = 18.0;
@@ -23,10 +24,24 @@ class _DishHomeState extends State<DishHome> {
        |    Variables    |
        |-----------------|
 */
-
+  final FirestoreService _firestoreService = FirestoreService();
+  List<Map<String, dynamic>> _recipes = [];
   final String imagePath = 'assets/Fondo2.jpg';
   final int likesCount = 4;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecipes();
+  }
+
+  Future<void> _fetchRecipes() async {
+    List<Map<String, dynamic>> recipes =
+        await _firestoreService.getRecipes(10); // Limit of 10 recipes
+    setState(() {
+      _recipes = recipes;
+    });
+  }
 /*     |----------------|
        |    Functions   |
        |----------------|
@@ -38,53 +53,63 @@ class _DishHomeState extends State<DishHome> {
         const Padding(padding: EdgeInsets.all(kPaddingValue)),
         builHeaderText(),
         const Padding(padding: EdgeInsets.all(kPaddingValue)),
-        Expanded(
-          child: ListWheelScrollView(
-            physics: const ClampingScrollPhysics(),
-            itemExtent: 300,
-            diameterRatio: 5,
-            useMagnifier: true,
-            magnification: 1.22,
-            children: [
-              foodInformation(),
-              foodInformation(),
-            ],
-          ),
+        Flexible(
+          child: _recipes.isEmpty
+              ? const CircularProgressIndicator()
+              : ListWheelScrollView(
+                  physics: const FixedExtentScrollPhysics(),
+                  itemExtent: 300,
+                  diameterRatio: 5,
+                  useMagnifier: false,
+                  magnification: 1.22,
+                  children: _recipes.map((recipe) {
+                    return foodInformation(recipe);
+                  }).toList()),
         )
       ],
     );
   }
 
-  Widget foodInformation() {
+  Widget foodInformation(Map<String, dynamic> recipe) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double imageWidth = screenWidth * 0.6; // 60% of screen width
+    final double imageHeight =
+        imageWidth * (kImageHeight / kImageWidth); // Maintain aspect ratio
+    final String name = recipe['name'];
+    final List<dynamic> ingredients = recipe['ingredients'];
+    String ingredientsText = ingredients.join('\n');
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Column(
           children: [
-            const Text(
-              "Nueces",
-              style: TextStyle(fontSize: 20),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 25),
             ),
             Container(
               width:
-                  260, // Slightly larger than image to accommodate the border
+                  imageWidth, // Slightly larger than image to accommodate the border
               height:
-                  190, // Slightly larger than image to accommodate the border
+                  imageHeight, // Slightly larger than image to accommodate the border
               decoration: boxDecoration(),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(
-                    kBorderRadius), // Clip the image inside rounded corners
-                child: Image.asset(
-                  imagePath,
-                  width: kImageWidth,
-                  height: kImageHeight,
-                  alignment: Alignment.center,
-                  fit: BoxFit.cover,
-                ),
-              ),
+                  borderRadius: BorderRadius.circular(
+                      kBorderRadius), // Clip the image inside rounded corners
+                  child: AspectRatio(
+                    aspectRatio: kImageWidth / kImageHeight,
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                    ),
+                    /*Image.network(
+                    recipe['imageUrl'] ?? 'https://via.placeholder.com/250',
+                    fit: BoxFit.cover,
+                  ),*/
+                  )),
             ),
             const SizedBox(height: 8), //space between text and image
-            buildDescriptionText()
+            buildDescriptionText(ingredientsText, imageWidth)
           ],
         ),
         const SizedBox(width: 10), //space between image and icons
@@ -108,16 +133,16 @@ class _DishHomeState extends State<DishHome> {
     );
   }
 
-  Widget buildDescriptionText() {
-    return const SizedBox(
-      width: kImageWidth, //text length with the image
+  Widget buildDescriptionText(String ingredients, double width) {
+    return SizedBox(
+      width: width, //text length with the image
       child: Text(
-        "Praesent venenatis laoreet dui sed euismod. Fusce sed cursus sem, at posuere ex. Nulla vel ligula justo. Vivamus condimentum eros in erat tincidunt sollicitudin.",
+        ingredients,
         textAlign: TextAlign.center, // Center the text
         overflow:
             TextOverflow.ellipsis, // Optional: Sample "..." If it's too long
         maxLines: 3, // limit The Text To A Maximum Of 3 Lines
-        style: TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 17),
       ),
     );
   }
