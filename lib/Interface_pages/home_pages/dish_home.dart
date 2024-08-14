@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 //Constant
 const double kPaddingValue = 18.0;
@@ -24,7 +25,7 @@ class _DishHomeState extends State<DishHome> {
        |    Variables    |
        |-----------------|
 */
-  final FirestoreService _firestoreService = FirestoreService();
+  late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final String imagePath = 'assets/Fondo2.jpg';
   final int likesCount = 4;
@@ -32,6 +33,8 @@ class _DishHomeState extends State<DishHome> {
   @override
   void initState() {
     super.initState();
+    _firestoreService =
+        DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid);
     _fetchRecipes();
   }
 
@@ -63,20 +66,25 @@ class _DishHomeState extends State<DishHome> {
                   useMagnifier: false,
                   magnification: 1.22,
                   children: _recipes.map((recipe) {
-                    return foodInformation(recipe);
+                    return foodInformation(recipe, _firestoreService.uid);
                   }).toList()),
         )
       ],
     );
   }
 
-  Widget foodInformation(Map<String, dynamic> recipe) {
+  Widget foodInformation(Map<String, dynamic> recipe, String userId) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double imageWidth = screenWidth * 0.6; // 60% of screen width
     final double imageHeight =
         imageWidth * (kImageHeight / kImageWidth); // Maintain aspect ratio
     final String name = recipe['name'];
     final List<dynamic> ingredients = recipe['ingredients'];
+    final String recetaId =
+        recipe['recetaId']; // Asegúrate de que 'recetaId' esté en el documento
+    final int likesCount = recipe['likes'] ?? 0;
+    final int dislikesCount = recipe['dislikes'] ?? 0;
+
     String ingredientsText = ingredients.join('\n');
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -113,11 +121,11 @@ class _DishHomeState extends State<DishHome> {
           ],
         ),
         const SizedBox(width: 10), //space between image and icons
-        buildLikesSection(),
+        buildLikesSection(recetaId, userId, likesCount),
         const SizedBox(
           width: 10,
         ), //space between the two icons
-        buildDislikesSection()
+        buildDislikesSection(recetaId, userId, dislikesCount)
       ],
     );
   }
@@ -147,23 +155,34 @@ class _DishHomeState extends State<DishHome> {
     );
   }
 
-  Widget buildLikesSection() {
-    return const Column(
+  Widget buildLikesSection(String recetaId, String userId, int currentLikes) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('3'),
-        Icon(Icons.thumb_up_alt_outlined),
+        Text('$currentLikes'),
+        IconButton(
+          icon: const Icon(Icons.thumb_up_alt_outlined),
+          onPressed: () async {
+            await _firestoreService.voteRecipe(recetaId, userId, true);
+            // Aquí podrías actualizar la UI para reflejar el nuevo voto
+          },
+        )
       ],
     );
   }
 
-  Widget buildDislikesSection() {
-    return const Column(
+  Widget buildDislikesSection(
+      String recetaId, String userId, int currentDislikes) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('2'),
-        Icon(
-          Icons.thumb_down_alt_outlined,
+        Text('$currentDislikes'),
+        IconButton(
+          icon: const Icon(Icons.thumb_down_alt_outlined),
+          onPressed: () async {
+            await _firestoreService.voteRecipe(recetaId, userId, false);
+            // Aquí podrías actualizar la UI para reflejar el nuevo voto
+          },
         )
       ],
     );
