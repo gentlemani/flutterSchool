@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:eatsily/auth.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
 
 //Constant
 const double kPaddingValue = 18.0;
@@ -28,14 +31,22 @@ class _DishHomeState extends State<DishHome> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final String imagePath = 'assets/Fondo2.jpg';
-  final int likesCount = 4;
 
   @override
   void initState() {
     super.initState();
-    _firestoreService =
-        DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid);
-    _fetchRecipes();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _firestoreService = DatabaseService(uid: user.uid);
+      _fetchRecipes(); // Only if it is authenticated the recipes are charged
+    } else {
+      _handleLogout(context);
+      // Redirect the user to the login screen
+    }
+  }
+
+  Future<void> signOutFunction() async {
+    await Auth().signOut();
   }
 
   Future<void> _fetchRecipes() async {
@@ -45,6 +56,16 @@ class _DishHomeState extends State<DishHome> {
       _recipes = recipes;
     });
   }
+
+  void _handleLogout(BuildContext context) {
+    signOutFunction();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const SignInPage(),
+      ),
+    );
+  }
 /*     |----------------|
        |    Functions   |
        |----------------|
@@ -53,85 +74,151 @@ class _DishHomeState extends State<DishHome> {
   Widget beastMeals() {
     return Column(
       children: [
-        const Padding(padding: EdgeInsets.all(kPaddingValue)),
-        builHeaderText(),
-        const Padding(padding: EdgeInsets.all(kPaddingValue)),
         Flexible(
-          child: _recipes.isEmpty
-              ? const CircularProgressIndicator()
-              : ListWheelScrollView(
-                  physics: const FixedExtentScrollPhysics(),
-                  itemExtent: 300,
-                  diameterRatio: 5,
-                  useMagnifier: false,
-                  magnification: 1.22,
-                  children: _recipes.map((recipe) {
-                    return foodInformation(recipe, _firestoreService.uid);
-                  }).toList()),
-        )
+            child: _recipes.isEmpty
+                ? const CircularProgressIndicator()
+                : ListWheelScrollView(
+                    physics: const FixedExtentScrollPhysics(),
+                    itemExtent: 300,
+                    diameterRatio: 5,
+                    useMagnifier: false,
+                    magnification: 1.22,
+                    children: _recipes.map((recipe) {
+                      final String recetaId = recipe['recetaId'];
+                      return foodInformation(recetaId, _firestoreService.uid);
+                    }).toList(),
+                  ))
       ],
     );
   }
 
-  Widget foodInformation(Map<String, dynamic> recipe, String userId) {
+  Widget foodInformation(String recetaId, String userId) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double imageWidth = screenWidth * 0.6; // 60% of screen width
     final double imageHeight =
         imageWidth * (kImageHeight / kImageWidth); // Maintain aspect ratio
-    final String name = recipe['name'];
-    final List<dynamic> ingredients = recipe['ingredients'];
-    final String recetaId =
-        recipe['recetaId']; // Asegúrate de que 'recetaId' esté en el documento
-    final int likesCount = recipe['likes'] ?? 0;
-    final int dislikesCount = recipe['dislikes'] ?? 0;
 
-    String ingredientsText = ingredients.join('\n');
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _firestoreService.getUserVoteStream(recetaId, userId),
+      builder: (context, voteSnapshot) {
+        if (voteSnapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (voteSnapshot.hasError) {
+          return Center(
+            child: Text('Error: ${voteSnapshot.error}'),
+          );
+        } else {
+          bool? userVote;
+          if (voteSnapshot.hasData && voteSnapshot.data!.exists) {
+            var voteData = voteSnapshot.data!.data() as Map<String, dynamic>?;
+            userVote = voteData?['vote'] as bool?;
+          }
+
+          return StreamBuilder<DocumentSnapshot>(
+            stream: _firestoreService.getRecipeStream(recetaId),
+            builder: (context, recipeSnapshot) {
+              if (recipeSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (recipeSnapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${recipeSnapshot.error}'),
+                );
+              } else if (!recipeSnapshot.hasData ||
+                  !recipeSnapshot.data!.exists) {
+                return const Center(
+                  child: Text('Receta no encontrada'),
+                );
+              } else {
+                var recipeData =
+                    recipeSnapshot.data!.data() as Map<String, dynamic>?;
+                if (recipeData == null) {
+                  return const Center(
+                    child: Text('Datos de la receta no disponibles'),
+                  );
+                }
+
+                final String name =
+                    recipeData['name'] as String? ?? 'Nombre no disponible';
+                final List<dynamic> ingredients =
+                    recipeData['ingredients'] as List<dynamic>? ?? [];
+                final int likesCount = recipeData['likes'] as int? ?? 0;
+                final int dislikesCount = recipeData['dislikes'] as int? ?? 0;
+
+                String ingredientsText = ingredients.join('\n');
+
+                return buildRecipeUI(
+                    name,
+                    ingredientsText,
+                    recetaId,
+                    userId,
+                    likesCount,
+                    dislikesCount,
+                    userVote,
+                    imageWidth,
+                    imageHeight);
+              }
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildRecipeUI(
+      String name,
+      String ingredientsText,
+      String recetaId,
+      String userId,
+      int likesCount,
+      int dislikesCount,
+      bool? userVote,
+      double imageWidth,
+      double imageHeight) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Column(
           children: [
-            Text(
-              name,
-              style: const TextStyle(fontSize: 25),
-            ),
+            Text(name, style: const TextStyle(fontSize: 25)),
             Container(
-              width:
-                  imageWidth, // Slightly larger than image to accommodate the border
-              height:
-                  imageHeight, // Slightly larger than image to accommodate the border
+              width: imageWidth,
+              height: imageHeight,
               decoration: boxDecoration(),
               child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      kBorderRadius), // Clip the image inside rounded corners
-                  child: AspectRatio(
-                    aspectRatio: kImageWidth / kImageHeight,
-                    child: Image.asset(
-                      imagePath,
-                      fit: BoxFit.cover,
-                    ),
-                    /*Image.network(
-                    recipe['imageUrl'] ?? 'https://via.placeholder.com/250',
+                borderRadius: BorderRadius.circular(kBorderRadius),
+                child: AspectRatio(
+                  aspectRatio: kImageWidth / kImageHeight,
+                  child: Image.asset(
+                    imagePath,
                     fit: BoxFit.cover,
-                  ),*/
-                  )),
+                  ),
+                  // Si usas imágenes de red:
+                  // Image.network(recipe['imageUrl'] ?? 'https://via.placeholder.com/250', fit: BoxFit.cover),
+                ),
+              ),
             ),
-            const SizedBox(height: 8), //space between text and image
-            buildDescriptionText(ingredientsText, imageWidth)
+            const SizedBox(
+                height: 8), // Space between the image and the description
+            buildDescriptionText(ingredientsText, imageWidth),
           ],
         ),
-        const SizedBox(width: 10), //space between image and icons
-        buildLikesSection(recetaId, userId, likesCount),
         const SizedBox(
-          width: 10,
-        ), //space between the two icons
-        buildDislikesSection(recetaId, userId, dislikesCount)
+            width:
+                10), // Space between the image and the icons of likes/dislikes
+        buildLikesSection(recetaId, userId, likesCount, userVote == true),
+        const SizedBox(width: 10),
+        buildDislikesSection(
+            recetaId, userId, dislikesCount, userVote == false),
       ],
     );
   }
 
-  Widget builHeaderText() {
-    return const Text(
+  /*Widget builHeaderText() {
+    return Text(
       "!Recomendación a tu gusto¡",
       textAlign: TextAlign.center,
       style: TextStyle(
@@ -139,7 +226,7 @@ class _DishHomeState extends State<DishHome> {
         fontWeight: FontWeight.bold,
       ),
     );
-  }
+  }*/
 
   Widget buildDescriptionText(String ingredients, double width) {
     return SizedBox(
@@ -155,16 +242,24 @@ class _DishHomeState extends State<DishHome> {
     );
   }
 
-  Widget buildLikesSection(String recetaId, String userId, int currentLikes) {
+  Widget buildLikesSection(
+      String recetaId, String userId, int currentLikes, bool userLiked) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('$currentLikes'),
         IconButton(
-          icon: const Icon(Icons.thumb_up_alt_outlined),
+          icon: Icon(
+            userLiked ? Icons.thumb_up_alt : Icons.thumb_up_alt_outlined,
+            color: userLiked ? Colors.blue : null,
+          ),
           onPressed: () async {
-            await _firestoreService.voteRecipe(recetaId, userId, true);
-            // Aquí podrías actualizar la UI para reflejar el nuevo voto
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              await _firestoreService.voteRecipe(recetaId, userId, true);
+            } else {
+              _handleLogout(context);
+            }
           },
         )
       ],
@@ -172,16 +267,23 @@ class _DishHomeState extends State<DishHome> {
   }
 
   Widget buildDislikesSection(
-      String recetaId, String userId, int currentDislikes) {
+      String recetaId, String userId, int currentDislikes, bool userDisliked) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('$currentDislikes'),
         IconButton(
-          icon: const Icon(Icons.thumb_down_alt_outlined),
+          icon: Icon(
+            userDisliked ? Icons.thumb_down_alt : Icons.thumb_down_alt_outlined,
+            color: userDisliked ? Colors.red : null,
+          ),
           onPressed: () async {
-            await _firestoreService.voteRecipe(recetaId, userId, false);
-            // Aquí podrías actualizar la UI para reflejar el nuevo voto
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              await _firestoreService.voteRecipe(recetaId, userId, false);
+            } else {
+              _handleLogout(context);
+            }
           },
         )
       ],
@@ -196,6 +298,18 @@ class _DishHomeState extends State<DishHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Title(
+              color: const Color.fromARGB(255, 168, 89, 83),
+              child: const Center(
+                  child: Text(
+                "Recomendación a tu gusto",
+                style: TextStyle(color: Colors.white),
+              ))),
+          backgroundColor: const Color.fromARGB(255, 151, 43, 187),
+          leading: null,
+          automaticallyImplyLeading: false,
+        ),
         body: Center(
           child: beastMeals(),
         ),

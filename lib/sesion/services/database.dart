@@ -29,12 +29,25 @@ class DatabaseService {
     return await userFrecuencyCollection.doc(uid).set(frecuencyValues);
   }
 
+  Stream<DocumentSnapshot> getUserVoteStream(String recetaId, String userId) {
+    return _db
+        .collection('Users')
+        .doc(userId)
+        .collection('Vote')
+        .doc(recetaId)
+        .snapshots();
+  }
+
+  Stream<DocumentSnapshot> getRecipeStream(String recetaId) {
+    return _db.collection('Recetas').doc(recetaId).snapshots();
+  }
+
   Future<List<Map<String, dynamic>>> getRecipes(int limit) async {
     QuerySnapshot snapshot = await _db.collection('Recetas').limit(limit).get();
 
     return snapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      data['recetaId'] = doc.id; // Agregar el ID del documento a los datos
+      data['recetaId'] = doc.id; // Add the document ID to the data
       return data;
     }).toList();
   }
@@ -44,29 +57,62 @@ class DatabaseService {
         _db.collection('Users').doc(userId).collection('Vote').doc(recetaId);
 
     DocumentSnapshot userVoteSnapshot = await userVoteRef.get();
+    DocumentReference recipeRef = _db.collection('Recetas').doc(recetaId);
 
     if (userVoteSnapshot.exists) {
-      // El usuario ya ha votado, puedes mostrar un mensaje o simplemente no hacer nada
-      return;
+      // The user has already voted
+      bool previousVote = userVoteSnapshot['vote'];
+
+      if (previousVote != vote) {
+        // The user is changing his vote, updates the counters
+        await userVoteRef.update({
+          'vote': vote,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // Change Likes/Dyslike counters in the recipe
+        if (vote == true) {
+          await recipeRef.update({
+            'likes': FieldValue.increment(1),
+            'dislikes': FieldValue.increment(-1),
+          });
+        } else {
+          await recipeRef.update({
+            'likes': FieldValue.increment(-1),
+            'dislikes': FieldValue.increment(1),
+          });
+        }
+      } else {
+        // If the vote is the same, we do nothing
+        return;
+      }
     } else {
-      // Permitir el voto y registrar el voto del usuario
+      await _db.collection('Users').doc(userId).set({});
+      // The user has not voted yet, records his vote
       await userVoteRef.set({
         'vote': vote,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Luego, actualiza el conteo de votos en la receta
-      DocumentReference recipeRef = _db.collection('Recetas').doc(recetaId);
-
+      // Update the vote counting in the recipe
       if (vote == true) {
         await recipeRef.update({
           'likes': FieldValue.increment(1),
         });
-      } else if (vote == false) {
+      } else {
         await recipeRef.update({
           'dislikes': FieldValue.increment(1),
         });
       }
     }
+  }
+
+  Future<DocumentSnapshot> getUserVote(String recetaId, String userId) async {
+    return await _db
+        .collection('Users')
+        .doc(userId)
+        .collection('Vote')
+        .doc(recetaId)
+        .get();
   }
 }
