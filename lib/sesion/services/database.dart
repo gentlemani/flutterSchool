@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../constants/constants.dart' as constants;
 
@@ -10,7 +10,7 @@ class DatabaseService {
   DatabaseService({required this.uid});
 
   final CollectionReference userFrecuencyCollection =
-      FirebaseFirestore.instance.collection('userFrecuency');
+      FirebaseFirestore.instance.collection('Users');
 
   Future inicializeUserFrequencyRecord() async {
     Map<String, int> userFrecuencyValuesNames = {
@@ -114,5 +114,25 @@ class DatabaseService {
         .collection('Vote')
         .doc(recetaId)
         .get();
+  }
+
+  Future<String> getImageUrl(String imagePath) async {
+    try {
+      if (imagePath.isEmpty) {
+        throw 'La ruta de la imagen es vacía';
+      }
+
+      // Si la imagen ya tiene la URL completa (es decir, la URL pública), no necesitas usar Storage
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+
+      // Si la imagen es solo el path, obtén la URL desde Firebase Storage
+      final ref = FirebaseStorage.instance.ref().child(imagePath);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      return '';
+    }
   }
 }

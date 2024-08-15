@@ -30,7 +30,6 @@ class _DishHomeState extends State<DishHome> {
 */
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
-  final String imagePath = 'assets/Fondo2.jpg';
 
   @override
   void initState() {
@@ -147,19 +146,44 @@ class _DishHomeState extends State<DishHome> {
                     recipeData['ingredients'] as List<dynamic>? ?? [];
                 final int likesCount = recipeData['likes'] as int? ?? 0;
                 final int dislikesCount = recipeData['dislikes'] as int? ?? 0;
+                final String imagePath = recipeData['image'] as String? ?? '';
 
                 String ingredientsText = ingredients.join('\n');
 
-                return buildRecipeUI(
-                    name,
-                    ingredientsText,
-                    recetaId,
-                    userId,
-                    likesCount,
-                    dislikesCount,
-                    userVote,
-                    imageWidth,
-                    imageHeight);
+                return FutureBuilder<String>(
+                  future: _firestoreService.getImageUrl(imagePath),
+                  builder: (context, imageSnapshot) {
+                    if (imageSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (imageSnapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${imageSnapshot.error}'),
+                      );
+                    } else if (!imageSnapshot.hasData ||
+                        imageSnapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text('Imagen no disponible'),
+                      );
+                    } else {
+                      final imageUrl = imageSnapshot.data!;
+
+                      return buildRecipeUI(
+                          name,
+                          ingredientsText,
+                          recetaId,
+                          userId,
+                          likesCount,
+                          dislikesCount,
+                          userVote,
+                          imageWidth,
+                          imageHeight,
+                          imageUrl);
+                    }
+                  },
+                );
               }
             },
           );
@@ -177,7 +201,8 @@ class _DishHomeState extends State<DishHome> {
       int dislikesCount,
       bool? userVote,
       double imageWidth,
-      double imageHeight) {
+      double imageHeight,
+      String imageUrl) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -192,12 +217,9 @@ class _DishHomeState extends State<DishHome> {
                 borderRadius: BorderRadius.circular(kBorderRadius),
                 child: AspectRatio(
                   aspectRatio: kImageWidth / kImageHeight,
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                  ),
-                  // Si usas imágenes de red:
-                  // Image.network(recipe['imageUrl'] ?? 'https://via.placeholder.com/250', fit: BoxFit.cover),
+                  child:
+                      // Si usas imágenes de red:
+                      Image.network(imageUrl, fit: BoxFit.cover),
                 ),
               ),
             ),
@@ -216,17 +238,6 @@ class _DishHomeState extends State<DishHome> {
       ],
     );
   }
-
-  /*Widget builHeaderText() {
-    return Text(
-      "!Recomendación a tu gusto¡",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: kTextFontSize,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }*/
 
   Widget buildDescriptionText(String ingredients, double width) {
     return SizedBox(
