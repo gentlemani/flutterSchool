@@ -7,13 +7,13 @@ import 'package:eatsily/sesion/sign_in_page.dart';
 
 //Constant
 const double kPaddingValue = 18.0;
-const double kImageWidth = 250.0;
+const double kImageWidth = 400.0;
 const double kTextFontSize = 25.0;
 const double kImageHeight = 180.0;
 const double kBorderWidth = 3.0;
 const double kBorderRadius = 12.0;
 const Color kBackgroundColor = Color.fromARGB(255, 255, 255, 255);
-const Color kBorderColor = Color.fromARGB(237, 233, 140, 17);
+const Color kBorderColor = Color.fromARGB(255, 0, 0, 0);
 const Color kShadowColor = Color.fromARGB(255, 54, 50, 50);
 
 class DishHome extends StatefulWidget {
@@ -78,10 +78,11 @@ class _DishHomeState extends State<DishHome> {
                 ? const CircularProgressIndicator()
                 : ListWheelScrollView(
                     physics: const FixedExtentScrollPhysics(),
-                    itemExtent: 450,
-                    diameterRatio: 5,
+                    itemExtent: 280,
+                    diameterRatio: 70,
+                    squeeze: 1.1,
                     useMagnifier: false,
-                    magnification: 1.22,
+                    //magnification: 1.22,
                     children: _recipes.map((recipe) {
                       final String recetaId = recipe['recetaId'];
                       return foodInformation(recetaId, _firestoreService.uid);
@@ -93,7 +94,7 @@ class _DishHomeState extends State<DishHome> {
 
   Widget foodInformation(String recetaId, String userId) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double imageWidth = screenWidth * 0.8; // 60% of screen width
+    final double imageWidth = screenWidth * 0.9; // 60% of screen width
     final double imageHeight =
         imageWidth * (kImageHeight / kImageWidth); // Maintain aspect ratio
 
@@ -223,9 +224,6 @@ class _DishHomeState extends State<DishHome> {
                 ),
               ),
             ),
-            const SizedBox(
-                height: 8), // Space between the image and the description
-            buildDescriptionText(ingredientsText, imageWidth),
             Row(
               children: [
                 buildLikesSection(
@@ -240,46 +238,34 @@ class _DishHomeState extends State<DishHome> {
     );
   }
 
-  Widget buildDescriptionText(String ingredients, double width) {
-    return SizedBox(
-      width: width, //text length with the image
-      child: Text(
-        ingredients,
-        textAlign: TextAlign.center, // Center the text
-        overflow:
-            TextOverflow.ellipsis, // Optional: Sample "..." If it's too long
-        maxLines: 3, // limit The Text To A Maximum Of 3 Lines
-        style: const TextStyle(fontSize: 19),
-      ),
-    );
-  }
-
   Widget buildLikesSection(
       String recetaId, String userId, int currentLikes, bool userLiked) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          '$currentLikes',
-          style: const TextStyle(fontSize: 17),
-        ),
-        IconButton(
-          iconSize: 25,
-          icon: Icon(
-            userLiked ? Icons.thumb_up_alt : Icons.thumb_up_alt_outlined,
-            color: userLiked ? Colors.blue : null,
-          ),
-          onPressed: () async {
-            final user = FirebaseAuth.instance.currentUser;
-            if (user != null) {
-              await _firestoreService.voteRecipe(recetaId, userId, true);
-            } else {
-              _handleLogout(context);
-            }
-          },
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$currentLikes',
+              style: const TextStyle(fontSize: 17),
+            ),
+            IconButton(
+              iconSize: 25,
+              icon: Icon(
+                userLiked ? Icons.thumb_up_alt : Icons.thumb_up_alt_outlined,
+                color: userLiked ? Colors.blue : null,
+              ),
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  await _firestoreService.voteRecipe(recetaId, userId, true);
+                } else {
+                  _handleLogout(context);
+                }
+              },
+            ),
+          ],
         )
       ],
     );
@@ -290,27 +276,31 @@ class _DishHomeState extends State<DishHome> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          '$currentDislikes',
-          style: const TextStyle(fontSize: 17),
-        ),
-        IconButton(
-          iconSize: 25,
-          icon: Icon(
-            userDisliked ? Icons.thumb_down_alt : Icons.thumb_down_alt_outlined,
-            color: userDisliked ? Colors.red : null,
-          ),
-          onPressed: () async {
-            final user = FirebaseAuth.instance.currentUser;
-            if (user != null) {
-              await _firestoreService.voteRecipe(recetaId, userId, false);
-            } else {
-              _handleLogout(context);
-            }
-          },
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              iconSize: 25,
+              icon: Icon(
+                userDisliked
+                    ? Icons.thumb_down_alt
+                    : Icons.thumb_down_alt_outlined,
+                color: userDisliked ? Colors.red : null,
+              ),
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  await _firestoreService.voteRecipe(recetaId, userId, false);
+                } else {
+                  _handleLogout(context);
+                }
+              },
+            ),
+            Text(
+              '$currentDislikes',
+              style: const TextStyle(fontSize: 17),
+            ),
+          ],
         )
       ],
     );
