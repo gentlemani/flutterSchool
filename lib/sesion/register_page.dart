@@ -39,6 +39,7 @@ class _SignUpPageState extends State<SignUpPage> {
       User? user = result.user;
       if (user != null) {
         await DatabaseService(uid: user.uid).inicializeUserFrequencyRecord();
+        await user.sendEmailVerification();
       } else {
         throw FirebaseAuthException(
           code: 'user-null',
@@ -152,7 +153,15 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _submitButton() {
     return OutlinedButton(
-        onPressed: createUserWithEmailAndPassword,
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Procesando registro...Verifique su correo'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+          createUserWithEmailAndPassword();
+        },
         style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 20),
             backgroundColor: const Color.fromARGB(255, 7, 82, 132)),

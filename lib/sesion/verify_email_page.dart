@@ -18,11 +18,26 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   bool isEmailVerified = false;
   Timer? timer;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
 /*     |----------------|
        |    Functions   |
        |----------------|
 */
+
+  @override
+  void initState() {
+    super.initState();
+    isEmailVerified = _auth.currentUser!.emailVerified;
+    if (!isEmailVerified) {
+      _auth.currentUser!.sendEmailVerification();
+
+      timer = Timer.periodic(
+        const Duration(seconds: 3),
+        (_) => checkEmailVerified(),
+      );
+    }
+  }
 
   Future checkEmailVerified() async {
     await FirebaseAuth.instance.currentUser!.reload();
@@ -30,6 +45,12 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
     if (isEmailVerified) timer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   Future sendVerificationEmail() async {
@@ -47,29 +68,34 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 */
 
   @override
-  void initState() {
-    super.initState();
-    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    if (!isEmailVerified) {
-      sendVerificationEmail();
-
-      timer = Timer.periodic(
-          const Duration(seconds: 3), (_) => checkEmailVerified());
-    }
+  Widget build(BuildContext context) {
+    return isEmailVerified
+        ? const HomePage()
+        : Scaffold(
+            appBar: AppBar(
+              title: const Text('Verificar correo'),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Se ha enviado un enlace de verificación a tu correo. Por favor, revisa tu bandeja de entrada.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        _auth.currentUser!.sendEmailVerification();
+                      },
+                      child: const Text('Reenviar enlace de verificación'))
+                ],
+              ),
+            ),
+          );
   }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => isEmailVerified
-      ? const HomePage()
-      : Scaffold(
-          appBar: AppBar(
-            title: const Text('Verify Email'),
-          ),
-        );
 }

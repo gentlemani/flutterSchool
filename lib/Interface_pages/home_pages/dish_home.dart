@@ -12,8 +12,8 @@ const double kTextFontSize = 25.0;
 const double kImageHeight = 180.0;
 const double kBorderWidth = 3.0;
 const double kBorderRadius = 12.0;
-const Color kBackgroundColor = Color.fromARGB(219, 155, 97, 200);
-const Color kBorderColor = Color.fromARGB(255, 7, 188, 64);
+const Color kBackgroundColor = Color.fromARGB(255, 255, 255, 255);
+const Color kBorderColor = Color.fromARGB(237, 233, 140, 17);
 const Color kShadowColor = Color.fromARGB(255, 54, 50, 50);
 
 class DishHome extends StatefulWidget {
@@ -78,7 +78,7 @@ class _DishHomeState extends State<DishHome> {
                 ? const CircularProgressIndicator()
                 : ListWheelScrollView(
                     physics: const FixedExtentScrollPhysics(),
-                    itemExtent: 300,
+                    itemExtent: 450,
                     diameterRatio: 5,
                     useMagnifier: false,
                     magnification: 1.22,
@@ -93,7 +93,7 @@ class _DishHomeState extends State<DishHome> {
 
   Widget foodInformation(String recetaId, String userId) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double imageWidth = screenWidth * 0.6; // 60% of screen width
+    final double imageWidth = screenWidth * 0.8; // 60% of screen width
     final double imageHeight =
         imageWidth * (kImageHeight / kImageWidth); // Maintain aspect ratio
 
@@ -226,15 +226,16 @@ class _DishHomeState extends State<DishHome> {
             const SizedBox(
                 height: 8), // Space between the image and the description
             buildDescriptionText(ingredientsText, imageWidth),
+            Row(
+              children: [
+                buildLikesSection(
+                    recetaId, userId, likesCount, userVote == true),
+                buildDislikesSection(
+                    recetaId, userId, dislikesCount, userVote == false),
+              ],
+            )
           ],
         ),
-        const SizedBox(
-            width:
-                10), // Space between the image and the icons of likes/dislikes
-        buildLikesSection(recetaId, userId, likesCount, userVote == true),
-        const SizedBox(width: 10),
-        buildDislikesSection(
-            recetaId, userId, dislikesCount, userVote == false),
       ],
     );
   }
@@ -248,7 +249,7 @@ class _DishHomeState extends State<DishHome> {
         overflow:
             TextOverflow.ellipsis, // Optional: Sample "..." If it's too long
         maxLines: 3, // limit The Text To A Maximum Of 3 Lines
-        style: const TextStyle(fontSize: 17),
+        style: const TextStyle(fontSize: 19),
       ),
     );
   }
@@ -258,8 +259,15 @@ class _DishHomeState extends State<DishHome> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('$currentLikes'),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          '$currentLikes',
+          style: const TextStyle(fontSize: 17),
+        ),
         IconButton(
+          iconSize: 25,
           icon: Icon(
             userLiked ? Icons.thumb_up_alt : Icons.thumb_up_alt_outlined,
             color: userLiked ? Colors.blue : null,
@@ -282,8 +290,15 @@ class _DishHomeState extends State<DishHome> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('$currentDislikes'),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          '$currentDislikes',
+          style: const TextStyle(fontSize: 17),
+        ),
         IconButton(
+          iconSize: 25,
           icon: Icon(
             userDisliked ? Icons.thumb_down_alt : Icons.thumb_down_alt_outlined,
             color: userDisliked ? Colors.red : null,
@@ -315,11 +330,12 @@ class _DishHomeState extends State<DishHome> {
               child: const Center(
                   child: Text(
                 "Recomendación a tu gusto",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ))),
-          backgroundColor: const Color.fromARGB(255, 151, 43, 187),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           leading: null,
           automaticallyImplyLeading: false,
+          elevation: 5,
         ),
         body: Center(
           child: beastMeals(),
