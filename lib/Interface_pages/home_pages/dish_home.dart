@@ -199,8 +199,6 @@ class _DishHomeState extends State<DishHome> {
           return const Center(child: CircularProgressIndicator());
         } else if (voteSnapshot.hasError) {
           return Center(child: Text('Error: ${voteSnapshot.error}'));
-        } else if (!voteSnapshot.hasData || !voteSnapshot.data!.exists) {
-          return const Center(child: Text('Voto no encontrado'));
         } else {
           bool? userVote;
           var voteData = voteSnapshot.data!.data() as Map<String, dynamic>?;
@@ -252,23 +250,28 @@ class _DishHomeState extends State<DishHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Title(
-              color: const Color.fromARGB(255, 168, 89, 83),
-              child: const Center(
-                  child: Text(
-                "Recomendación a tu gusto",
-                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-              ))),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          leading: null,
-          automaticallyImplyLeading: false,
-          elevation: 5,
-        ),
-        body: Center(
-          child: recommendedDishes(),
-        ),
-        backgroundColor: kBackgroundColor);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+        padding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.005, horizontal: screenWidth * 0.01),
+        child: Scaffold(
+            appBar: AppBar(
+              title: Title(
+                  color: const Color.fromARGB(255, 168, 89, 83),
+                  child: const Center(
+                      child: Text(
+                    "Recomendación a tu gusto",
+                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                  ))),
+              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              leading: null,
+              automaticallyImplyLeading: false,
+              elevation: 5,
+            ),
+            body: Center(
+              child: recommendedDishes(),
+            ),
+            backgroundColor: kBackgroundColor));
   }
 }
