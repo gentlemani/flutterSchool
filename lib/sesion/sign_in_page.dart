@@ -83,6 +83,7 @@ class _SignInPageState extends State<SignInPage> {
     TextEditingController controller,
   ) {
     return TextFormField(
+        key: const Key('passwordField'),
         controller: controller,
         textAlign: TextAlign.center,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -112,6 +113,7 @@ class _SignInPageState extends State<SignInPage> {
     TextEditingController controller,
   ) {
     return TextFormField(
+      key: const Key('emailField'),
       controller: controller,
       textAlign: TextAlign.left,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -171,21 +173,27 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _submitButton() {
     return TextButton(
+      key: const Key('submit'),
       onPressed: () async {
+        print('Submit button pressed');
         try {
           if (_controllerEmail.text.isEmpty ||
               _controllerPassword.text.isEmpty) {
             setState(() {
               errorMessage = 'Por favor, completa todos los campos.';
             });
+            print('Llego al error');
             return; // Detener la función si algún campo está vacío
           } else {
+            print('Casi llego');
             bool isAuthenticated = await signInWithEmailAndPassword();
             if (mounted) {
               if (isAuthenticated) {
+                print('llego Final');
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                 );
+                print('After Navigator push');
               }
             } else {
               const Text(
@@ -193,6 +201,7 @@ class _SignInPageState extends State<SignInPage> {
             }
           }
         } catch (e) {
+          print('Catch error llego');
           setState(() {
             errorMessage = 'Error al iniciar sesión: $e';
           });
@@ -221,7 +230,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _registerButton() {
     return TextButton(
-      onPressed: () {
+      onPressed: () async {
         // Navegar a la pantalla de login.dart
         Navigator.push(
           context,
@@ -280,31 +289,31 @@ class _SignInPageState extends State<SignInPage> {
         body: Stack(children: [
       _backgorund(),
       Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 50),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               const Text(
                 'Eatsily',
                 style: TextStyle(
-                    fontSize: 40.0,
+                    fontSize: 20.0,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 254, 250, 250)),
               ),
               const Text(
                 'Come seguro',
                 style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 10.0,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 255, 255, 255)),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _entryEmailField(_controllerEmail),
               _entryPasswordField(_controllerPassword),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               if (errorMessage != null && errorMessage!.isNotEmpty)
                 Text(
                   errorMessage!,
@@ -315,11 +324,11 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               _submitButton(),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               _registerButton(),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               _passwdResetText(context),
             ],
@@ -329,3 +338,20 @@ class _SignInPageState extends State<SignInPage> {
     ]));
   }
 }
+
+// class DishHome extends StatefulWidget {
+//   const DishHome({super.key});
+
+//   @override
+//   State<DishHome> createState() => _DishHomeState();
+// }
+
+// class _DishHomeState extends State<DishHome> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('DishHome')),
+//       body: const Center(child: Text('Welcome to DishHome')),
+//     );
+//   }
+// }
