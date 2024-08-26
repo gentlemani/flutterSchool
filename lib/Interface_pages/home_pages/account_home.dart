@@ -104,9 +104,12 @@ class _AccountHomeState extends State<AccountHome> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return ClipRRect(
         child: Container(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.01, horizontal: screenWidth * 0.01),
       child: Scaffold(
         appBar: AppBar(
           titleTextStyle: const TextStyle(
