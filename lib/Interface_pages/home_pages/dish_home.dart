@@ -100,6 +100,10 @@ class _DishHomeState extends State<DishHome> {
 */
 
   Widget recommendedDishes() {
+    // Get the total high screen
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Define a percentage of the screen that each element should occupy
+    final itemHeight = screenHeight * 0.3;
     return Column(
       children: [
         Flexible(
@@ -107,9 +111,8 @@ class _DishHomeState extends State<DishHome> {
                 ? const CircularProgressIndicator()
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemExtent: 270,
+                    itemExtent: itemHeight,
                     itemCount: _recipes.length,
-                    //magnification: 1.22,
                     itemBuilder: (context, index) {
                       final String recetaId = _recipes[index]['recetaId'];
                       return foodInformation(recetaId, _firestoreService.uid);
@@ -146,7 +149,7 @@ class _DishHomeState extends State<DishHome> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Carga de Imagen
+              // Image load
               FutureBuilder<String>(
                 future: _firestoreService.getImageUrl(imagePath),
                 builder: (context, imageSnapshot) {
@@ -175,7 +178,12 @@ class _DishHomeState extends State<DishHome> {
                   }
                 },
               ),
-              Text(name, style: const TextStyle(fontSize: 25)),
+              Text(
+                name,
+                style: const TextStyle(fontSize: 20),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -252,26 +260,27 @@ class _DishHomeState extends State<DishHome> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-        padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.005, horizontal: screenWidth * 0.01),
-        child: Scaffold(
-            appBar: AppBar(
-              title: Title(
-                  color: const Color.fromARGB(255, 168, 89, 83),
-                  child: const Center(
-                      child: Text(
-                    "Recomendación a tu gusto",
-                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                  ))),
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-              leading: null,
-              automaticallyImplyLeading: false,
-              elevation: 5,
-            ),
-            body: Center(
-              child: recommendedDishes(),
-            ),
-            backgroundColor: kBackgroundColor));
+    return Scaffold(
+        appBar: AppBar(
+          title: Title(
+              color: const Color.fromARGB(255, 168, 89, 83),
+              child: const Center(
+                  child: Text(
+                "Recomendación a tu gusto",
+                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+              ))),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          leading: null,
+          automaticallyImplyLeading: false,
+          elevation: 5,
+        ),
+        body: Center(
+          child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.005,
+                  horizontal: screenWidth * 0.01),
+              child: recommendedDishes()),
+        ),
+        backgroundColor: kBackgroundColor);
   }
 }
