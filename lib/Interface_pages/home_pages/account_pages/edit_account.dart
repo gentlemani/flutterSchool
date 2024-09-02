@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -13,93 +14,37 @@ class _EditAccountState extends State<EditAccount> {
   final TextEditingController controlleruser = TextEditingController();
   final TextEditingController controllerEmail = TextEditingController();
   final TextEditingController controllerPass = TextEditingController();
-  String? errorMessage;
+  final TextEditingController controllerPassNew = TextEditingController();
+  User? user = FirebaseAuth.instance.currentUser;
 
-  Widget userData(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, ingresa un valor';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          if (value.isEmpty) {
-            errorMessage = 'El campo no puede estar vacío';
-          } else {
-            errorMessage = null;
-          }
-        });
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: InputDecoration(
-        labelStyle: const TextStyle(fontSize: 25),
-        labelText: "Usuario",
-        errorText: errorMessage,
-      ),
-      style: const TextStyle(fontSize: 25),
-    );
+  Future<String?> getUserName() async {
+    // Obtén el usuario actual
+    if (user == null) {
+      return null; // Si el usuario no está autenticado, retorna null
+    }
+
+    // Obtiene el documento del usuario en la colección "Users"
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user?.uid)
+        .get();
+    if (userDoc.exists) {
+      // Retorna el campo "name" del documento si existe
+      return userDoc.get('name');
+    } else {
+      return null; // Retorna null si el documento no existe
+    } // Retorna null si el usuario no está autenticado o no tiene un nombre registrado
   }
 
-  Widget userEmail(TextEditingController controller, String? userEmail) {
-    return TextFormField(
-      controller: controller,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, ingresa un valor';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          if (value.isEmpty) {
-            errorMessage = 'El campo no puede estar vacío';
-          } else {
-            errorMessage = null; // Elimina el mensaje de error si está correcto
-          }
-        });
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: InputDecoration(
-        labelStyle: const TextStyle(fontSize: 25),
-        labelText: '$userEmail',
-        errorText: errorMessage,
-      ),
-      style: const TextStyle(fontSize: 25),
-    );
+  Future<void> fetchUserName() async {
+    String? name = await getUserName();
+    setState(() {
+      controlleruser.text = name ?? '';
+      controllerEmail.text = user?.email ?? '';
+    });
   }
 
-  Widget userPassword(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, ingresa un valor';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          if (value.isEmpty) {
-            errorMessage = 'El campo no puede estar vacío';
-          } else {
-            errorMessage = null;
-          }
-        });
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: InputDecoration(
-        labelStyle: const TextStyle(fontSize: 25),
-        labelText: 'Contraseña',
-        errorText: errorMessage,
-      ),
-      style: const TextStyle(fontSize: 25),
-    );
-  }
-
-  Widget _buttomCambiar() {
+  Widget _buttomUpdate() {
     return ElevatedButton(
       onPressed: () {},
       style: ElevatedButton.styleFrom(minimumSize: const Size(250, 50)),
@@ -110,12 +55,45 @@ class _EditAccountState extends State<EditAccount> {
     );
   }
 
+  Widget buildTextField(
+      {required TextEditingController controller,
+      required String labelText,
+      bool isPassword = false,
+      String? errorText}) {
+    return TextFormField(
+      controller: controller,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, ingresa un valor';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          // Maneja la lógica de error específico aquí
+        });
+      },
+      obscureText: isPassword,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: InputDecoration(
+        labelStyle: const TextStyle(fontSize: 20),
+        labelText: labelText,
+        errorText: errorText,
+      ),
+      style: const TextStyle(fontSize: 20),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserName();
+  }
+
   @override
   Widget build(BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Editar Cuenta"),
@@ -143,15 +121,33 @@ class _EditAccountState extends State<EditAccount> {
         padding: EdgeInsets.symmetric(
             vertical: screenHeight * 0.02, horizontal: screenWidth * 0.03),
         child: Column(children: [
-          widget.gestureImage,
+          Flexible(
+            flex: 2,
+            child: widget.gestureImage,
+          ),
+          Flexible(
+              flex: 1,
+              child: buildTextField(
+                  controller: controlleruser, labelText: "Usuario")),
+          Flexible(
+              flex: 1,
+              child: buildTextField(
+                  controller: controllerEmail,
+                  labelText: "Correo electrónico")),
+          Flexible(
+              flex: 1,
+              child: buildTextField(
+                  controller: controllerPass,
+                  labelText: "Contraseña actual",
+                  isPassword: true)),
+          Flexible(
+              flex: 1,
+              child: buildTextField(
+                  controller: controllerPassNew,
+                  labelText: "Contraseña nueva",
+                  isPassword: true)),
           SizedBox(height: screenHeight * 0.02),
-          Flexible(flex: 1, child: userData(controlleruser)),
-          SizedBox(height: screenHeight * 0.02),
-          Flexible(flex: 1, child: userEmail(controllerEmail, user?.email)),
-          SizedBox(height: screenHeight * 0.02),
-          Flexible(flex: 1, child: userPassword(controllerPass)),
-          SizedBox(height: screenHeight * 0.02),
-          Flexible(flex: 1, child: _buttomCambiar())
+          Flexible(flex: 1, child: _buttomUpdate())
         ]),
       ),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),

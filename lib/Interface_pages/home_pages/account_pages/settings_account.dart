@@ -122,12 +122,6 @@ class _SettingsAccountState extends State<SettingsAccount> {
           mainAxisSpacing: 16.0,
           children: [
             _buildSettingCard(
-              icon: Icons.language,
-              title: 'Idioma',
-              color: Colors.blue,
-              onTap: () {},
-            ),
-            _buildSettingCard(
               icon: Icons.straighten,
               title: 'Unidades de medida',
               color: Colors.green,
@@ -149,24 +143,6 @@ class _SettingsAccountState extends State<SettingsAccount> {
               icon: Icons.info_outline,
               title: 'Sobre Eatsily',
               color: Colors.teal,
-              onTap: () {},
-            ),
-            _buildSettingCard(
-              icon: Icons.group,
-              title: 'Nuestros Partners',
-              color: Colors.deepPurple,
-              onTap: () {},
-            ),
-            _buildSettingCard(
-              icon: Icons.gavel,
-              title: 'Información legal',
-              color: Colors.red,
-              onTap: () {},
-            ),
-            _buildSettingCard(
-              icon: Icons.restore,
-              title: 'Restaurar tus compras',
-              color: Colors.indigo,
               onTap: () {},
             ),
             _buildSettingCard(

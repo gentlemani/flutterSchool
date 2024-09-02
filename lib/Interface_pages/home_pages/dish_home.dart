@@ -1,3 +1,4 @@
+import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -54,11 +55,29 @@ class _DishHomeState extends State<DishHome> {
   }
 
   Future<void> _fetchRecipes() async {
-    List<Map<String, dynamic>> recipes =
-        await _firestoreService.getRecipes(10); // Limit of 10 recipes
-    setState(() {
-      _recipes = recipes;
-    });
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Obtener IDs de recetas que el usuario ha marcado como 'dislike'
+      List<String> dislikedRecipeIds =
+          await _firestoreService.getDislikedRecipeIds(user.uid);
+
+      // Obtener recetas
+      QuerySnapshot snapshot = await _firestoreService.getRecipes2(10);
+
+      // Filtrar recetas para excluir las que el usuario ha marcado como 'dislike'
+      List<Map<String, dynamic>> recipes = snapshot.docs
+          .map((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            data['recetaId'] = doc.id; // Add the document ID to the data
+            return data;
+          })
+          .where((recipe) => !dislikedRecipeIds.contains(recipe['recetaId']))
+          .toList();
+
+      setState(() {
+        _recipes = recipes;
+      });
+    }
   }
 
   void _handleLogout(BuildContext context) {
@@ -149,35 +168,47 @@ class _DishHomeState extends State<DishHome> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image load
-              FutureBuilder<String>(
-                future: _firestoreService.getImageUrl(imagePath),
-                builder: (context, imageSnapshot) {
-                  if (imageSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (imageSnapshot.hasError) {
-                    return Center(child: Text('Error: ${imageSnapshot.error}'));
-                  } else if (!imageSnapshot.hasData ||
-                      imageSnapshot.data!.isEmpty) {
-                    return const Center(child: Text('Imagen no disponible'));
-                  } else {
-                    final imageUrl = imageSnapshot.data!;
-                    return Container(
-                      width: MediaQuery.of(context).size.width *
-                          0.9, // 90% of screen width
-                      height: MediaQuery.of(context).size.width *
-                          0.9 *
-                          (kImageHeight / kImageWidth),
-                      decoration: boxDecoration(),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(kBorderRadius),
-                        child: Image.network(imageUrl, fit: BoxFit.cover),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipesHome(recetaId: recetaId),
                       ),
                     );
-                  }
-                },
-              ),
+                  },
+                  child:
+                      // Image load
+                      FutureBuilder<String>(
+                    future: _firestoreService.getImageUrl(imagePath),
+                    builder: (context, imageSnapshot) {
+                      if (imageSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (imageSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${imageSnapshot.error}'));
+                      } else if (!imageSnapshot.hasData ||
+                          imageSnapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('Imagen no disponible'));
+                      } else {
+                        final imageUrl = imageSnapshot.data!;
+                        return Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.9, // 90% of screen width
+                          height: MediaQuery.of(context).size.width *
+                              0.9 *
+                              (kImageHeight / kImageWidth),
+                          decoration: boxDecoration(),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(kBorderRadius),
+                            child: Image.network(imageUrl, fit: BoxFit.cover),
+                          ),
+                        );
+                      }
+                    },
+                  )),
               Text(
                 name,
                 style: const TextStyle(fontSize: 20),
@@ -262,17 +293,17 @@ class _DishHomeState extends State<DishHome> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
-          title: Title(
-              color: const Color.fromARGB(255, 168, 89, 83),
-              child: const Center(
-                  child: Text(
-                "Recomendación a tu gusto",
-                style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-              ))),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          leading: null,
+          centerTitle: true,
+          title: const Text(
+            "Recomendación a tu gusto",
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+          elevation: 10,
           automaticallyImplyLeading: false,
-          elevation: 5,
+          shadowColor: Colors.grey,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         ),
         body: Center(
           child: Container(
