@@ -89,9 +89,12 @@ class _AccountHomeState extends State<AccountHome> {
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('Users').doc(uid).get();
 
-    if (userDoc.exists) {
+    if (userDoc.exists && userDoc.data() != null) {
+      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
       setState(() {
-        _profileImageUrl = userDoc['profileImageUrl'];
+        _profileImageUrl = userData?.containsKey('profileImageUrl') == true
+            ? userData!['profileImageUrl']
+            : null; // Null if the field doesn't exist
       });
     }
   }
@@ -139,7 +142,8 @@ class _AccountHomeState extends State<AccountHome> {
                     : const AssetImage('assets/iconoP.png'))
                 as ImageProvider<Object>?,
         child: _imageFile == null && _profileImageUrl == null
-            ? const Icon(Icons.person, size: 80, color: Colors.grey)
+            ? const Icon(Icons.person,
+                size: 80, color: Color.fromARGB(0, 158, 158, 158))
             : null,
       ),
     );
@@ -173,15 +177,15 @@ class _AccountHomeState extends State<AccountHome> {
                 child: ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      selectedCategory = "preferidas";
+                      selectedCategory = "Creadas";
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: selectedCategory == "preferidas"
+                    backgroundColor: selectedCategory == "Creadas"
                         ? Colors.blue
                         : Colors.grey,
                   ),
-                  child: const Text("Recetas Preferidas"),
+                  child: const Text("Recetas Creadas"),
                 ),
               ),
             ],
@@ -194,7 +198,7 @@ class _AccountHomeState extends State<AccountHome> {
             padding: const EdgeInsets.all(8.0),
             child: selectedCategory == "gustadas"
                 ? _buildGustadas()
-                : _buildPreferidas(),
+                : _buildCreadas(),
           ),
         ),
       ],
@@ -202,25 +206,67 @@ class _AccountHomeState extends State<AccountHome> {
   }
 
   Widget _buildGustadas() {
-    return ListView(
-      children: List.generate(5, (index) {
-        return ListTile(
-          title: Text("Receta Gustada ${index + 1}"),
-          onTap: () {
-            Text("Receta Gustada ${index + 1} seleccionada");
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('Users')
+          .doc(uid)
+          .collection('Vote')
+          .where('vote', isEqualTo: true) // Filtrar solo los likes
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No hay recetas gustadas.'));
+        }
+
+        List<String> recipeIds =
+            snapshot.data!.docs.map((doc) => doc.id).toList();
+
+        return FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('Recetas')
+              .where(FieldPath.documentId, whereIn: recipeIds)
+              .get(),
+          builder: (context, recipeSnapshot) {
+            if (recipeSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!recipeSnapshot.hasData || recipeSnapshot.data!.docs.isEmpty) {
+              return const Center(child: Text('No se encontraron recetas.'));
+            }
+
+            return ListView(
+              children: recipeSnapshot.data!.docs.map((doc) {
+                return ListTile(
+                  title: Text(doc['name']),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Receta seleccionada: ${doc['name']}')),
+                    );
+                  },
+                );
+              }).toList(),
+            );
           },
         );
-      }),
+      },
     );
   }
 
-  Widget _buildPreferidas() {
+  Widget _buildCreadas() {
     return ListView(
-      children: List.generate(1, (index) {
+      children: List.generate(0, (index) {
         return ListTile(
-          title: Text("Receta Preferida ${index + 1}"),
+          title: Text("Receta creadas ${index + 1}"),
           onTap: () {
-            Text("Receta Preferida ${index + 1} seleccionada");
+            Text("Receta creadas ${index + 1} seleccionada");
           },
         );
       }),

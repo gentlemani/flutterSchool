@@ -12,11 +12,13 @@ class DatabaseService {
   final CollectionReference userFrecuencyCollection =
       FirebaseFirestore.instance.collection('Users');
 
-  Future inicializeUserFrequencyRecord() async {
+  Future inicializeUserFrequencyRecord({required String name}) async {
     Map<String, int> userFrecuencyValuesNames = {
       for (var name in constants.userFrecuencyValuesNames) name: 0
     };
-    return await userFrecuencyCollection.doc(uid).set(userFrecuencyValuesNames);
+    return await userFrecuencyCollection
+        .doc(uid)
+        .set({...userFrecuencyValuesNames, 'name': name});
   }
 
   Future updateUserData(Map<String, dynamic> frecuencyValues) async {
@@ -27,6 +29,10 @@ class DatabaseService {
       }
     }
     return await userFrecuencyCollection.doc(uid).set(frecuencyValues);
+  }
+
+  Future<QuerySnapshot> getAllRecipes() async {
+    return await _db.collection('Recetas').get();
   }
 
   Stream<DocumentSnapshot> getUserVoteStream(String recetaId, String userId) {
@@ -50,6 +56,10 @@ class DatabaseService {
       data['recetaId'] = doc.id; // Add the document ID to the data
       return data;
     }).toList();
+  }
+
+  Future<QuerySnapshot> getRecipes2(int limit) async {
+    return await _db.collection('Recetas').limit(limit).get();
   }
 
   Future<void> voteRecipe(String recetaId, String userId, bool vote) async {
@@ -87,13 +97,10 @@ class DatabaseService {
         return;
       }
     } else {
-      await _db.collection('Users').doc(userId).set({});
-      // The user has not voted yet, records his vote
       await userVoteRef.set({
         'vote': vote,
         'timestamp': FieldValue.serverTimestamp(),
       });
-
       // Update the vote counting in the recipe
       if (vote == true) {
         await recipeRef.update({
@@ -105,6 +112,17 @@ class DatabaseService {
         });
       }
     }
+  }
+
+  Future<List<String>> getDislikedRecipeIds(String userId) async {
+    QuerySnapshot snapshot = await _db
+        .collection('Users')
+        .doc(userId)
+        .collection('Vote')
+        .where('vote', isEqualTo: false)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.id).toList();
   }
 
   Future<DocumentSnapshot> getUserVote(String recetaId, String userId) async {
