@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../constants/constants.dart' as constants;
@@ -7,6 +8,7 @@ import '../../constants/constants.dart' as constants;
 class DatabaseService {
   final String uid;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  User? user = FirebaseAuth.instance.currentUser;
   DatabaseService({required this.uid});
 
   final CollectionReference userFrecuencyCollection =
@@ -152,5 +154,24 @@ class DatabaseService {
     } catch (e) {
       return '';
     }
+  }
+
+  Future<String?> getUserName() async {
+    // Obtén el usuario actual
+    if (user == null) {
+      return null; // Si el usuario no está autenticado, retorna null
+    }
+
+    // Obtiene el documento del usuario en la colección "Users"
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user?.uid)
+        .get();
+    if (userDoc.exists) {
+      // Retorna el campo "name" del documento si existe
+      return userDoc.get('name');
+    } else {
+      return null; // Retorna null si el documento no existe
+    } // Retorna null si el usuario no está autenticado o no tiene un nombre registrado
   }
 }
