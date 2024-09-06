@@ -213,7 +213,7 @@ class _AccountHomeState extends State<AccountHome> {
           .collection('Users')
           .doc(uid)
           .collection('Vote')
-          .where('vote', isEqualTo: true) // Filtrar solo los likes
+          .where('vote', isEqualTo: true) // Filter only Likes
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

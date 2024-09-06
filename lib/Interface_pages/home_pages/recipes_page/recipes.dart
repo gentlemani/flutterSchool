@@ -40,15 +40,15 @@ class _RecipesHomeState extends State<RecipesHome> {
             final List<dynamic> ingredients = recipeData['ingredients'] ?? [];
             final List<dynamic> portions = recipeData['portions'] ?? [];
 
-            // Dividir la descripción en pasos
+            // Divide the description into steps
             List<String> steps = description.split('. ');
 
-            // Si la última parte de la lista está vacía, eliminamos ese elemento
+            // If the last part of the list is empty, we eliminate that element
             if (steps.isNotEmpty && steps.last.isEmpty) {
               steps.removeLast();
             }
 
-            // Añadir número de paso a cada parte
+            // Add step number to each part
             String formattedDescription = steps.asMap().entries.map((entry) {
               int index = entry.key;
               String step = entry.value.trim();

@@ -56,7 +56,7 @@ class _EditAccountState extends State<EditAccount> {
       onPressed: () async {
         bool isValid = true;
 
-        // Variables para los campos a actualizar
+        // Variables for fields to update
         String? newUsername;
         String? newEmail;
         String? newPassword;
@@ -110,7 +110,7 @@ class _EditAccountState extends State<EditAccount> {
         }
 
         if (isValid) {
-          // Actualizar solo los campos que se deben actualizar
+          // Update only the fields that must be updated
           await updateAllFields(newUsername, newEmail, newPassword);
         }
       },
@@ -182,7 +182,8 @@ class _EditAccountState extends State<EditAccount> {
   void showVerificationDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // No permite cerrar el diálogo sin verificar
+      barrierDismissible:
+          false, // It does not allow closing the dialog without verifying
       builder: (BuildContext context) => AlertDialog(
         title: Text(
           'Verificación de Correo',
@@ -247,7 +248,7 @@ class _EditAccountState extends State<EditAccount> {
       SnackBar(
         content: Text(message),
         duration:
-            const Duration(seconds: 3), // Display the snack bar for 6 seconds
+            const Duration(seconds: 3), // Display the snack bar for 3 seconds
       ),
     );
   }

@@ -57,14 +57,14 @@ class _DishHomeState extends State<DishHome> {
   Future<void> _fetchRecipes() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // Obtener IDs de recetas que el usuario ha marcado como 'dislike'
+      // Obtain recipe ids that the user has marked as 'Dislike'
       List<String> dislikedRecipeIds =
           await _firestoreService.getDislikedRecipeIds(user.uid);
 
-      // Obtener recetas
+      // Get recipes
       QuerySnapshot snapshot = await _firestoreService.getRecipes2(10);
 
-      // Filtrar recetas para excluir las que el usuario ha marcado como 'dislike'
+      //Filter recipes to exclude what the user has marked as 'Dislike'
       List<Map<String, dynamic>> recipes = snapshot.docs
           .map((doc) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
