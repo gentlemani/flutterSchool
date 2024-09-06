@@ -101,7 +101,7 @@ class _PasswdResetState extends State<PasswdReset> {
           setState(() {
             errorMessage = 'Por favor escribe un correo';
           });
-          return; // Detener la función si algún campo está vacío
+          return; // Stop the function if any field is empty
         }
         resetPassword(context);
       },

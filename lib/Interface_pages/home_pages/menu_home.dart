@@ -54,7 +54,7 @@ class _MenuHomeState extends State<MenuHome> {
         _filteredRecipesByCategory['Bolillo']!.add(recipe);
       }
     }*/
-    // Almacenar recetas recientes
+    // Store recent recipes
     _filteredRecipesByCategory['timestamp'] = recentRecipes;
 
     setState(() {
@@ -63,7 +63,7 @@ class _MenuHomeState extends State<MenuHome> {
   }
 
   Future<void> _fetchSimpleRecipes() async {
-    // Consulta a Firestore para obtener todas las recetas
+    // Consult Firestore to obtain all recipes
     QuerySnapshot snapshot =
         await FirebaseFirestore.instance.collection('Recetas').get();
 
@@ -78,7 +78,7 @@ class _MenuHomeState extends State<MenuHome> {
       if (ingredients.length <= 5) {
         simpleRecipes.add({
           ...recipeData,
-          'recetaId': doc.id, // Incluye el ID del documento en los datos
+          'recetaId': doc.id, // Includes the Document ID in the data
         });
       }
     }
@@ -267,8 +267,8 @@ class _MenuHomeState extends State<MenuHome> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _firestoreService = DatabaseService(uid: user.uid);
-      _fetchRecipesD(); // Carga las recetas habituales
-      _fetchSimpleRecipes(); // Carga las recetas con 5 ingredientes o menos
+      _fetchRecipesD(); //Load the usual recipes
+      _fetchSimpleRecipes(); //Load recipes with 5 ingredients or less
     }
   }
 

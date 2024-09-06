@@ -142,12 +142,12 @@ class DatabaseService {
         throw 'La ruta de la imagen es vacía';
       }
 
-      // Si la imagen ya tiene la URL completa (es decir, la URL pública), no necesitas usar Storage
+      // If the image already has the complete url (that is, the public URL), you do not need to use storage
       if (imagePath.startsWith('http')) {
         return imagePath;
       }
 
-      // Si la imagen es solo el path, obtén la URL desde Firebase Storage
+      //If the image is just the path, get the URL from Firebase Storage
       final ref = FirebaseStorage.instance.ref().child(imagePath);
       final url = await ref.getDownloadURL();
       return url;
@@ -157,22 +157,22 @@ class DatabaseService {
   }
 
   Future<String?> getUserName() async {
-    // Obtén el usuario actual
+    // Get the current user
     if (user == null) {
-      return null; // Si el usuario no está autenticado, retorna null
+      return null; // If the user is not authenticated, Null returns
     }
 
-    // Obtiene el documento del usuario en la colección "Users"
+    // Get the user's document in the "Users" collection
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('Users')
         .doc(user?.uid)
         .get();
     if (userDoc.exists) {
-      // Retorna el campo "name" del documento si existe
+      // Returns the "name" field of the document if it exists
       return userDoc.get('name');
     } else {
-      return null; // Retorna null si el documento no existe
-    } // Retorna null si el usuario no está autenticado o no tiene un nombre registrado
+      return null;
+    } // Null returns if the user is not authenticated or does not have a registered name
   }
 
   Future<void> updateUserName(String newName) async {

@@ -57,13 +57,13 @@ class _AllRecipesState extends State<AllRecipes> {
   Future<void> _fetchRecipes() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // Obtener todas las recetas
+      // Get all recipes
       QuerySnapshot snapshot = await _firestoreService.getAllRecipes();
 
-      // Filtrar recetas para excluir las que el usuario ha marcado como 'dislike'
+      // Filter recipes to exclude what the user has marked as 'Dislike'
       List<Map<String, dynamic>> recipes = snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        data['recetaId'] = doc.id; // Añadir el ID del documento a los datos
+        data['recetaId'] = doc.id; // Add the document ID to the data
         return data;
       }).toList();
 
