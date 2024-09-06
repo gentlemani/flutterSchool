@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../constants/constants.dart' as constants;
@@ -7,16 +8,19 @@ import '../../constants/constants.dart' as constants;
 class DatabaseService {
   final String uid;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  User? user = FirebaseAuth.instance.currentUser;
   DatabaseService({required this.uid});
 
   final CollectionReference userFrecuencyCollection =
       FirebaseFirestore.instance.collection('Users');
 
-  Future inicializeUserFrequencyRecord() async {
+  Future inicializeUserFrequencyRecord({required String name}) async {
     Map<String, int> userFrecuencyValuesNames = {
       for (var name in constants.userFrecuencyValuesNames) name: 0
     };
-    return await userFrecuencyCollection.doc(uid).set(userFrecuencyValuesNames);
+    return await userFrecuencyCollection
+        .doc(uid)
+        .set({...userFrecuencyValuesNames, 'name': name});
   }
 
   Future updateUserData(Map<String, dynamic> frecuencyValues) async {
@@ -27,6 +31,10 @@ class DatabaseService {
       }
     }
     return await userFrecuencyCollection.doc(uid).set(frecuencyValues);
+  }
+
+  Future<QuerySnapshot> getAllRecipes() async {
+    return await _db.collection('Recetas').get();
   }
 
   Stream<DocumentSnapshot> getUserVoteStream(String recetaId, String userId) {
@@ -50,6 +58,10 @@ class DatabaseService {
       data['recetaId'] = doc.id; // Add the document ID to the data
       return data;
     }).toList();
+  }
+
+  Future<QuerySnapshot> getRecipes2(int limit) async {
+    return await _db.collection('Recetas').limit(limit).get();
   }
 
   Future<void> voteRecipe(String recetaId, String userId, bool vote) async {
@@ -87,13 +99,10 @@ class DatabaseService {
         return;
       }
     } else {
-      await _db.collection('Users').doc(userId).set({});
-      // The user has not voted yet, records his vote
       await userVoteRef.set({
         'vote': vote,
         'timestamp': FieldValue.serverTimestamp(),
       });
-
       // Update the vote counting in the recipe
       if (vote == true) {
         await recipeRef.update({
@@ -105,6 +114,17 @@ class DatabaseService {
         });
       }
     }
+  }
+
+  Future<List<String>> getDislikedRecipeIds(String userId) async {
+    QuerySnapshot snapshot = await _db
+        .collection('Users')
+        .doc(userId)
+        .collection('Vote')
+        .where('vote', isEqualTo: false)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.id).toList();
   }
 
   Future<DocumentSnapshot> getUserVote(String recetaId, String userId) async {
@@ -122,17 +142,46 @@ class DatabaseService {
         throw 'La ruta de la imagen es vacía';
       }
 
-      // Si la imagen ya tiene la URL completa (es decir, la URL pública), no necesitas usar Storage
+      // If the image already has the complete url (that is, the public URL), you do not need to use storage
       if (imagePath.startsWith('http')) {
         return imagePath;
       }
 
-      // Si la imagen es solo el path, obtén la URL desde Firebase Storage
+      //If the image is just the path, get the URL from Firebase Storage
       final ref = FirebaseStorage.instance.ref().child(imagePath);
       final url = await ref.getDownloadURL();
       return url;
     } catch (e) {
       return '';
+    }
+  }
+
+  Future<String?> getUserName() async {
+    // Get the current user
+    if (user == null) {
+      return null; // If the user is not authenticated, Null returns
+    }
+
+    // Get the user's document in the "Users" collection
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user?.uid)
+        .get();
+    if (userDoc.exists) {
+      // Returns the "name" field of the document if it exists
+      return userDoc.get('name');
+    } else {
+      return null;
+    } // Null returns if the user is not authenticated or does not have a registered name
+  }
+
+  Future<void> updateUserName(String newName) async {
+    try {
+      await FirebaseFirestore.instance.collection('Users').doc(uid).update({
+        'name': newName,
+      });
+    } catch (e) {
+      return;
     }
   }
 }

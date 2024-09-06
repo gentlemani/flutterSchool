@@ -1,3 +1,4 @@
+import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -54,11 +55,29 @@ class _DishHomeState extends State<DishHome> {
   }
 
   Future<void> _fetchRecipes() async {
-    List<Map<String, dynamic>> recipes =
-        await _firestoreService.getRecipes(10); // Limit of 10 recipes
-    setState(() {
-      _recipes = recipes;
-    });
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Obtain recipe ids that the user has marked as 'Dislike'
+      List<String> dislikedRecipeIds =
+          await _firestoreService.getDislikedRecipeIds(user.uid);
+
+      // Get recipes
+      QuerySnapshot snapshot = await _firestoreService.getRecipes2(10);
+
+      //Filter recipes to exclude what the user has marked as 'Dislike'
+      List<Map<String, dynamic>> recipes = snapshot.docs
+          .map((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            data['recetaId'] = doc.id; // Add the document ID to the data
+            return data;
+          })
+          .where((recipe) => !dislikedRecipeIds.contains(recipe['recetaId']))
+          .toList();
+
+      setState(() {
+        _recipes = recipes;
+      });
+    }
   }
 
   void _handleLogout(BuildContext context) {
@@ -100,6 +119,10 @@ class _DishHomeState extends State<DishHome> {
 */
 
   Widget recommendedDishes() {
+    // Get the total high screen
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Define a percentage of the screen that each element should occupy
+    final itemHeight = screenHeight * 0.3;
     return Column(
       children: [
         Flexible(
@@ -107,9 +130,8 @@ class _DishHomeState extends State<DishHome> {
                 ? const CircularProgressIndicator()
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemExtent: 270,
+                    itemExtent: itemHeight,
                     itemCount: _recipes.length,
-                    //magnification: 1.22,
                     itemBuilder: (context, index) {
                       final String recetaId = _recipes[index]['recetaId'];
                       return foodInformation(recetaId, _firestoreService.uid);
@@ -146,36 +168,53 @@ class _DishHomeState extends State<DishHome> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Carga de Imagen
-              FutureBuilder<String>(
-                future: _firestoreService.getImageUrl(imagePath),
-                builder: (context, imageSnapshot) {
-                  if (imageSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (imageSnapshot.hasError) {
-                    return Center(child: Text('Error: ${imageSnapshot.error}'));
-                  } else if (!imageSnapshot.hasData ||
-                      imageSnapshot.data!.isEmpty) {
-                    return const Center(child: Text('Imagen no disponible'));
-                  } else {
-                    final imageUrl = imageSnapshot.data!;
-                    return Container(
-                      width: MediaQuery.of(context).size.width *
-                          0.9, // 90% of screen width
-                      height: MediaQuery.of(context).size.width *
-                          0.9 *
-                          (kImageHeight / kImageWidth),
-                      decoration: boxDecoration(),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(kBorderRadius),
-                        child: Image.network(imageUrl, fit: BoxFit.cover),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipesHome(recetaId: recetaId),
                       ),
                     );
-                  }
-                },
+                  },
+                  child:
+                      // Image load
+                      FutureBuilder<String>(
+                    future: _firestoreService.getImageUrl(imagePath),
+                    builder: (context, imageSnapshot) {
+                      if (imageSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (imageSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${imageSnapshot.error}'));
+                      } else if (!imageSnapshot.hasData ||
+                          imageSnapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('Imagen no disponible'));
+                      } else {
+                        final imageUrl = imageSnapshot.data!;
+                        return Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.9, // 90% of screen width
+                          height: MediaQuery.of(context).size.width *
+                              0.9 *
+                              (kImageHeight / kImageWidth),
+                          decoration: boxDecoration(),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(kBorderRadius),
+                            child: Image.network(imageUrl, fit: BoxFit.cover),
+                          ),
+                        );
+                      }
+                    },
+                  )),
+              Text(
+                name,
+                style: const TextStyle(fontSize: 20),
+                maxLines: 2,
+                textAlign: TextAlign.center,
               ),
-              Text(name, style: const TextStyle(fontSize: 25)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -252,26 +291,27 @@ class _DishHomeState extends State<DishHome> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-        padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.005, horizontal: screenWidth * 0.01),
-        child: Scaffold(
-            appBar: AppBar(
-              title: Title(
-                  color: const Color.fromARGB(255, 168, 89, 83),
-                  child: const Center(
-                      child: Text(
-                    "Recomendación a tu gusto",
-                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                  ))),
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-              leading: null,
-              automaticallyImplyLeading: false,
-              elevation: 5,
-            ),
-            body: Center(
-              child: recommendedDishes(),
-            ),
-            backgroundColor: kBackgroundColor));
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text(
+            "Recomendación a tu gusto",
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+          elevation: 10,
+          automaticallyImplyLeading: false,
+          shadowColor: Colors.grey,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+        ),
+        body: Center(
+          child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.005,
+                  horizontal: screenWidth * 0.01),
+              child: recommendedDishes()),
+        ),
+        backgroundColor: kBackgroundColor);
   }
 }

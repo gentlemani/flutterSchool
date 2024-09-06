@@ -223,7 +223,6 @@ class _SignInPageState extends State<SignInPage> {
   Widget _registerButton() {
     return TextButton(
       onPressed: () {
-        // Navegar a la pantalla de login.dart
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const SignUpPage()),
