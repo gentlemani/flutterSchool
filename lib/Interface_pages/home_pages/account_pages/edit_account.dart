@@ -1,9 +1,13 @@
 import 'dart:async';
-
+import 'package:eatsily/auth.dart';
+import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/sesion/services/database.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:eatsily/constants/constants.dart';
 
 class EditAccount extends StatefulWidget {
   final Widget gestureImage;
@@ -21,6 +25,7 @@ class _EditAccountState extends State<EditAccount> {
   final TextEditingController controllerPassNew = TextEditingController();
   User? user = FirebaseAuth.instance.currentUser;
   String? successMessage = '';
+
   final _formKey = GlobalKey<FormState>();
 
   Future<void> fetchUserName() async {
@@ -31,17 +36,174 @@ class _EditAccountState extends State<EditAccount> {
     });
   }
 
-  Widget _buttomUpdate() {
+  Future<void> signOutFunction() async {
+    await Auth().signOut();
+  }
+
+  void _handleLogout(BuildContext context) {
+    signOutFunction();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const SignInPage(),
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  Widget _buttonUpdateAll() {
     return ElevatedButton(
-      onPressed: () {
-        if (_formKey.currentState?.validate() ?? false) {
-          updatePassword();
+      onPressed: () async {
+        bool isValid = true;
+
+        // Variables para los campos a actualizar
+        String? newUsername;
+        String? newEmail;
+        String? newPassword;
+
+        if (controlleruser.text.trim() !=
+            (await _firestoreService.getUserName())) {
+          final usernameError = validateFields(controlleruser.text, 'user');
+          if (usernameError != null) {
+            if (mounted) {
+              showSimpleSnackBar(context, usernameError);
+              isValid = false;
+            }
+          } else {
+            newUsername = controlleruser.text;
+          }
+        }
+
+        if (controllerPass.text.isNotEmpty ||
+            controllerPassNew.text.isNotEmpty) {
+          final currentPasswordError =
+              validateFields(controllerPass.text, 'password');
+          final newPasswordError =
+              validateFields(controllerPassNew.text, 'password');
+          if (currentPasswordError != null) {
+            if (mounted) {
+              showSimpleSnackBar(context, currentPasswordError);
+              isValid = false;
+            }
+          }
+          if (newPasswordError != null) {
+            if (mounted) {
+              showSimpleSnackBar(context, newPasswordError);
+              isValid = false;
+            }
+          }
+          if (isValid) {
+            newPassword = controllerPassNew.text;
+          }
+        }
+
+        if (controllerEmail.text.trim() != user?.email) {
+          final emailError = validateFields(controllerEmail.text, 'email');
+          if (emailError != null) {
+            if (mounted) {
+              showSimpleSnackBar(context, emailError);
+              isValid = false;
+            }
+          } else {
+            newEmail = controllerEmail.text;
+          }
+        }
+
+        if (isValid) {
+          // Actualizar solo los campos que se deben actualizar
+          await updateAllFields(newUsername, newEmail, newPassword);
         }
       },
-      style: ElevatedButton.styleFrom(minimumSize: const Size(250, 50)),
-      child: const Text(
-        "Actualizar contraseña",
-        style: TextStyle(color: Colors.black, fontSize: 18),
+      style: ElevatedButton.styleFrom(
+          minimumSize: const Size(250, 50),
+          backgroundColor: colorYellowOrange,
+          side: const BorderSide(
+              width: 1, color: colorBlack, style: BorderStyle.solid)),
+      child: Text(
+        "Actualizar cuenta",
+        style: buttomTextStyle,
+      ),
+    );
+  }
+
+  Future<void> updateAllFields(
+      String? newUsername, String? newEmail, String? newPassword) async {
+    if (newUsername != null &&
+        newUsername != (await _firestoreService.getUserName())) {
+      await _firestoreService.updateUserName(newUsername);
+      if (mounted) {
+        showSimpleSnackBar(context, 'Nombre de usuario actualizado');
+      }
+    }
+    if (newPassword != null) {
+      await updatePassword();
+    }
+    if (newEmail != null && newEmail != user?.email) {
+      try {
+        await user?.verifyBeforeUpdateEmail(newEmail);
+        if (mounted) {
+          showSimpleSnackBar(
+              context, 'Correo de verificación enviado a $newEmail');
+          showVerificationDialog();
+        }
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          _mapFirebaseAuthErrorCode(context, e.code);
+        }
+      }
+    }
+  }
+
+  String? validateFields(String? value, String fieldType) {
+    if (fieldType == 'user') {
+      if (value == null || value.isEmpty) {
+        return 'Por favor ingresa un nombre de usuario';
+      } else if (value.length < 3) {
+        return 'Nombre de usuario demasiado corto';
+      } else if (value.length > 12) {
+        return 'Nombre de usuario demasiado largo';
+      }
+    } else if (fieldType == 'password') {
+      if (value == null || value.isEmpty) {
+        return 'Por favor ingresa una contraseña';
+      } else if (value.length < 6) {
+        return 'Se requieren al menos 6 caracteres';
+      }
+    } else if (fieldType == 'email') {
+      if (value == null || value.isEmpty) {
+        return 'Por favor ingresa un correo electrónico';
+      } else if (!EmailValidator.validate(value)) {
+        return 'Correo electrónico inválido';
+      }
+    }
+    return null;
+  }
+
+  void showVerificationDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // No permite cerrar el diálogo sin verificar
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          'Verificación de Correo',
+          style: headingTextStyle,
+        ),
+        content: Text(
+          'Hemos enviado un correo de verificación a tu nueva dirección de correo. Por favor, verifica tu correo se le redireccionara al inicio de sesión.',
+          style: bodyTextStyle,
+        ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); //Close the dialog box and close session
+                _handleLogout(context);
+              },
+              child: Text(
+                "OK",
+                style: bodyTextStyle,
+              ))
+        ],
       ),
     );
   }
@@ -53,15 +215,15 @@ class _EditAccountState extends State<EditAccount> {
             email: user!.email ?? '', password: controllerPass.text.trim());
         await user!.reauthenticateWithCredential(credential);
         await user!.updatePassword(controllerPassNew.text.trim());
-        setState(() {
+        if (mounted) {
           successMessage = 'Contraseña actualizada con extito';
           showSimpleSnackBar(context, successMessage!);
-        });
+        }
       }
     } on FirebaseAuthException catch (e) {
-      setState(() {
+      if (mounted) {
         _mapFirebaseAuthErrorCode(context, e.code);
-      });
+      }
     }
   }
 
@@ -85,65 +247,29 @@ class _EditAccountState extends State<EditAccount> {
       SnackBar(
         content: Text(message),
         duration:
-            const Duration(seconds: 6), // Display the snack bar for 6 seconds
+            const Duration(seconds: 3), // Display the snack bar for 6 seconds
       ),
     );
   }
 
-  Widget buildTextField(
-      {required TextEditingController controller,
-      required String labelText,
-      bool isPassword = false,
-      String? errorText,
-      String? fieldType,
-      bool read = false}) {
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    bool isPassword = false,
+    String? errorText,
+    String? fieldType,
+  }) {
     return TextFormField(
       controller: controller,
-      readOnly: read,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, ingresa un valor';
-        }
-        switch (fieldType) {
-          case 'user':
-            {
-              if (value.length < 3) {
-                return 'nombre de usuario demasiado corto';
-              } else if (value.length > 12) {
-                return 'nombre de usuario demasiado largo';
-              }
-            }
-            break;
-          case 'email':
-            {
-              if (!EmailValidator.validate(value)) {
-                return 'correo electrónico invalido';
-              }
-            }
-            break;
-          case 'password':
-            {
-              if (value.length < 6) {
-                return '6 caracteres requeridos';
-              }
-            }
-            break;
-          default:
-            break;
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {});
-      },
+      validator: (value) => validateFields(value, fieldType ?? ''),
       obscureText: isPassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
-        labelStyle: const TextStyle(fontSize: 20),
+        labelStyle: instrucctionTextStyle,
         labelText: labelText,
         errorText: errorText,
       ),
-      style: const TextStyle(fontSize: 20),
+      style: bodyTextStyle,
     );
   }
 
@@ -160,7 +286,7 @@ class _EditAccountState extends State<EditAccount> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Editar Cuenta"),
+        title: Text("Editar Cuenta", style: GoogleFonts.lato(fontSize: 24)),
         backgroundColor: Colors.white,
         elevation: 10,
         shadowColor: Colors.grey,
@@ -181,48 +307,56 @@ class _EditAccountState extends State<EditAccount> {
           },
         ),
       ),
-      body: Padding(
-          padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.02, horizontal: screenWidth * 0.03),
-          child: Form(
-            key: _formKey,
-            child: Column(children: [
-              Flexible(
-                flex: 2,
-                child: widget.gestureImage,
-              ),
-              Flexible(
-                  flex: 1,
-                  child: buildTextField(
-                      controller: controlleruser,
-                      labelText: "Usuario",
-                      fieldType: "user",
-                      read: true)),
-              Flexible(
-                  flex: 1,
-                  child: buildTextField(
-                      controller: controllerEmail,
-                      labelText: "Correo electrónico",
-                      fieldType: "email",
-                      read: true)),
-              Flexible(
-                  flex: 1,
-                  child: buildTextField(
-                      controller: controllerPass,
-                      labelText: "Contraseña actual",
-                      isPassword: true,
-                      fieldType: "password")),
-              Flexible(
-                  flex: 1,
-                  child: buildTextField(
-                      controller: controllerPassNew,
-                      labelText: "Contraseña nueva",
-                      isPassword: true,
-                      fieldType: "password")),
-              SizedBox(height: screenHeight * 0.02),
-              Flexible(flex: 1, child: _buttomUpdate()),
-            ]),
-          )),
+      body: Stack(children: [
+        SeasonalBackground(),
+        Padding(
+            padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.02, horizontal: screenWidth * 0.06),
+            child: Form(
+                key: _formKey,
+                child: Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          fit: FlexFit.loose,
+                          flex: 2,
+                          child: widget.gestureImage,
+                        ),
+                        Flexible(
+                          fit: FlexFit.loose,
+                          child: buildTextField(
+                            controller: controlleruser,
+                            labelText: "Usuario",
+                            fieldType: "user",
+                          ),
+                        ),
+                        Flexible(
+                            fit: FlexFit.loose,
+                            child: buildTextField(
+                              controller: controllerEmail,
+                              labelText: "Correo electrónico",
+                              fieldType: "email",
+                            )),
+                        Flexible(
+                            fit: FlexFit.loose,
+                            child: buildTextField(
+                                controller: controllerPass,
+                                labelText: "Contraseña actual",
+                                isPassword: true,
+                                fieldType: "password")),
+                        Flexible(
+                            fit: FlexFit.loose,
+                            child: buildTextField(
+                                controller: controllerPassNew,
+                                labelText: "Contraseña nueva",
+                                isPassword: true,
+                                fieldType: "password")),
+                        SizedBox(height: screenHeight * 0.02),
+                        Flexible(fit: FlexFit.loose, child: _buttonUpdateAll()),
+                      ]),
+                )))
+      ]),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
     );
   }
