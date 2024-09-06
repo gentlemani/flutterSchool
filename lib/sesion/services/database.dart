@@ -174,4 +174,14 @@ class DatabaseService {
       return null; // Retorna null si el documento no existe
     } // Retorna null si el usuario no está autenticado o no tiene un nombre registrado
   }
+
+  Future<void> updateUserName(String newName) async {
+    try {
+      await FirebaseFirestore.instance.collection('Users').doc(uid).update({
+        'name': newName,
+      });
+    } catch (e) {
+      return;
+    }
+  }
 }
