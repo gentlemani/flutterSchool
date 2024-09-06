@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      // Si se selecciona la tercera opción (index = 2), muestra el contenido del perfil
+      // If the third option is selected (Index = 2), show the profile content
       _currentIndex = index;
     });
   }

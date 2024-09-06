@@ -27,6 +27,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  final TextEditingController _controllerName = TextEditingController();
 
 /*     |----------------|
        |    Functions   |
@@ -39,7 +40,9 @@ class _SignUpPageState extends State<SignUpPage> {
           email: _controllerEmail.text, password: _controllerPassword.text);
       User? user = result.user;
       if (user != null) {
-        await DatabaseService(uid: user.uid).inicializeUserFrequencyRecord();
+        await DatabaseService(uid: user.uid).inicializeUserFrequencyRecord(
+          name: _controllerName.text,
+        );
         await user.sendEmailVerification();
       } else {
         throw FirebaseAuthException(
@@ -73,16 +76,24 @@ class _SignUpPageState extends State<SignUpPage> {
 */
 
   Widget userText() {
-    return const TextField(
+    return TextFormField(
+      controller: _controllerName,
       textAlign: TextAlign.center,
-      decoration: InputDecoration(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (name) {
+        if (name == null || name.isEmpty) {
+          return 'Por favor, ingresa tu nombre de usuario';
+        }
+        return null;
+      },
+      decoration: const InputDecoration(
         alignLabelWithHint: true,
         labelText: 'Usuario',
         contentPadding: EdgeInsets.only(top: 30),
         labelStyle:
             TextStyle(fontSize: 25, color: Color.fromARGB(255, 255, 255, 255)),
       ),
-      style: TextStyle(fontSize: 25, color: Colors.white),
+      style: const TextStyle(fontSize: 25, color: Colors.white),
     );
   }
 
