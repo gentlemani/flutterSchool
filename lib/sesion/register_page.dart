@@ -1,5 +1,4 @@
 import 'package:eatsily/sesion/services/database.dart';
-import 'package:eatsily/widget_tree.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
