@@ -20,12 +20,6 @@ class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? errorMessage = '';
   bool isLogin = true;
-  // Password criteria
-  // At least one lowercase letter, one uppercase letter, one number and one special symbol
-  // Minimum length 6
-  // RegExp regex =
-  //     RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{6,}$');
-
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
