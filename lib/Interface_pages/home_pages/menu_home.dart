@@ -57,9 +57,9 @@ class _MenuHomeState extends State<MenuHome> {
     // Store recent recipes
     _filteredRecipesByCategory['timestamp'] = recentRecipes;
 
-    setState(() {
-      // Trigger UI update with filtered recipes
-    });
+    // setState(() {
+    //   // Trigger UI update with filtered recipes
+    // });
   }
 
   Future<void> _fetchSimpleRecipes() async {
