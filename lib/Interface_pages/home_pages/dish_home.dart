@@ -1,10 +1,10 @@
 import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:eatsily/auth.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
+import 'package:eatsily/utils/auth.helpers.dart';
 
 //Constant
 const double kPaddingValue = 18.0;
@@ -45,14 +45,11 @@ class _DishHomeState extends State<DishHome> {
       _firestoreService = DatabaseService(uid: user.uid);
       _fetchRecipes(); // Only if it is authenticated the recipes are charged
     } else {
-      _handleLogout(context);
+      handleLogout(context,redirectTo: const WidgetTree());
       // Redirect the user to the login screen
     }
   }
 
-  Future<void> signOutFunction() async {
-    await Auth().signOut();
-  }
 
   Future<void> _fetchRecipes() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -80,15 +77,6 @@ class _DishHomeState extends State<DishHome> {
     }
   }
 
-  void _handleLogout(BuildContext context) {
-    signOutFunction();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const SignInPage(),
-      ),
-    );
-  }
 
 /*     |---------------------|
        |    Decorate image   |
@@ -270,7 +258,7 @@ class _DishHomeState extends State<DishHome> {
                         await _firestoreService.voteRecipe(
                             recetaId, userId, isLike);
                       } else {
-                        _handleLogout(context);
+                        handleLogout(context,redirectTo: const WidgetTree());
                       }
                     },
                   ),
