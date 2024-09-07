@@ -31,6 +31,7 @@ class _DishHomeState extends State<DishHome> {
 */
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
+  final user = FirebaseAuth.instance.currentUser;
 
 /*     |----------------|
        |    Functions   |
@@ -40,16 +41,14 @@ class _DishHomeState extends State<DishHome> {
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      _firestoreService = DatabaseService(uid: user.uid);
+      _firestoreService = DatabaseService(uid: user!.uid);
       _fetchRecipes(); // Only if it is authenticated the recipes are charged
     } else {
-      handleLogout(context,redirectTo: const WidgetTree());
+      handleLogout(context, redirectTo: const WidgetTree());
       // Redirect the user to the login screen
     }
   }
-
 
   Future<void> _fetchRecipes() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -70,13 +69,13 @@ class _DishHomeState extends State<DishHome> {
           })
           .where((recipe) => !dislikedRecipeIds.contains(recipe['recetaId']))
           .toList();
-
-      setState(() {
-        _recipes = recipes;
-      });
+      if (mounted) {
+        setState(() {
+          _recipes = recipes;
+        });
+      }
     }
   }
-
 
 /*     |---------------------|
        |    Decorate image   |
@@ -109,24 +108,43 @@ class _DishHomeState extends State<DishHome> {
   Widget recommendedDishes() {
     // Get the total high screen
     final screenHeight = MediaQuery.of(context).size.height;
-    // Define a percentage of the screen that each element should occupy
-    final itemHeight = screenHeight * 0.3;
-    return Column(
-      children: [
-        Flexible(
+    final itemHeight = screenHeight * 0.4;
+    return LayoutBuilder(builder: (context, constraints) {
+      return Column(
+        children: [
+          Flexible(
             child: _recipes.isEmpty
                 ? const CircularProgressIndicator()
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemExtent: itemHeight,
+                    itemExtent: itemHeight, // Responsively adjusts height
                     itemCount: _recipes.length,
                     itemBuilder: (context, index) {
                       final String recetaId = _recipes[index]['recetaId'];
-                      return foodInformation(recetaId, _firestoreService.uid);
+                      return Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: constraints.maxHeight * 0.05,
+                          horizontal: constraints.maxWidth * 0.05,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: foodInformation(recetaId, _firestoreService.uid),
+                      );
                     },
-                  ))
-      ],
-    );
+                  ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget foodInformation(String recetaId, String userId) {
@@ -200,8 +218,9 @@ class _DishHomeState extends State<DishHome> {
               Text(
                 name,
                 style: const TextStyle(fontSize: 20),
-                maxLines: 2,
+                maxLines: 1,
                 textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -258,7 +277,7 @@ class _DishHomeState extends State<DishHome> {
                         await _firestoreService.voteRecipe(
                             recetaId, userId, isLike);
                       } else {
-                        handleLogout(context,redirectTo: const WidgetTree());
+                        handleLogout(context, redirectTo: const WidgetTree());
                       }
                     },
                   ),
@@ -294,11 +313,14 @@ class _DishHomeState extends State<DishHome> {
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         ),
         body: Center(
-          child: Container(
+          child: LayoutBuilder(builder: (context, constraints) {
+            return Container(
               padding: EdgeInsets.symmetric(
                   vertical: screenHeight * 0.005,
                   horizontal: screenWidth * 0.01),
-              child: recommendedDishes()),
+              child: recommendedDishes(),
+            );
+          }),
         ),
         backgroundColor: kBackgroundColor);
   }
