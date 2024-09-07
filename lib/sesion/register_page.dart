@@ -1,4 +1,5 @@
 import 'package:eatsily/sesion/services/database.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,12 @@ class _SignUpPageState extends State<SignUpPage> {
       User? user = result.user;
       if (user != null) {
         await DatabaseService(uid: user.uid).inicializeUserFrequencyRecord();
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const WidgetTree()),
+          );
+        }
       } else {
         throw FirebaseAuthException(
           code: 'user-null',

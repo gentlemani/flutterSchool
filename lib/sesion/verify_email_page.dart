@@ -1,5 +1,9 @@
 import 'dart:async';
 import 'package:eatsily/Interface_pages/home_page.dart';
+import 'package:eatsily/auth.dart';
+import 'package:eatsily/sesion/register_page.dart';
+import 'package:eatsily/sesion/sign_in_page.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,19 +19,53 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
        |    Variables    |
        |-----------------|
 */
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isEmailVerified = false;
   Timer? timer;
+  void _handleLogout(BuildContext context) {
+    signOutFunction();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const WidgetTree(),
+      ),
+    );
+  }
 
-/*     |----------------|
-       |    Functions   |
-       |----------------|
-*/
+  Future<void> signOutFunction() async {
+    await Auth().signOut();
+  }
+
+/**
+ * Will return false if there is not current user
+ */
+  bool _checkCurrentUser() {
+    print('checo');
+    return _auth.currentUser == null ? false : true;
+  }
+
+/**
+ * Navigator to push to the provided widget
+ * 
+ */
+  void navigateTo(Widget widget) {
+    print('llego Navi');
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => widget),
+    // );
+    _handleLogout(context);
+  }
 
   Future checkEmailVerified() async {
-    await FirebaseAuth.instance.currentUser!.reload();
+    print('llego aca');
+    if (_checkCurrentUser()) {
+      await _auth.currentUser!.reload();
+    } else {
+      navigateTo(const WidgetTree());
+    }
     setState(() {
-      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+      isEmailVerified = _auth.currentUser!.emailVerified;
     });
     if (isEmailVerified) timer?.cancel();
   }
@@ -49,10 +87,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   @override
   void initState() {
     super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _handleLogout(context);
+    }
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     if (!isEmailVerified) {
       sendVerificationEmail();
-
       timer = Timer.periodic(
           const Duration(seconds: 3), (_) => checkEmailVerified());
     }
@@ -65,7 +106,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   }
 
   @override
-  Widget build(BuildContext context) => isEmailVerified
+  Widget build(BuildContext context) => isEmailVerified == true
       ? const HomePage()
       : Scaffold(
           appBar: AppBar(

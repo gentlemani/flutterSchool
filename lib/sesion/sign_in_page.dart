@@ -175,25 +175,20 @@ class _SignInPageState extends State<SignInPage> {
     return TextButton(
       key: const Key('submit'),
       onPressed: () async {
-        print('Submit button pressed');
         try {
           if (_controllerEmail.text.isEmpty ||
               _controllerPassword.text.isEmpty) {
             setState(() {
               errorMessage = 'Por favor, completa todos los campos.';
             });
-            print('Llego al error');
             return; // Detener la función si algún campo está vacío
           } else {
-            print('Casi llego');
             bool isAuthenticated = await signInWithEmailAndPassword();
             if (mounted) {
               if (isAuthenticated) {
-                print('llego Final');
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                 );
-                print('After Navigator push');
               }
             } else {
               const Text(
@@ -201,7 +196,6 @@ class _SignInPageState extends State<SignInPage> {
             }
           }
         } catch (e) {
-          print('Catch error llego');
           setState(() {
             errorMessage = 'Error al iniciar sesión: $e';
           });
@@ -230,6 +224,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _registerButton() {
     return TextButton(
+      key: const Key('register'),
       onPressed: () async {
         // Navegar a la pantalla de login.dart
         Navigator.push(
@@ -338,20 +333,3 @@ class _SignInPageState extends State<SignInPage> {
     ]));
   }
 }
-
-// class DishHome extends StatefulWidget {
-//   const DishHome({super.key});
-
-//   @override
-//   State<DishHome> createState() => _DishHomeState();
-// }
-
-// class _DishHomeState extends State<DishHome> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('DishHome')),
-//       body: const Center(child: Text('Welcome to DishHome')),
-//     );
-//   }
-// }
