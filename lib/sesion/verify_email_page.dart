@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:eatsily/Interface_pages/home_page.dart';
 import 'package:eatsily/auth.dart';
-import 'package:eatsily/sesion/register_page.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,21 +55,6 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     _handleLogout(context);
   }
 
- @override
-  void initState() {
-    super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      _handleLogout(context);
-    }
-    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    if (!isEmailVerified) {
-      sendVerificationEmail();
-      timer = Timer.periodic(
-          const Duration(seconds: 3), (_) => checkEmailVerified());
-    }
-  }
-
   Future checkEmailVerified() async {
     print('llego aca');
     if (_checkCurrentUser()) {
@@ -99,7 +82,20 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
        |----------------------------------------------|
 */
 
-
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _handleLogout(context);
+    }
+    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    if (!isEmailVerified) {
+      sendVerificationEmail();
+      timer = Timer.periodic(
+          const Duration(seconds: 3), (_) => checkEmailVerified());
+    }
+  }
 
   @override
   void dispose() {
