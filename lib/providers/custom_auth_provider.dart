@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:eatsily/services/auth_service.dart';
-import 'package:eatsily/widget_tree.dart';
 
 class CustomAuthProvider extends ChangeNotifier {
   final AuthService _authService;
