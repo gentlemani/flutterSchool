@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:eatsily/auth.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/sesion/services/database.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
+import 'package:eatsily/utils/auth.helpers.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,21 +34,6 @@ class _EditAccountState extends State<EditAccount> {
       controlleruser.text = name ?? '';
       controllerEmail.text = user?.email ?? '';
     });
-  }
-
-  Future<void> signOutFunction() async {
-    await Auth().signOut();
-  }
-
-  void _handleLogout(BuildContext context) {
-    signOutFunction();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const SignInPage(),
-      ),
-      (Route<dynamic> route) => false,
-    );
   }
 
   Widget _buttonUpdateAll() {
@@ -198,7 +183,7 @@ class _EditAccountState extends State<EditAccount> {
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); //Close the dialog box and close session
-                _handleLogout(context);
+                handleLogout(context,redirectTo: const WidgetTree());
               },
               child: Text(
                 "OK",

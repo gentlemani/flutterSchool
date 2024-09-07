@@ -41,6 +41,7 @@ dependencies:
   cloud_firestore: ^5.2.0
   email_validator: ^3.0.0
   firebase_storage: ^12.1.0
+  provider: ^6.1.2
 
 dev_dependencies:
   integration_test:
