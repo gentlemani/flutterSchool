@@ -1,5 +1,5 @@
 import 'package:eatsily/Interface_pages/home_page.dart';
-import 'package:eatsily/auth.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
 import 'package:email_validator/email_validator.dart';
@@ -41,7 +41,7 @@ class _SignInPageState extends State<SignInPage> {
       return isAuthenticated; // Devolver falso si algún campo está vacío
     }
     try {
-      await Auth().signInWithEmailAndPassword(
+      await AuthService().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
       // Si no se lanzó una excepción, la autenticación fue exitosa
       isAuthenticated = true;
@@ -55,7 +55,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().createUserWithEmailAndPassword(
+      await AuthService().createUserWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
