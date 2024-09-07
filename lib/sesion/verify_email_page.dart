@@ -34,33 +34,16 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     await Auth().signOut();
   }
 
-/**
- * Will return false if there is not current user
- */
+/// Will return false if there is not current user
   bool _checkCurrentUser() {
-    print('checo');
     return _auth.currentUser == null ? false : true;
   }
 
-/**
- * Navigator to push to the provided widget
- * 
- */
-  void navigateTo(Widget widget) {
-    print('llego Navi');
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => widget),
-    // );
-    _handleLogout(context);
-  }
-
   Future checkEmailVerified() async {
-    print('llego aca');
     if (_checkCurrentUser()) {
       await _auth.currentUser!.reload();
     } else {
-      navigateTo(const WidgetTree());
+      _handleLogout(context);
     }
     setState(() {
       isEmailVerified = _auth.currentUser!.emailVerified;
@@ -103,6 +86,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     super.dispose();
   }
 
+@override
   Widget build(BuildContext context) {
     return isEmailVerified
         ? const HomePage()
