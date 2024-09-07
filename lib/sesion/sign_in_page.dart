@@ -84,6 +84,7 @@ class _SignInPageState extends State<SignInPage> {
     TextEditingController controller,
   ) {
     return TextFormField(
+        key: const Key('passwordField'),
         controller: controller,
         textAlign: TextAlign.center,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -113,6 +114,7 @@ class _SignInPageState extends State<SignInPage> {
     TextEditingController controller,
   ) {
     return TextFormField(
+      key: const Key('emailField'),
       controller: controller,
       textAlign: TextAlign.left,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -172,6 +174,7 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _submitButton() {
     return TextButton(
+      key: const Key('submit'),
       onPressed: () async {
         try {
           if (_controllerEmail.text.isEmpty ||
@@ -222,7 +225,9 @@ class _SignInPageState extends State<SignInPage> {
 
   Widget _registerButton() {
     return TextButton(
-      onPressed: () {
+      key: const Key('register'),
+      onPressed: () async {
+        // Navegar a la pantalla de login.dart
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const SignUpPage()),
@@ -269,25 +274,25 @@ class _SignInPageState extends State<SignInPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               const Text(
                 'Eatsily',
                 style: TextStyle(
-                    fontSize: 40.0,
+                    fontSize: 20.0,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 254, 250, 250)),
               ),
               const Text(
                 'Come seguro',
                 style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 10.0,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 255, 255, 255)),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _entryEmailField(_controllerEmail),
               _entryPasswordField(_controllerPassword),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               if (errorMessage != null && errorMessage!.isNotEmpty)
                 Text(
                   errorMessage!,
@@ -298,11 +303,11 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               _submitButton(),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               _registerButton(),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               _passwdResetText(context),
             ],
