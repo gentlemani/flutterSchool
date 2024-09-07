@@ -57,6 +57,21 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     _handleLogout(context);
   }
 
+ @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _handleLogout(context);
+    }
+    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    if (!isEmailVerified) {
+      sendVerificationEmail();
+      timer = Timer.periodic(
+          const Duration(seconds: 3), (_) => checkEmailVerified());
+    }
+  }
+
   Future checkEmailVerified() async {
     print('llego aca');
     if (_checkCurrentUser()) {
@@ -84,20 +99,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
        |----------------------------------------------|
 */
 
-  @override
-  void initState() {
-    super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      _handleLogout(context);
-    }
-    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    if (!isEmailVerified) {
-      sendVerificationEmail();
-      timer = Timer.periodic(
-          const Duration(seconds: 3), (_) => checkEmailVerified());
-    }
-  }
+
 
   @override
   void dispose() {
@@ -105,12 +107,34 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) => isEmailVerified == true
-      ? const HomePage()
-      : Scaffold(
-          appBar: AppBar(
-            title: const Text('Verify Email'),
-          ),
-        );
+  Widget build(BuildContext context) {
+    return isEmailVerified
+        ? const HomePage()
+        : Scaffold(
+            appBar: AppBar(
+              title: const Text('Verificar correo'),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Se ha enviado un enlace de verificación a tu correo. Por favor, revisa tu bandeja de entrada.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        _auth.currentUser!.sendEmailVerification();
+                      },
+                      child: const Text('Reenviar enlace de verificación'))
+                ],
+              ),
+            ),
+          );
+  }
 }

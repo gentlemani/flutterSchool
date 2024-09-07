@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:eatsily/common_widgets/common_widgets.dart';
 
 class PasswdReset extends StatefulWidget {
   const PasswdReset({super.key});
@@ -100,7 +101,7 @@ class _PasswdResetState extends State<PasswdReset> {
           setState(() {
             errorMessage = 'Por favor escribe un correo';
           });
-          return; // Detener la función si algún campo está vacío
+          return; // Stop the function if any field is empty
         }
         resetPassword(context);
       },
@@ -172,26 +173,6 @@ class _PasswdResetState extends State<PasswdReset> {
     }
   }
 
-/*     |-----------------------------|
-       |          background         |
-       |-----------------------------|
-*/
-
-  Widget background() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black,
-          width: 5.0,
-        ),
-        image: const DecorationImage(
-          image: AssetImage('assets/Fondo4.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
 /*     |----------------------------------------------|
        |          Main interface construction         |
        |----------------------------------------------|
@@ -213,7 +194,7 @@ class _PasswdResetState extends State<PasswdReset> {
         elevation: 0,
       ),
       body: Stack(children: [
-        background(),
+        CommonWidgets.background(),
         const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
