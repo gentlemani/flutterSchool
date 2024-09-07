@@ -1,6 +1,6 @@
-import 'package:eatsily/auth.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
+import 'package:eatsily/utils/auth.helpers.dart';
 
 class SettingsAccount extends StatefulWidget {
   const SettingsAccount({super.key});
@@ -10,10 +10,6 @@ class SettingsAccount extends StatefulWidget {
 }
 
 class _SettingsAccountState extends State<SettingsAccount> {
-  Future<void> signOutFunction() async {
-    await Auth().signOut();
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -33,23 +29,13 @@ class _SettingsAccountState extends State<SettingsAccount> {
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); //Close the dialog box and close session
-                _handleLogout(context);
+                handleLogout(context,redirectTo: const WidgetTree());
               },
               child: const Text('Sí'),
             ),
           ],
         );
       },
-    );
-  }
-
-  void _handleLogout(BuildContext context) {
-    signOutFunction();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const SignInPage(),
-      ),
     );
   }
 
