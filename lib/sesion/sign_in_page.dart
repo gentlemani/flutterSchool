@@ -187,7 +187,7 @@ class _SignInPageState extends State<SignInPage> {
             bool isAuthenticated = await signInWithEmailAndPassword();
             if (mounted) {
               if (isAuthenticated) {
-                Navigator.of(context).push(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                 );
               }
