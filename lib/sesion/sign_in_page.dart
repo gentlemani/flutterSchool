@@ -5,6 +5,7 @@ import 'package:eatsily/sesion/register_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:eatsily/common_widgets/common_widgets.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -253,26 +254,6 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-/*     |-----------------------------|
-       |          Background         |
-       |-----------------------------|
-*/
-
-  Widget _backgorund() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black,
-          width: 5.0,
-        ),
-        image: const DecorationImage(
-          image: AssetImage('assets/Fondo4.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
 /*     |----------------------------------------------|
        |          Main interface construction         |
        |----------------------------------------------|
@@ -280,11 +261,14 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Stack(children: [
-      _backgorund(),
+      CommonWidgets.background(),
       Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+        padding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.03, horizontal: screenWidth * 0.12),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
