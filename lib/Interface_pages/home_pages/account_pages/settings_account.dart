@@ -29,7 +29,7 @@ class _SettingsAccountState extends State<SettingsAccount> {
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); //Close the dialog box and close session
-                handleLogout(context,redirectTo: const WidgetTree());
+                handleLogout(context, redirectTo: const WidgetTree());
               },
               child: const Text('Sí'),
             ),
