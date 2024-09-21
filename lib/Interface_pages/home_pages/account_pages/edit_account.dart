@@ -6,7 +6,6 @@ import 'package:eatsily/widget_tree.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:eatsily/constants/constants.dart';
 
 class EditAccount extends StatefulWidget {
@@ -183,7 +182,7 @@ class _EditAccountState extends State<EditAccount> {
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); //Close the dialog box and close session
-                handleLogout(context,redirectTo: const WidgetTree());
+                handleLogout(context, redirectTo: const WidgetTree());
               },
               child: Text(
                 "OK",
@@ -272,7 +271,7 @@ class _EditAccountState extends State<EditAccount> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Editar Cuenta", style: GoogleFonts.lato(fontSize: 24)),
+        title: Text("Editar Cuenta", style: headingTextStyle),
         backgroundColor: Colors.white,
         elevation: 10,
         shadowColor: Colors.grey,
