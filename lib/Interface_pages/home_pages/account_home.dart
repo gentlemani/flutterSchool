@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/create_recipe_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/edit_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account.dart';
+import 'package:eatsily/common_widgets/seasonal_background.dart';
+import 'package:eatsily/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,7 +28,7 @@ class _AccountHomeState extends State<AccountHome> {
   String? _uploadStatusMessage;
   String? _profileImageUrl;
   bool _isLoading = false;
-  String selectedCategory = "gustadas";
+  String selectedCategory = "preferidas";
 
 /*     |----------------|
        |    Functions   |
@@ -109,18 +112,15 @@ class _AccountHomeState extends State<AccountHome> {
       onPressed: () {},
       elevation: 2,
       backgroundColor: const Color.fromARGB(255, 230, 227, 228),
-      label: const Row(
+      label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'Preferencias',
-            style: TextStyle(
-              fontSize: 20,
-              color: Color.fromARGB(255, 0, 0, 0),
-            ),
+            style: buttomTextStyle,
           ),
-          SizedBox(width: 50),
-          Icon(Icons.room_preferences),
+          const SizedBox(width: 50),
+          const Icon(Icons.room_preferences),
         ],
       ),
       extendedPadding: const EdgeInsets.only(left: 20, right: 20),
@@ -161,15 +161,15 @@ class _AccountHomeState extends State<AccountHome> {
                 child: ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      selectedCategory = "gustadas";
+                      selectedCategory = "preferidas";
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: selectedCategory == "gustadas"
+                    backgroundColor: selectedCategory == "preferidas"
                         ? Colors.blue
                         : Colors.grey,
                   ),
-                  child: const Text("Recetas Gustadas"),
+                  child: Text("Preferidas", style: buttomTextStyle),
                 ),
               ),
               const SizedBox(width: 10),
@@ -185,7 +185,7 @@ class _AccountHomeState extends State<AccountHome> {
                         ? Colors.blue
                         : Colors.grey,
                   ),
-                  child: const Text("Recetas Creadas"),
+                  child: Text("Creadas", style: buttomTextStyle),
                 ),
               ),
             ],
@@ -196,7 +196,7 @@ class _AccountHomeState extends State<AccountHome> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: selectedCategory == "gustadas"
+            child: selectedCategory == "preferidas"
                 ? _buildGustadas()
                 : _buildCreadas(),
           ),
@@ -221,7 +221,7 @@ class _AccountHomeState extends State<AccountHome> {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No hay recetas gustadas.'));
+          return const Center(child: Text('No hay recetas preferidas.'));
         }
 
         List<String> recipeIds =
@@ -244,7 +244,10 @@ class _AccountHomeState extends State<AccountHome> {
             return ListView(
               children: recipeSnapshot.data!.docs.map((doc) {
                 return ListTile(
-                  title: Text(doc['name']),
+                  title: Text(
+                    doc['name'],
+                    style: instrucctionTextStyle,
+                  ),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -261,16 +264,80 @@ class _AccountHomeState extends State<AccountHome> {
   }
 
   Widget _buildCreadas() {
-    return ListView(
-      children: List.generate(0, (index) {
-        return ListTile(
-          title: Text("Receta creadas ${index + 1}"),
-          onTap: () {
-            Text("Receta creadas ${index + 1} seleccionada");
-          },
-        );
-      }),
-    );
+    return SafeArea(
+        child: Column(
+      children: [
+        // Botón "Agregar Receta"
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreateRecipeAccount()));
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.add,
+                  color: colorGreen,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  "Crear Receta",
+                  style: buttomTextStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20), // Espacio entre el botón y el grid
+        // Grid de recetas
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // Número de columnas en el grid
+              crossAxisSpacing: 10.0, // Espaciado entre columnas
+              mainAxisSpacing: 10.0, // Espaciado entre filas
+              childAspectRatio: 1 / 0.9, // Relación de aspecto
+            ),
+            padding: const EdgeInsets.all(8.0),
+            itemCount: 4, // Número de recetas
+            itemBuilder: (context, index) {
+              return Card(
+                elevation: 4.0,
+                child: InkWell(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Receta seleccionada")),
+                    );
+                  },
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.fastfood,
+                          size: 50), // Icono o imagen de la receta
+                      SizedBox(height: 10),
+                      Text(
+                        "d", // Nombre de la receta
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ));
   }
 
 /*     |----------------------------------------------|
@@ -290,8 +357,7 @@ class _AccountHomeState extends State<AccountHome> {
     return ClipRRect(
       child: Scaffold(
         appBar: AppBar(
-          titleTextStyle: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+          titleTextStyle: headingTextStyle,
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           title: const Text('Perfil'),
           automaticallyImplyLeading: false,
@@ -322,6 +388,7 @@ class _AccountHomeState extends State<AccountHome> {
           ],
         ),
         body: Stack(children: [
+          SeasonalBackground(),
           Container(
             padding: const EdgeInsets.only(top: 20),
             alignment: Alignment.topCenter,
@@ -343,7 +410,7 @@ class _AccountHomeState extends State<AccountHome> {
                 user != null
                     ? Text(
                         '${user.email}',
-                        style: const TextStyle(fontSize: 19),
+                        style: bodyTextStyle,
                       )
                     : const Text('No hay un usuario autenticado'),
                 const SizedBox(height: 30),

@@ -126,17 +126,6 @@ class _DishHomeState extends State<DishHome> {
                           vertical: constraints.maxHeight * 0.05,
                           horizontal: constraints.maxWidth * 0.05,
                         ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
                         child: foodInformation(recetaId, _firestoreService.uid),
                       );
                     },
