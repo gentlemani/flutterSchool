@@ -82,7 +82,7 @@ class _SeasonalPainter extends CustomPainter {
     paint.color = Colors.orange.shade300;
     canvas.drawCircle(Offset(size.width * 0.45, size.height * 0.2), 150, paint);
     paint.color = Colors.deepOrangeAccent.shade100;
-    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.8), 120, paint);
+    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.7), 120, paint);
   }
 
   @override
