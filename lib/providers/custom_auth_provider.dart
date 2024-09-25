@@ -6,14 +6,15 @@ class CustomAuthProvider extends ChangeNotifier {
 
   CustomAuthProvider(this._authService);
 
-  Future<void> signOut(BuildContext context,{Widget? redirectTo}) async {
+  Future<void> signOut(BuildContext context, {Widget? redirectTo}) async {
     await _authService.signOut();
     if (context.mounted && redirectTo != null) {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => redirectTo,
         ),
+        (Route<dynamic> route) => false,
       );
     }
   }
