@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/edit_recipe_account.dart';
+import 'package:eatsily/constants/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RecipesHome extends StatefulWidget {
@@ -39,6 +42,11 @@ class _RecipesHomeState extends State<RecipesHome> {
             final String imageUrl = recipeData['image'] as String? ?? '';
             final List<dynamic> ingredients = recipeData['ingredients'] ?? [];
             final List<dynamic> portions = recipeData['portions'] ?? [];
+            final String createdBy = recipeData['created_by'] as String? ?? '';
+
+            final List<String> formattedIngredients = ingredients
+                .map((ingredient) => ingredient.toString().replaceAll('_', ' '))
+                .toList();
 
             // Divide the description into steps
             List<String> steps = description.split('. ');
@@ -55,9 +63,24 @@ class _RecipesHomeState extends State<RecipesHome> {
               return 'Paso ${index + 1}: $step.';
             }).join('\n\n');
 
+            String uid = FirebaseAuth.instance.currentUser!.uid;
             return CustomScrollView(
               slivers: [
                 SliverAppBar(
+                  leading: IconButton(
+                    icon: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 2)),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Color.fromARGB(255, 0, 0, 0),
+                        )),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                   expandedHeight: 250,
                   flexibleSpace: FlexibleSpaceBar(
                     background: imageUrl.isNotEmpty
@@ -87,44 +110,64 @@ class _RecipesHomeState extends State<RecipesHome> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Expanded(
+                                child: Text(
+                              name,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: headingTextStyle,
+                            )),
+                            if (createdBy == uid)
+                              IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    size: 30,
+                                    color: Color.fromARGB(255, 243, 17, 17),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditRecipeAccount(
+                                                    recipeId:
+                                                        widget.recetaId)));
+                                  })
+                          ],
                         ),
                         const SizedBox(height: 16.0),
-                        const Text(
+                        Text(
                           'Ingredientes:',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: bodyTextStyle,
                         ),
                         const SizedBox(height: 8.0),
-                        for (int i = 0; i < ingredients.length; i++)
+                        for (int i = 0; i < formattedIngredients.length; i++)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
                                 child: Text(
-                                  ingredients[i].toString(),
-                                  style: const TextStyle(fontSize: 18),
+                                  formattedIngredients[i].toString(),
+                                  style: instrucctionTextStyle,
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Text(
                                 (i < portions.length ? portions[i] : ''),
-                                style: const TextStyle(fontSize: 18),
+                                style: instrucctionTextStyle,
                               ),
                             ],
                           ),
                         const SizedBox(height: 16.0),
-                        const Text(
+                        Text(
                           "Descripción",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: bodyTextStyle,
                         ),
                         Text(
                           formattedDescription,
-                          style: const TextStyle(fontSize: 17),
+                          style: instrucctionTextStyle,
                         ),
                       ],
                     ),
