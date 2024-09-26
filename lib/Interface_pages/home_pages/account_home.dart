@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/create_recipe_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/edit_account.dart';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/preferences_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
@@ -110,7 +111,14 @@ class _AccountHomeState extends State<AccountHome> {
 
   Widget _buttonPref() {
     return FloatingActionButton.extended(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PreferencesAccount(),
+          ),
+        );
+      },
       elevation: 2,
       backgroundColor: const Color.fromARGB(255, 230, 227, 228),
       label: Row(
