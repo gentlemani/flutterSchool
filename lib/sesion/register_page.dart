@@ -161,13 +161,41 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _submitButton() {
     return OutlinedButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Procesando registro...Verifique su correo'),
-              backgroundColor: Colors.blue,
-            ),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirmación"),
+                content: Text(
+                    "¿Estás seguro de haber introducido tus datos correctamente? \n"
+                    "Correo: ${_controllerEmail.text} \nUsuario: ${_controllerName.text}"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("Cancelar"),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(); // Cierra el cuadro de diálogo
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Enviar"),
+                    onPressed: () {
+                      // Cierra el cuadro de diálogo y continúa con el registro
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Procesando registro...Verifique su correo'),
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                      createUserWithEmailAndPassword();
+                    },
+                  ),
+                ],
+              );
+            },
           );
-          createUserWithEmailAndPassword();
         },
         style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 20),
