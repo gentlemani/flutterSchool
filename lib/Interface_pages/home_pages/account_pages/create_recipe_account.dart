@@ -27,6 +27,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   List<Map<String, dynamic>> selectedIngredients = [];
   List<String> recipeSteps = [];
   int step = 1;
+  int counterDiners = 0;
 
   Future<void> _showQuantityDialog(String ingredient) async {
     Map<String, dynamic>? existingIngredient = selectedIngredients.firstWhere(
@@ -294,6 +295,50 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     }
   }
 
+  void _incrementCounter() {
+    setState(() {
+      counterDiners++;
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      if (counterDiners > 0) counterDiners--;
+    });
+  }
+
+  Widget diners() {
+    String textDiners;
+    if (counterDiners == 1) {
+      textDiners = "Comensal";
+    } else {
+      textDiners = "Comensales";
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+            onPressed: _decrementCounter,
+            icon: const Icon(
+              Icons.remove_circle_outlined,
+              color: Colors.red,
+            )),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            "$counterDiners $textDiners",
+            style: bodyTextStyle,
+          ),
+        ),
+        IconButton(
+          onPressed: _incrementCounter,
+          icon: const Icon(Icons.add_circle),
+          color: colorGreen,
+        )
+      ],
+    );
+  }
+
   Widget _gestureImage() {
     return GestureDetector(
       onTap: () {
@@ -446,6 +491,8 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 18),
+                          diners(),
                           const SizedBox(height: 18),
                           Text(
                             "Ingredientes",
