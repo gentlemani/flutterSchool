@@ -288,59 +288,51 @@ class _EditAccountState extends State<EditAccount> {
                 color: Color.fromARGB(255, 0, 0, 0),
               )),
           onPressed: () {
+            FocusScope.of(context).unfocus();
             Navigator.pop(context);
           },
         ),
       ),
+      resizeToAvoidBottomInset: true,
       body: Stack(children: [
         SeasonalBackground(),
         Padding(
             padding: EdgeInsets.symmetric(
                 vertical: screenHeight * 0.02, horizontal: screenWidth * 0.06),
-            child: Form(
-                key: _formKey,
-                child: Center(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Flexible(
-                          fit: FlexFit.loose,
-                          flex: 2,
-                          child: widget.gestureImage,
-                        ),
-                        Flexible(
-                          fit: FlexFit.loose,
-                          child: buildTextField(
+            child: SingleChildScrollView(
+              child: Form(
+                  key: _formKey,
+                  child: Center(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          widget.gestureImage,
+                          SizedBox(height: screenHeight * 0.02),
+                          buildTextField(
                             controller: controlleruser,
                             labelText: "Usuario",
                             fieldType: "user",
                           ),
-                        ),
-                        Flexible(
-                            fit: FlexFit.loose,
-                            child: buildTextField(
-                              controller: controllerEmail,
-                              labelText: "Correo electrónico",
-                              fieldType: "email",
-                            )),
-                        Flexible(
-                            fit: FlexFit.loose,
-                            child: buildTextField(
-                                controller: controllerPass,
-                                labelText: "Contraseña actual",
-                                isPassword: true,
-                                fieldType: "password")),
-                        Flexible(
-                            fit: FlexFit.loose,
-                            child: buildTextField(
-                                controller: controllerPassNew,
-                                labelText: "Contraseña nueva",
-                                isPassword: true,
-                                fieldType: "password")),
-                        SizedBox(height: screenHeight * 0.02),
-                        Flexible(fit: FlexFit.loose, child: _buttonUpdateAll()),
-                      ]),
-                )))
+                          buildTextField(
+                            controller: controllerEmail,
+                            labelText: "Correo electrónico",
+                            fieldType: "email",
+                          ),
+                          buildTextField(
+                              controller: controllerPass,
+                              labelText: "Contraseña actual",
+                              isPassword: true,
+                              fieldType: "password"),
+                          buildTextField(
+                              controller: controllerPassNew,
+                              labelText: "Contraseña nueva",
+                              isPassword: true,
+                              fieldType: "password"),
+                          SizedBox(height: screenHeight * 0.02),
+                          _buttonUpdateAll(),
+                        ]),
+                  )),
+            ))
       ]),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
     );
