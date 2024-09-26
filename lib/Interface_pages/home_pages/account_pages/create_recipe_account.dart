@@ -392,6 +392,12 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
           titleTextStyle: headingTextStyle,
           title: const Text("Crea tu receta"),
           elevation: 10,
+          leading: IconButton(
+              onPressed: () {
+                FocusScope.of(context).unfocus(); // Cerrar el teclado
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
         resizeToAvoidBottomInset: false,
         body: Stack(
