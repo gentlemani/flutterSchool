@@ -4,6 +4,7 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/ingredient.dart
 import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredient_delegate.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -45,7 +46,15 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       'porciones',
       'tazas',
       'ml',
-      'cucharadas'
+      'cucharadas',
+      'paquetes',
+      'unidades',
+      'lonchas',
+      'ramas',
+      'cucharadtias',
+      'pizcas',
+      'c/s',
+      'cantidad al gusto'
     ]; // Lista de unidades
     await showDialog(
       context: context,
@@ -156,7 +165,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               child: const Text("Agregar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps.add("Paso $step - ${stepController.text}");
+                  recipeSteps.add("Paso $step. ${stepController.text}");
                   step++;
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
@@ -275,23 +284,50 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
 
   Future<void> uploadRecipe(String imageUrl) async {
     // Crear un nuevo documento en la colección "Recetas"
+    String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
-      await _firestore.collection('Prueba').add({
+      String recipeDescription =
+          recipeSteps.map((step) => step.replaceAll('\n', '').trim()).join(" ");
+
+      List<String> newIngredients = selectedIngredients.map((ingredient) {
+        return '${ingredient['name'].replaceAll(' ', '_')}';
+      }).toList();
+
+      List<String> portions = selectedIngredients.map((ingredientData) {
+        return '${ingredientData['quantity']} ${ingredientData['unit']}';
+      }).toList();
+
+      await _firestore.collection('Recetas').add({
         'name': _title.text,
-        //'ingredients': _ingredientsController.text
-        //.split(','), // Separar ingredientes por coma
-        //'description': _body.text,
+        'ingredients': newIngredients,
+        'description': recipeDescription,
+        'portions': portions,
+        'diners': counterDiners,
         'image': imageUrl,
-        'likes': 0, // Valor inicial para likes
-        'dislikes': 0, // Valor inicial para dislikes
+        'likes': 0,
+        'dislikes': 0,
+        'created_by': uid
       });
-      // Limpiar los campos después de subir
-      _title.clear();
-      //_ingredientsController.clear();
-      //_body.clear();
-      _imageFile = null;
+      setState(() {
+        _title.clear();
+        selectedIngredients.clear();
+        recipeSteps.clear();
+        _imageFile = null;
+        counterDiners = 0;
+        step = 1;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Receta subida exitosamente')),
+        );
+      }
     } catch (e) {
-      rethrow;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al subir la receta: $e')),
+        );
+      }
     }
   }
 
@@ -462,23 +498,23 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                   // Mostrar los pasos con opción de editar y eliminar
                                   ...recipeSteps.asMap().entries.map((entry) {
                                     int index = entry.key;
-                                    String step = entry.value;
+                                    String steep = entry.value;
 
                                     return Row(
                                       children: [
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () async {
-                                              await _editStep(index, step);
+                                              await _editStep(index, steep);
                                             },
-                                            child: Text(step),
+                                            child: Text(steep),
                                           ),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () async {
                                             await _editStep(index,
-                                                step); // Función para editar el paso
+                                                steep); // Función para editar el paso
                                           },
                                         ),
                                         IconButton(
@@ -487,6 +523,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                             setState(() {
                                               recipeSteps.removeAt(
                                                   index); // Eliminar paso
+                                              step--;
                                             });
                                           },
                                         ),
