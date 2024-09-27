@@ -57,7 +57,8 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
       'cucharadtias',
       'pizcas',
       'c/s',
-      'cantidad al gusto'
+      'cantidad al gusto',
+      'rebanadas'
     ]; // Lista de unidades
     await showDialog(
       context: context,
