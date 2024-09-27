@@ -349,10 +349,10 @@ class _AccountHomeState extends State<AccountHome> {
 
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Número de columnas en el grid
-                crossAxisSpacing: 10.0, // Espaciado entre columnas
-                mainAxisSpacing: 10.0, // Espaciado entre filas
-                childAspectRatio: 1 / 0.9, // Relación de aspecto
+                crossAxisCount: 2, // Number of columns in the Grid
+                crossAxisSpacing: 10.0, // Spacing between columns
+                mainAxisSpacing: 10.0, // Spacing between rows
+                childAspectRatio: 1 / 0.9, // Appearance relationship
               ),
               padding: const EdgeInsets.all(8.0),
               itemCount: snapshot.data!.docs.length,
@@ -374,7 +374,7 @@ class _AccountHomeState extends State<AccountHome> {
                       children: [
                         Expanded(
                           child: Image.network(
-                            doc['image'], // URL de la imagen
+                            doc['image'], // Image URL
                             fit: BoxFit.cover,
                           ),
                         ),
