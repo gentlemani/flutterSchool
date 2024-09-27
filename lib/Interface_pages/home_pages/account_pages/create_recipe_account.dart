@@ -54,7 +54,8 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       'cucharadtias',
       'pizcas',
       'c/s',
-      'cantidad al gusto'
+      'cantidad al gusto',
+      'rebanadas'
     ]; // Lista de unidades
     await showDialog(
       context: context,
