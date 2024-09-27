@@ -358,13 +358,17 @@ class _AccountHomeState extends State<AccountHome> {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 var doc = snapshot.data!.docs[index];
+                final recipeId = doc.id;
                 return Card(
                   elevation: 4.0,
                   child: InkWell(
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Receta seleccionada  ${doc['name']}"),
-                      ));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RecipesHome(recetaId: recipeId),
+                        ),
+                      );
                     },
                     child: Column(
                       children: [
