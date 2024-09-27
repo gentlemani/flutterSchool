@@ -166,7 +166,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               onPressed: () {
                 setState(() {
                   recipeSteps.add("Paso $step. ${stepController.text}");
-                  step++;
+                  _renumberSteps();
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -203,7 +203,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               onPressed: () {
                 setState(() {
                   recipeSteps[index] =
-                      "Paso ${index + 1} - ${stepController.text}";
+                      "Paso ${index + 1}. ${stepController.text}";
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -212,6 +212,22 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
         );
       },
     );
+  }
+
+  void _deleteStep(int index) {
+    setState(() {
+      recipeSteps.removeAt(index); // Eliminar el paso
+      step--; // Decrementar el contador de pasos
+      _renumberSteps(); // Renumerar todos los pasos después de la eliminación
+    });
+  }
+
+  // Función para renumerar todos los pasos de la lista
+  void _renumberSteps() {
+    for (int i = 0; i < recipeSteps.length; i++) {
+      // Renumerar cada paso
+      recipeSteps[i] = "Paso ${i + 1}. ${recipeSteps[i].split('. ')[1]}";
+    }
   }
 
   Widget _buildSelectedIngredients() {
@@ -521,9 +537,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                           icon: const Icon(Icons.delete),
                                           onPressed: () {
                                             setState(() {
-                                              recipeSteps.removeAt(
-                                                  index); // Eliminar paso
-                                              step--;
+                                              _deleteStep(index);
                                             });
                                           },
                                         ),
@@ -583,10 +597,13 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                 _imageFile!, _title.text);
                             await uploadRecipe(imageUrl);
                           } else {
-                            Text(
-                              'Por favor selecciona una imagen.',
-                              style: instrucctionTextStyle,
-                            );
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Porfavor inserte una imagen')),
+                              );
+                            }
                           }
                         },
                         child: Text(

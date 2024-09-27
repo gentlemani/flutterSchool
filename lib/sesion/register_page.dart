@@ -60,7 +60,7 @@ class _SignUpPageState extends State<SignUpPage> {
       case 'weak-password':
         return 'Contraseña debil, por favor utilice 6 o más caracteres';
       default:
-        return 'Error';
+        return '';
     }
   }
 
