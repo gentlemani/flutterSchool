@@ -129,6 +129,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                     selectedIngredients.add({
                       'name': ingredient,
                       'quantity': quantityController.text,
+                      'originalQuantity': quantityController.text,
                       'unit': selectedUnit,
                     });
                   }
@@ -205,8 +206,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               child: const Text("Guardar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps[index] =
-                      "Paso ${index + 1} - ${stepController.text}";
+                  recipeSteps[index] = stepController.text;
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -280,28 +280,6 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
 
       String downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> uploadRecipe(String imageUrl) async {
-    // Crear un nuevo documento en la colección "Recetas"
-    try {
-      await _firestore.collection('Prueba').add({
-        'name': _title.text,
-        //'ingredients': _ingredientsController.text
-        //.split(','), // Separar ingredientes por coma
-        //'description': _body.text,
-        'image': imageUrl,
-        'likes': 0, // Valor inicial para likes
-        'dislikes': 0, // Valor inicial para dislikes
-      });
-      // Limpiar los campos después de subir
-      _title.clear();
-      //_ingredientsController.clear();
-      //_body.clear();
-      _imageFile = null;
     } catch (e) {
       rethrow;
     }
@@ -473,6 +451,20 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
 
   Future<void> _updateRecipeData() async {
     try {
+      String updatedDescription = recipeSteps
+          .map((step) => step
+              .replaceAll('\n', '')
+              .trim()) // Eliminar el salto de línea y espacios
+          .join(" ");
+
+      List<String> updatedIngredients = selectedIngredients.map((ingredient) {
+        return '${ingredient['name'].replaceAll(' ', '_')}';
+      }).toList();
+
+      List<String> updatedPortions = selectedIngredients.map((ingredientData) {
+        return '${ingredientData['quantity']} ${ingredientData['unit']}';
+      }).toList();
+
       await _firestore.collection('Recetas').doc(widget.recipeId).update({
         'name': _title.text,
         'image': _imageFile != null
@@ -481,16 +473,10 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                 .collection('Recetas')
                 .doc(widget.recipeId)
                 .get())['image'], // Sube imagen si cambió
-        'steps': recipeSteps, // Unir pasos con "."
-        'ingredients': _filteredIngredients, // Actualizar ingredientes
+        'description': updatedDescription, // Unir pasos con "."
+        'ingredients': updatedIngredients, // Actualizar ingredientes
         'diners': counterDiners, // Actualizar comensales
-        'portions': selectedIngredients.map((ingredientData) {
-          return {
-            'ingredient': ingredientData['name'],
-            'quantity': ingredientData['quantity'],
-            'unit': ingredientData['unit'],
-          };
-        }).toList(), // Actualizar cantidades
+        'portions': updatedPortions // Actualizar cantidades
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
