@@ -143,13 +143,17 @@ class PreferencesAccountState extends State<PreferencesAccount> {
           .collection('Users')
           .doc(userId)
           .update(updatedValues);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preferencias guardadas correctamente')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preferencias guardadas correctamente')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al guardar las preferencias')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al guardar las preferencias')),
+        );
+      }
     }
   }
 

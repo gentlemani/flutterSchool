@@ -29,6 +29,9 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
   List<Map<String, dynamic>> selectedIngredients = [];
   List<String> recipeSteps = [];
   int step = 1;
+  int counterDiners = 0;
+  String? _recipeImageUrl;
+  int originalDiners = 1;
 
   Future<void> _showQuantityDialog(String ingredient) async {
     Map<String, dynamic>? existingIngredient = selectedIngredients.firstWhere(
@@ -46,7 +49,15 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
       'porciones',
       'tazas',
       'ml',
-      'cucharadas'
+      'cucharadas',
+      'paquetes',
+      'unidades',
+      'lonchas',
+      'ramas',
+      'cucharadtias',
+      'pizcas',
+      'c/s',
+      'cantidad al gusto'
     ]; // Lista de unidades
     await showDialog(
       context: context,
@@ -296,6 +307,81 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
     }
   }
 
+  void _incrementCounter() {
+    setState(() {
+      counterDiners++;
+      _updateIngredientQuantities();
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      if (counterDiners > 1) {
+        counterDiners--;
+        _updateIngredientQuantities();
+      }
+    });
+  }
+
+  void _updateIngredientQuantities() {
+    setState(() {
+      for (var ingredient in selectedIngredients) {
+        // Actualizar la cantidad según la proporción de comensales
+        double originalQuantity =
+            _parseQuantity(ingredient['originalQuantity']);
+        double newQuantity =
+            (originalQuantity / originalDiners) * counterDiners;
+        ingredient['quantity'] = _formatQuantity(newQuantity);
+      }
+    });
+  }
+
+  double _parseQuantity(String quantity) {
+    // Maneja las fracciones como "1/2", "1/4", etc.
+    if (quantity.contains('/')) {
+      List<String> parts = quantity.split('/');
+      return double.parse(parts[0]) / double.parse(parts[1]);
+    }
+    return double.tryParse(quantity) ??
+        1.0; // Default a 1 si no se puede parsear
+  }
+
+  String _formatQuantity(double quantity) {
+    if (quantity == quantity.roundToDouble()) {
+      return quantity.toStringAsFixed(0); // Si es número entero
+    } else {
+      return quantity
+          .toStringAsFixed(2); // Mostrar dos decimales para fracciones
+    }
+  }
+
+  Widget diners() {
+    String textDiners = counterDiners == 1 ? "Comensal" : "Comensales";
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+            onPressed: _decrementCounter,
+            icon: const Icon(
+              Icons.remove_circle_outlined,
+              color: Colors.red,
+            )),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            "$counterDiners $textDiners",
+            style: bodyTextStyle,
+          ),
+        ),
+        IconButton(
+          onPressed: _incrementCounter,
+          icon: const Icon(Icons.add_circle),
+          color: colorGreen,
+        )
+      ],
+    );
+  }
+
   Widget _gestureImage() {
     return GestureDetector(
       onTap: () {
@@ -317,15 +403,103 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                   fit: BoxFit.cover,
                 ),
               )
-            : const Center(
-                child: Icon(
-                  Icons.add,
-                  size: 40,
-                  color: Colors.grey,
-                ),
-              ),
+            : (_recipeImageUrl != null
+                ? Image.network(_recipeImageUrl!,
+                    fit: BoxFit
+                        .cover) // Muestra la imagen almacenada en Firestore si existe
+                : const Center(
+                    child: Icon(
+                      Icons.add,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  )),
       ),
     );
+  }
+
+  Future<void> _fetchRecipeData() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('Recetas').doc(widget.recipeId).get();
+
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Cargar los datos en los controladores y listas
+        _title.text = data['name'] ?? '';
+        _recipeImageUrl =
+            data['image']; // Si no tienes la imagen cargada, obtén la URL.
+        String description = data['description'] as String;
+
+        description.split('Paso').forEach((part) {
+          if (part.trim().isNotEmpty) {
+            recipeSteps.add(
+                'Paso ${part.trim()}\n'); // Añadir salto de línea y numeración
+          }
+        });
+        step = recipeSteps.length;
+        _filteredIngredients = List<String>.from(data['ingredients'].map(
+            (ingredient) =>
+                ingredient.replaceAll('_', ' '))); // Obtener ingredientes
+        originalDiners = data['diners'] ?? 1;
+        counterDiners = originalDiners; // Comensales
+        // Si tienes las cantidades:
+        selectedIngredients = List<Map<String, dynamic>>.generate(
+          data['portions'].length, // Asegúrate de que el tamaño coincida
+          (index) {
+            // Separar la cadena en cantidad y unidad
+            final portion = data['portions'][index];
+            final parts = portion.split(' '); // Divide la cadena en partes
+            final quantity = parts[0]; // Primer elemento es la cantidad
+            final unit = parts
+                .sublist(1)
+                .join(' '); // Resto de los elementos son la unidad
+
+            return {
+              'name': _filteredIngredients[
+                  index], // Asigna el nombre del ingrediente correspondiente
+              'quantity': quantity,
+              'originalQuantity': quantity,
+              'unit': unit,
+            };
+          },
+        );
+      }
+    } catch (e) {
+      Text('Error al obtener los datos de la receta: $e');
+    }
+  }
+
+  Future<void> _updateRecipeData() async {
+    try {
+      await _firestore.collection('Recetas').doc(widget.recipeId).update({
+        'name': _title.text,
+        'image': _imageFile != null
+            ? await uploadRecipeImage(_imageFile!, _title.text)
+            : (await _firestore
+                .collection('Recetas')
+                .doc(widget.recipeId)
+                .get())['image'], // Sube imagen si cambió
+        'steps': recipeSteps, // Unir pasos con "."
+        'ingredients': _filteredIngredients, // Actualizar ingredientes
+        'diners': counterDiners, // Actualizar comensales
+        'portions': selectedIngredients.map((ingredientData) {
+          return {
+            'ingredient': ingredientData['name'],
+            'quantity': ingredientData['quantity'],
+            'unit': ingredientData['unit'],
+          };
+        }).toList(), // Actualizar cantidades
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Receta actualizada exitosamente')),
+        );
+      }
+    } catch (e) {
+      Text('Error al actualizar los datos de la receta: $e');
+    }
   }
 
   @override
@@ -333,6 +507,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
     super.initState();
     step = 1;
     _fetchIngredients();
+    _fetchRecipeData();
     _focusNodeTitle.addListener(() {
       if (!_focusNodeTitle.hasFocus && _title.text.isEmpty) {
         setState(() {
@@ -347,8 +522,14 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
     return Scaffold(
         appBar: AppBar(
           titleTextStyle: headingTextStyle,
-          title: const Text("Crea tu receta"),
+          title: const Text("Edita tu receta"),
           elevation: 10,
+          leading: IconButton(
+              onPressed: () {
+                FocusScope.of(context).unfocus(); // Cerrar el teclado
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
         resizeToAvoidBottomInset: false,
         body: Stack(
@@ -449,6 +630,8 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                             ),
                           ),
                           const SizedBox(height: 18),
+                          diners(),
+                          const SizedBox(height: 18),
                           Text(
                             "Ingredientes",
                             style: bodyTextStyle,
@@ -490,16 +673,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                     width: double.infinity,
                     child: ElevatedButton(
                         onPressed: () async {
-                          if (_imageFile != null) {
-                            String imageUrl = await uploadRecipeImage(
-                                _imageFile!, _title.text);
-                            await uploadRecipe(imageUrl);
-                          } else {
-                            Text(
-                              'Por favor selecciona una imagen.',
-                              style: instrucctionTextStyle,
-                            );
-                          }
+                          _updateRecipeData();
                         },
                         child: Text(
                           "Subir receta",
