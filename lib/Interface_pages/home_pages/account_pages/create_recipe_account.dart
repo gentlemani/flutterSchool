@@ -45,7 +45,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       'gramos',
       'porciones',
       'tazas',
-      'ml',
+      'mililitros',
       'cucharadas',
       'paquetes',
       'unidades',
@@ -53,7 +53,6 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       'ramas',
       'cucharadtias',
       'pizcas',
-      'c/s',
       'cantidad al gusto',
       'rebanadas'
     ]; // Lista de unidades
