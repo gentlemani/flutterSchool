@@ -173,14 +173,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   TextButton(
                     child: const Text("Cancelar"),
                     onPressed: () {
-                      Navigator.of(context)
-                          .pop(); // Cierra el cuadro de diálogo
+                      Navigator.of(context).pop(); // Close the dialog box
                     },
                   ),
                   TextButton(
                     child: const Text("Enviar"),
                     onPressed: () {
-                      // Cierra el cuadro de diálogo y continúa con el registro
+                      // Close the dialog box and continue with the registration
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

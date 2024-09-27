@@ -22,7 +22,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
     'Carnívora'
   ];
 
-  // Información de cada preferencia
+  //Information of each preference
   Map<String, String> preferenceInfo = {
     'Omnívoro':
         'La dieta omnívora incluye tanto alimentos de origen vegetal como de origen animal. Es la más amplia y variada de todas, ya que permite el consumo de todos los grupos de alimentos.',
@@ -64,7 +64,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
   }
 
   Future<void> updateUserPreferences(String userId) async {
-    // Estructura para almacenar los cambios a realizar en Firestore
+    // Structure to store the changes to make in Firestore
     List<String> allCategories = [
       'Azúcares_y_dulces',
       'Carnes_pescado_y_huevos',
@@ -91,7 +91,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
       }
 
       if (resetValues.isNotEmpty) {
-        // Actualizar categorías que estaban en -1 a 0
+        // Update categories that were at -1 to 0
         await FirebaseFirestore.instance
             .collection('Users')
             .doc(userId)
@@ -101,7 +101,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
 
     Map<String, dynamic> updatedValues = {
       'foodPreferences':
-          selectedPreference, // Guardar la preferencia en el campo 'foodPreferences'
+          selectedPreference, // Save preference in the 'foodpreter' field
     };
 
     switch (selectedPreference) {
@@ -137,7 +137,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
         break;
     }
 
-    // Actualizar Firestore con los valores modificados
+    // Update Firestore with modified values
     try {
       await FirebaseFirestore.instance
           .collection('Users')
@@ -175,7 +175,7 @@ class PreferencesAccountState extends State<PreferencesAccount> {
   @override
   void initState() {
     super.initState();
-    loadUserPreferences(user!.uid); // Cargar preferencias guardadas al iniciar
+    loadUserPreferences(user!.uid); // Load saving preferences when starting
   }
 
   @override

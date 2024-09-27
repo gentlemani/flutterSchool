@@ -31,26 +31,26 @@ class _SignInPageState extends State<SignInPage> {
 */
 
   Future<bool> signInWithEmailAndPassword() async {
-    // Variable para indicar si la autenticación fue exitosa
+    // Variable to indicate if the authentication was successful
     bool isAuthenticated = false;
-    // Verificar que los campos no estén vacíos
+    // Verify that the fields are not empty
     if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
       setState(() {
         errorMessage = 'Campos vacios';
       });
-      return isAuthenticated; // Devolver falso si algún campo está vacío
+      return isAuthenticated; // Return false if any field is empty
     }
     try {
       await AuthService().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-      // Si no se lanzó una excepción, la autenticación fue exitosa
+      // If an exception was not launched, the authentication was successful
       isAuthenticated = true;
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = _mapFirebaseAuthErrorCode(e.code);
       });
     }
-    return isAuthenticated; // Devolver falso si algún campo está vacío
+    return isAuthenticated; // Return false if any field is empty
   }
 
   Future<void> createUserWithEmailAndPassword() async {
@@ -69,7 +69,8 @@ class _SignInPageState extends State<SignInPage> {
     switch (code) {
       case 'invalid-email':
         return 'Formato de correo incorrecto';
-      // Poner codigo para correo existente
+      case 'email-already-in-use':
+        return 'Usuario ya existente';
       default:
         return 'Correo o contraseña incorrecta';
     }
@@ -182,7 +183,7 @@ class _SignInPageState extends State<SignInPage> {
             setState(() {
               errorMessage = 'Por favor, completa todos los campos.';
             });
-            return; // Detener la función si algún campo está vacío
+            return; //Stop the function if any field is empty
           } else {
             bool isAuthenticated = await signInWithEmailAndPassword();
             if (mounted) {
@@ -193,7 +194,7 @@ class _SignInPageState extends State<SignInPage> {
               }
             } else {
               const Text(
-                  'Error al iniciar sesión:'); // Autenticación fallida: mostrar un mensaje de error al usuario
+                  'Error al iniciar sesión:'); //Failed authentication: Show an error message to the user
             }
           }
         } catch (e) {
@@ -227,7 +228,7 @@ class _SignInPageState extends State<SignInPage> {
     return TextButton(
       key: const Key('register'),
       onPressed: () async {
-        // Navegar a la pantalla de login.dart
+        // Navigate to the login.dart screen
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const SignUpPage()),
