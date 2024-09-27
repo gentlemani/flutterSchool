@@ -169,8 +169,9 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               child: const Text("Agregar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps.add("Paso $step - ${stepController.text}");
+                  recipeSteps.add("Paso $step. ${stepController.text}");
                   step++;
+                  _renumberSteps();
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -206,7 +207,8 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               child: const Text("Guardar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps[index] = stepController.text;
+                  recipeSteps[index] =
+                      "Paso ${index + 1}. ${stepController.text}";
                 });
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -215,6 +217,21 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
         );
       },
     );
+  }
+
+  void _deleteStep(int index) {
+    setState(() {
+      recipeSteps.removeAt(index); // Eliminar el paso
+      step--; // Decrementar el contador de pasos
+      _renumberSteps(); // Renumerar todos los pasos después de la eliminación
+    });
+  }
+
+  void _renumberSteps() {
+    for (int i = 0; i < recipeSteps.length; i++) {
+      // Renumerar cada paso
+      recipeSteps[i] = "Paso ${i + 1}. ${recipeSteps[i].split('. ')[1]}";
+    }
   }
 
   Widget _buildSelectedIngredients() {
@@ -416,7 +433,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                 'Paso ${part.trim()}\n'); // Añadir salto de línea y numeración
           }
         });
-        step = recipeSteps.length;
+        step = recipeSteps.length + 1;
         _filteredIngredients = List<String>.from(data['ingredients'].map(
             (ingredient) =>
                 ingredient.replaceAll('_', ' '))); // Obtener ingredientes
@@ -580,30 +597,30 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                                   // Mostrar los pasos con opción de editar y eliminar
                                   ...recipeSteps.asMap().entries.map((entry) {
                                     int index = entry.key;
-                                    String step = entry.value;
+                                    String stepe = entry.value;
 
                                     return Row(
                                       children: [
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () async {
-                                              await _editStep(index, step);
+                                              await _editStep(index, stepe);
                                             },
-                                            child: Text(step),
+                                            child: Text(stepe),
                                           ),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () async {
                                             await _editStep(index,
-                                                step); // Función para editar el paso
+                                                stepe); // Función para editar el paso
                                           },
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete),
                                           onPressed: () {
                                             setState(() {
-                                              recipeSteps.removeAt(
+                                              _deleteStep(
                                                   index); // Eliminar paso
                                             });
                                           },
