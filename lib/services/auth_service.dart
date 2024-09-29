@@ -29,4 +29,7 @@ class AuthService {
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
+  Future<String?> getUserToken() async {
+      return await currentUser?.getIdToken();
+  }
 }
