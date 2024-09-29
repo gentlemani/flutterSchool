@@ -32,6 +32,7 @@ class _DishHomeState extends State<DishHome> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final user = FirebaseAuth.instance.currentUser;
+  
 
 /*     |----------------|
        |    Functions   |
