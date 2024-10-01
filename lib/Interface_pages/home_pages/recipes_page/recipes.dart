@@ -34,40 +34,33 @@ class _RecipesHomeState extends State<RecipesHome> {
 
       if (doc.exists) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        // Cargar los datos en los controladores y listas
         name = data['name'] ?? '';
-        _recipeImageUrl =
-            data['image']; // Si no tienes la imagen cargada, obtén la URL.
+        _recipeImageUrl = data['image'];
         String description = data['description'] as String;
-
         description.split('Paso').forEach((part) {
           if (part.trim().isNotEmpty) {
-            recipeSteps.add(
-                'Paso ${part.trim()}\n'); // Añadir salto de línea y numeración
+            recipeSteps
+                .add('Paso ${part.trim()}\n'); // Add line jump and numbering
           }
         });
         step = recipeSteps.length;
-        _filteredIngredients = List<String>.from(data['ingredients'].map(
-            (ingredient) =>
-                ingredient.replaceAll('_', ' '))); // Obtener ingredientes
+        _filteredIngredients = List<String>.from(data['ingredients']
+            .map((ingredient) => ingredient.replaceAll('_', ' ')));
         originalDiners = data['diners'] ?? 1;
-        counterDiners = originalDiners; // Comensales
-        // Si tienes las cantidades:
+        counterDiners = originalDiners;
         selectedIngredients = List<Map<String, dynamic>>.generate(
-          data['portions'].length, // Asegúrate de que el tamaño coincida
+          data['portions'].length,
           (index) {
-            // Separar la cadena en cantidad y unidad
+            // Separate the chain into quantity and unit
             final portion = data['portions'][index];
-            final parts = portion.split(' '); // Divide la cadena en partes
-            final quantity = parts[0]; // Primer elemento es la cantidad
-            final unit = parts
-                .sublist(1)
-                .join(' '); // Resto de los elementos son la unidad
+            final parts = portion.split(' '); // Divide the chain into partss
+            final quantity = parts[0]; //First element is the amount
+            final unit =
+                parts.sublist(1).join(' '); //Rest of the elements are the unit
 
             return {
               'name': _filteredIngredients[
-                  index], // Asigna el nombre del ingrediente correspondiente
+                  index], //Assign the name of the corresponding ingredient
               'quantity': quantity,
               'originalQuantity': quantity,
               'unit': unit,
@@ -76,7 +69,12 @@ class _RecipesHomeState extends State<RecipesHome> {
         );
       }
     } catch (e) {
-      Text('Error al obtener los datos de la receta: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Error al obtener los datos de la receta')),
+        );
+      }
     }
   }
 
@@ -151,7 +149,7 @@ class _RecipesHomeState extends State<RecipesHome> {
   void _updateIngredientQuantities() {
     setState(() {
       for (var ingredient in selectedIngredients) {
-        // Actualizar la cantidad según la proporción de comensales
+        // Update the amount according to the proportion of diners
         double originalQuantity =
             _parseQuantity(ingredient['originalQuantity']);
         double newQuantity =
@@ -162,21 +160,19 @@ class _RecipesHomeState extends State<RecipesHome> {
   }
 
   double _parseQuantity(String quantity) {
-    // Maneja las fracciones como "1/2", "1/4", etc.
+    //Handle fractions as "1/2", "1/4", etc..
     if (quantity.contains('/')) {
       List<String> parts = quantity.split('/');
       return double.parse(parts[0]) / double.parse(parts[1]);
     }
-    return double.tryParse(quantity) ??
-        1.0; // Default a 1 si no se puede parsear
+    return double.tryParse(quantity) ?? 1.0; // Default to 1 if you can't stand
   }
 
   String _formatQuantity(double quantity) {
     if (quantity == quantity.roundToDouble()) {
-      return quantity.toStringAsFixed(0); // Si es número entero
+      return quantity.toStringAsFixed(0); // If it is a whole number
     } else {
-      return quantity
-          .toStringAsFixed(2); // Mostrar dos decimales para fracciones
+      return quantity.toStringAsFixed(2); // Show two decimals for fractions
     }
   }
 
@@ -230,8 +226,7 @@ class _RecipesHomeState extends State<RecipesHome> {
   Widget buildIngredientsList() {
     return ListView.builder(
       shrinkWrap: true,
-      physics:
-          const NeverScrollableScrollPhysics(), // Evita el scroll independiente
+      physics: const NeverScrollableScrollPhysics(), // Avoid independent scroll
       itemCount: selectedIngredients.length,
       itemBuilder: (context, index) {
         final ingredient = selectedIngredients[index];
@@ -239,23 +234,23 @@ class _RecipesHomeState extends State<RecipesHome> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white, // Fondo blanco
-              borderRadius: BorderRadius.circular(12), // Bordes redondeados
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 6,
-                  offset: Offset(0, 3), // Sombra ligeramente desplazada
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(12.0), // Espaciado interior
+            padding: const EdgeInsets.all(12.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    ingredient['name'], // Nombre del ingrediente
+                    ingredient['name'],
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -263,7 +258,7 @@ class _RecipesHomeState extends State<RecipesHome> {
                   ),
                 ),
                 Text(
-                  "${ingredient['quantity']} ${ingredient['unit']}", // Cantidad y unidad
+                  "${ingredient['quantity']} ${ingredient['unit']}",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -347,50 +342,47 @@ class _RecipesHomeState extends State<RecipesHome> {
   Widget buildRecipeSteps() {
     return ListView.builder(
       shrinkWrap: true,
-      physics:
-          const NeverScrollableScrollPhysics(), // Evita el scroll independiente
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: recipeSteps.length,
       itemBuilder: (context, index) {
         final step = recipeSteps[index]
-            .replaceFirst(RegExp(r'Paso \d+\.?\s*'), ''); // Remover "Paso X."
+            .replaceFirst(RegExp(r'Paso \d+\.?\s*'), ''); // remover "pasoX."
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 1.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white, // Fondo blanco
-              borderRadius: BorderRadius.circular(12), // Bordes redondeados
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 6,
-                  offset: Offset(0, 3), // Sombra ligeramente desplazada
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(16.0), // Espaciado interior
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Circulo con número a la izquierda
                 Container(
                   width: 35,
                   height: 35,
                   decoration: const BoxDecoration(
-                    color: Colors.blue, // Fondo azul
-                    shape: BoxShape.circle, // Círculo
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
-                      '${index + 1}', // Número del paso
+                      '${index + 1}',
                       style: const TextStyle(
-                        color: Colors.white, // Texto blanco
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12), // Espacio entre círculo y texto
-                // Paso de la receta
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     step,

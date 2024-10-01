@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditRecipeAccount extends StatefulWidget {
-  final String recipeId; // ID de la receta que se va a editar
+  final String recipeId; // Recipe id that is going to be edited
 
   const EditRecipeAccount({required this.recipeId, super.key});
 
@@ -43,7 +43,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
     );
     String? selectedUnit = existingIngredient.isNotEmpty
         ? existingIngredient['unit']
-        : "gramos"; // Unidad por defecto o la existente
+        : "gramos"; // Default or existing unit
     List<String> units = [
       'gramos',
       'porciones',
@@ -58,7 +58,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
       'pizcas',
       'cantidad al gusto',
       'rebanadas'
-    ]; // Lista de unidades
+    ]; // List of units
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -111,7 +111,6 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               onPressed: () {
                 setState(() {
                   if (quantityController.text.isEmpty) {
-                    // Mostrar un mensaje de error si la cantidad está vacía
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Por favor, ingrese una cantidad'),
@@ -121,11 +120,11 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                     return;
                   }
                   if (existingIngredient.isNotEmpty) {
-                    // Si el ingrediente ya existía, modificar sus valores
+                    // If the ingredient already existed, modify its values
                     existingIngredient['quantity'] = quantityController.text;
                     existingIngredient['unit'] = selectedUnit;
                   } else {
-                    // Si no existe, añadirlo a la lista
+                    // If do not exist, add it to the list
                     selectedIngredients.add({
                       'name': ingredient,
                       'quantity': quantityController.text,
@@ -134,7 +133,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                     });
                   }
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -173,7 +172,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                   step++;
                   _renumberSteps();
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -193,7 +192,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
           title: const Text("Editar Paso"),
           content: TextField(
             controller: stepController,
-            maxLines: null, // Permitir múltiples líneas
+            maxLines: null, // Allow multiple lines
             decoration: const InputDecoration(hintText: "Escribe el paso"),
           ),
           actions: <Widget>[
@@ -210,7 +209,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                   recipeSteps[index] =
                       "Paso ${index + 1}. ${stepController.text}";
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -221,15 +220,15 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
 
   void _deleteStep(int index) {
     setState(() {
-      recipeSteps.removeAt(index); // Eliminar el paso
-      step--; // Decrementar el contador de pasos
-      _renumberSteps(); // Renumerar todos los pasos después de la eliminación
+      recipeSteps.removeAt(index); // Eliminate the step
+      step--; // Decree the steps counter
+      _renumberSteps(); //Renumerate all steps after elimination
     });
   }
 
   void _renumberSteps() {
     for (int i = 0; i < recipeSteps.length; i++) {
-      // Renumerar cada paso
+      // Renumerate every stepep
       recipeSteps[i] = "Paso ${i + 1}. ${recipeSteps[i].split('. ')[1]}";
     }
   }
@@ -321,7 +320,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
   void _updateIngredientQuantities() {
     setState(() {
       for (var ingredient in selectedIngredients) {
-        // Actualizar la cantidad según la proporción de comensales
+        // Update the amount according to the proportion of diners
         double originalQuantity =
             _parseQuantity(ingredient['originalQuantity']);
         double newQuantity =
@@ -332,21 +331,19 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
   }
 
   double _parseQuantity(String quantity) {
-    // Maneja las fracciones como "1/2", "1/4", etc.
+    // Handle fractions such as "1/2", "1/4", etc.
     if (quantity.contains('/')) {
       List<String> parts = quantity.split('/');
       return double.parse(parts[0]) / double.parse(parts[1]);
     }
-    return double.tryParse(quantity) ??
-        1.0; // Default a 1 si no se puede parsear
+    return double.tryParse(quantity) ?? 1.0; // Default to 1 if you can't stand
   }
 
   String _formatQuantity(double quantity) {
     if (quantity == quantity.roundToDouble()) {
-      return quantity.toStringAsFixed(0); // Si es número entero
+      return quantity.toStringAsFixed(0); // If it is a whole number
     } else {
-      return quantity
-          .toStringAsFixed(2); // Mostrar dos decimales para fracciones
+      return quantity.toStringAsFixed(2); // Show two decimals for fractions
     }
   }
 
@@ -401,7 +398,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
             : (_recipeImageUrl != null
                 ? Image.network(_recipeImageUrl!,
                     fit: BoxFit
-                        .cover) // Muestra la imagen almacenada en Firestore si existe
+                        .cover) // Shows the image stored in Firestore if there is
                 : const Center(
                     child: Icon(
                       Icons.add,
@@ -421,39 +418,32 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
       if (doc.exists) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        // Cargar los datos en los controladores y listas
+        // Load the data in the controllers and lists
         _title.text = data['name'] ?? '';
-        _recipeImageUrl =
-            data['image']; // Si no tienes la imagen cargada, obtén la URL.
+        _recipeImageUrl = data['image'];
         String description = data['description'] as String;
 
         description.split('Paso').forEach((part) {
           if (part.trim().isNotEmpty) {
-            recipeSteps.add(
-                'Paso ${part.trim()}\n'); // Añadir salto de línea y numeración
+            recipeSteps
+                .add('Paso ${part.trim()}\n'); // Add line jump and numbering
           }
         });
         step = recipeSteps.length + 1;
-        _filteredIngredients = List<String>.from(data['ingredients'].map(
-            (ingredient) =>
-                ingredient.replaceAll('_', ' '))); // Obtener ingredientes
+        _filteredIngredients = List<String>.from(data['ingredients']
+            .map((ingredient) => ingredient.replaceAll('_', ' ')));
         originalDiners = data['diners'] ?? 1;
-        counterDiners = originalDiners; // Comensales
-        // Si tienes las cantidades:
+        counterDiners = originalDiners;
         selectedIngredients = List<Map<String, dynamic>>.generate(
-          data['portions'].length, // Asegúrate de que el tamaño coincida
+          data['portions'].length,
           (index) {
-            // Separar la cadena en cantidad y unidad
             final portion = data['portions'][index];
-            final parts = portion.split(' '); // Divide la cadena en partes
-            final quantity = parts[0]; // Primer elemento es la cantidad
-            final unit = parts
-                .sublist(1)
-                .join(' '); // Resto de los elementos son la unidad
+            final parts = portion.split(' ');
+            final quantity = parts[0];
+            final unit = parts.sublist(1).join(' ');
 
             return {
-              'name': _filteredIngredients[
-                  index], // Asigna el nombre del ingrediente correspondiente
+              'name': _filteredIngredients[index],
               'quantity': quantity,
               'originalQuantity': quantity,
               'unit': unit,
@@ -462,16 +452,20 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
         );
       }
     } catch (e) {
-      Text('Error al obtener los datos de la receta: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Error al obtener los datos de la receta')),
+        );
+      }
     }
   }
 
   Future<void> _updateRecipeData() async {
     try {
       String updatedDescription = recipeSteps
-          .map((step) => step
-              .replaceAll('\n', '')
-              .trim()) // Eliminar el salto de línea y espacios
+          .map((step) =>
+              step.replaceAll('\n', '').trim()) // Eliminate line and space jump
           .join(" ");
 
       List<String> updatedIngredients = selectedIngredients.map((ingredient) {
@@ -489,11 +483,11 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
             : (await _firestore
                 .collection('Recetas')
                 .doc(widget.recipeId)
-                .get())['image'], // Sube imagen si cambió
-        'description': updatedDescription, // Unir pasos con "."
-        'ingredients': updatedIngredients, // Actualizar ingredientes
-        'diners': counterDiners, // Actualizar comensales
-        'portions': updatedPortions // Actualizar cantidades
+                .get())['image'], // Upload image if it changed
+        'description': updatedDescription, // Unite steps with "."
+        'ingredients': updatedIngredients, // Update ingredients
+        'diners': counterDiners, // Update diners
+        'portions': updatedPortions // Update amounts
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -501,7 +495,12 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
         );
       }
     } catch (e) {
-      Text('Error al actualizar los datos de la receta: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Error al obtener los datos de la receta')),
+        );
+      }
     }
   }
 
@@ -529,7 +528,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
           elevation: 10,
           leading: IconButton(
               onPressed: () {
-                FocusScope.of(context).unfocus(); // Cerrar el teclado
+                FocusScope.of(context).unfocus(); // Close the keyboard
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back)),
@@ -594,7 +593,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                                     "Agregar paso",
                                     style: instrucctionTextStyle,
                                   ),
-                                  // Mostrar los pasos con opción de editar y eliminar
+                                  // Show the steps with the option of editing and deleting
                                   ...recipeSteps.asMap().entries.map((entry) {
                                     int index = entry.key;
                                     String stepe = entry.value;
@@ -613,7 +612,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                                           icon: const Icon(Icons.edit),
                                           onPressed: () async {
                                             await _editStep(index,
-                                                stepe); // Función para editar el paso
+                                                stepe); // Function to edit the step
                                           },
                                         ),
                                         IconButton(
@@ -621,7 +620,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                                           onPressed: () {
                                             setState(() {
                                               _deleteStep(
-                                                  index); // Eliminar paso
+                                                  index); // Eliminate step
                                             });
                                           },
                                         ),

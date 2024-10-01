@@ -43,7 +43,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     );
     String? selectedUnit = existingIngredient.isNotEmpty
         ? existingIngredient['unit']
-        : "gramos"; // Unidad por defecto o la existente
+        : "gramos"; // Default or existing unit
     List<String> units = [
       'gramos',
       'porciones',
@@ -58,7 +58,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       'pizcas',
       'cantidad al gusto',
       'rebanadas'
-    ]; // Lista de unidades
+    ]; // List of units
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -111,7 +111,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               onPressed: () {
                 setState(() {
                   if (quantityController.text.isEmpty) {
-                    // Mostrar un mensaje de error si la cantidad está vacía
+                    // Show an error message if the amount is empty
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Por favor, ingrese una cantidad'),
@@ -121,11 +121,11 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                     return;
                   }
                   if (existingIngredient.isNotEmpty) {
-                    // Si el ingrediente ya existía, modificar sus valores
+                    // If the ingredient already existed, modify its values
                     existingIngredient['quantity'] = quantityController.text;
                     existingIngredient['unit'] = selectedUnit;
                   } else {
-                    // Si no existe, añadirlo a la lista
+                    // If it does not exist, add it to the list
                     selectedIngredients.add({
                       'name': ingredient,
                       'quantity': quantityController.text,
@@ -133,7 +133,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                     });
                   }
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -171,7 +171,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                   recipeSteps.add("Paso $step. ${stepController.text}");
                   _renumberSteps();
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -191,7 +191,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
           title: const Text("Editar Paso"),
           content: TextField(
             controller: stepController,
-            maxLines: null, // Permitir múltiples líneas
+            maxLines: null, // Allow multiple lines
             decoration: const InputDecoration(hintText: "Escribe el paso"),
           ),
           actions: <Widget>[
@@ -208,7 +208,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                   recipeSteps[index] =
                       "Paso ${index + 1}. ${stepController.text}";
                 });
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -230,16 +230,16 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
 
   void _deleteStep(int index) {
     setState(() {
-      recipeSteps.removeAt(index); // Eliminar el paso
-      step--; // Decrementar el contador de pasos
-      _renumberSteps(); // Renumerar todos los pasos después de la eliminación
+      recipeSteps.removeAt(index); // Eliminate the step
+      step--; // Decree the steps counter
+      _renumberSteps(); // Renumerate all steps after elimination
     });
   }
 
-  // Función para renumerar todos los pasos de la lista
+  //Function to reume all the steps on the list
   void _renumberSteps() {
     for (int i = 0; i < recipeSteps.length; i++) {
-      // Renumerar cada paso
+      // Renumerate every step
       recipeSteps[i] = "Paso ${i + 1}. ${recipeSteps[i].split('. ')[1]}";
     }
   }
@@ -313,7 +313,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   }
 
   Future<void> uploadRecipe(String imageUrl) async {
-    // Crear un nuevo documento en la colección "Recetas"
+    // Create a new document in the "Recipes" collection
     String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       String recipeDescription =
@@ -460,7 +460,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
           elevation: 10,
           leading: IconButton(
               onPressed: () {
-                FocusScope.of(context).unfocus(); // Cerrar el teclado
+                FocusScope.of(context).unfocus();
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back)),
@@ -525,7 +525,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                     "Agregar paso",
                                     style: instrucctionTextStyle,
                                   ),
-                                  // Mostrar los pasos con opción de editar y eliminar
+                                  // Show the steps with the option of editing and deleting
                                   ...recipeSteps.asMap().entries.map((entry) {
                                     int index = entry.key;
                                     String steep = entry.value;
@@ -544,7 +544,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                           icon: const Icon(Icons.edit),
                                           onPressed: () async {
                                             await _editStep(index,
-                                                steep); // Función para editar el paso
+                                                steep); // Function to edit the step
                                           },
                                         ),
                                         IconButton(
