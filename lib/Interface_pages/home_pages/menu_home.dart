@@ -26,13 +26,11 @@ class _MenuHomeState extends State<MenuHome> {
   late final DatabaseService _firestoreService;
 
   final Map<String, List<Map<String, dynamic>>> _filteredRecipesByCategory = {
-    //'Bolillo': [],
     'timestamp': [],
     'Recetas Simples': []
   };
 
   Future<void> _fetchRecipesD() async {
-    //List<Map<String, dynamic>> recipes = await _firestoreService.getRecipes(10);
     QuerySnapshot recentRecipesSnapshot = await FirebaseFirestore.instance
         .collection('Recetas')
         .where('timestamp',
@@ -47,19 +45,8 @@ class _MenuHomeState extends State<MenuHome> {
       };
     }).toList();
 
-    /*for (var recipe in recipes) {
-      List<String> categories = List<String>.from(recipe['ingredients'] ?? []);
-
-      if (categories.contains('Bolillo')) {
-        _filteredRecipesByCategory['Bolillo']!.add(recipe);
-      }
-    }*/
     // Store recent recipes
     _filteredRecipesByCategory['timestamp'] = recentRecipes;
-
-    // setState(() {
-    //   // Trigger UI update with filtered recipes
-    // });
   }
 
   Future<void> _fetchSimpleRecipes() async {
