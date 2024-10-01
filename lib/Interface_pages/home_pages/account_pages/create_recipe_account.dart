@@ -4,11 +4,13 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/ingredient.dart
 import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredient_delegate.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:eatsily/services/api_service.dart';
 
 class CreateRecipeAccount extends StatefulWidget {
   const CreateRecipeAccount({super.key});
@@ -29,6 +31,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   List<String> recipeSteps = [];
   int step = 1;
   int counterDiners = 0;
+  final ApiService _apiService = ApiService();
 
   Future<void> _showQuantityDialog(String ingredient) async {
     Map<String, dynamic>? existingIngredient = selectedIngredients.firstWhere(
@@ -212,6 +215,17 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
         );
       },
     );
+  }
+
+  Future<void> createRecipe(File image) async {
+    String? token = await AuthService().getUserToken();
+    if (token != null) {
+      List<String> ingredients = ['sal','harina','tartas'];
+      List<String> portions = ['200gr','1 taza'];
+      print(token);
+      _apiService.createRecipe(
+          'name', 'description', ingredients, portions, image, token);
+    }
   }
 
   void _deleteStep(int index) {
@@ -593,9 +607,9 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                     child: ElevatedButton(
                         onPressed: () async {
                           if (_imageFile != null) {
-                            String imageUrl = await uploadRecipeImage(
-                                _imageFile!, _title.text);
-                            await uploadRecipe(imageUrl);
+                            // String imageUrl = await uploadRecipeImage(
+                            //     _imageFile!, _title.text);
+                            createRecipe(_imageFile!);
                           } else {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
