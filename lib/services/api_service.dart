@@ -53,7 +53,6 @@ class ApiService {
       request.fields.forEach((key, value) {});
       var response = await request.send();
       if (response.statusCode == 201) {
-        print('Receta creada correctamente');
       } else {
         String errorResponse = await response.stream.bytesToString();
         throw Exception('Error ${response.statusCode}: $errorResponse');
@@ -72,7 +71,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-        print('Recomendaciones obtenidas correctamente');
         return jsonResponse['recommendations'];
       } else {
         throw Exception('Error ${response.statusCode}: ${response.body}');
