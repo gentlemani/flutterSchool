@@ -60,7 +60,7 @@ class _SignUpPageState extends State<SignUpPage> {
       case 'weak-password':
         return 'Contraseña debil, por favor utilice 6 o más caracteres';
       default:
-        return 'Error';
+        return '';
     }
   }
 
@@ -161,13 +161,40 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _submitButton() {
     return OutlinedButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Procesando registro...Verifique su correo'),
-              backgroundColor: Colors.blue,
-            ),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirmación"),
+                content: Text(
+                    "¿Estás seguro de haber introducido tus datos correctamente? \n"
+                    "Correo: ${_controllerEmail.text} \nUsuario: ${_controllerName.text}"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text("Cancelar"),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog box
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Enviar"),
+                    onPressed: () {
+                      // Close the dialog box and continue with the registration
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Procesando registro...Verifique su correo'),
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                      createUserWithEmailAndPassword();
+                    },
+                  ),
+                ],
+              );
+            },
           );
-          createUserWithEmailAndPassword();
         },
         style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 20),

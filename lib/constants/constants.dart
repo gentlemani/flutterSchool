@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const Set<String> userFrecuencyValuesNames = {
-  'carne',
-  'fruta',
-  'verdura',
-  'grasas',
-  'cereales',
-  'lacteos'
+  'Azúcares_y_dulces',
+  'Carnes_pescado_y_huevos',
+  'Cereales_y_tuberculos',
+  'Condimentos_y_salsas',
+  'Frutas',
+  'Grasas_y_aceites',
+  'Lacteos',
+  'Legumbres_y_frutos_secos',
+  'Verduras_y_hortalizas'
 };
 
 //colors palette

@@ -1,4 +1,6 @@
 import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
+import 'package:eatsily/services/api_service.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
@@ -32,7 +34,8 @@ class _DishHomeState extends State<DishHome> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final user = FirebaseAuth.instance.currentUser;
-
+  final ApiService _apiService = ApiService();
+  List<dynamic> recommendations = [];
 /*     |----------------|
        |    Functions   |
        |----------------|
@@ -43,37 +46,79 @@ class _DishHomeState extends State<DishHome> {
     super.initState();
     if (user != null) {
       _firestoreService = DatabaseService(uid: user!.uid);
-      _fetchRecipes(); // Only if it is authenticated the recipes are charged
+      _fetchRecommendations();
     } else {
       handleLogout(context, redirectTo: const WidgetTree());
       // Redirect the user to the login screen
     }
   }
 
-  Future<void> _fetchRecipes() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // Obtain recipe ids that the user has marked as 'Dislike'
-      List<String> dislikedRecipeIds =
-          await _firestoreService.getDislikedRecipeIds(user.uid);
+  Future<void> _fetchRecommendations() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Get the IDs of the recipes that the user has marked as 'Dislike'
+        List<String> dislikedRecipeIds =
+            await _firestoreService.getDislikedRecipeIds(user.uid);
 
-      // Get recipes
-      QuerySnapshot snapshot = await _firestoreService.getRecipes2(10);
+        String? token = await AuthService().getUserToken();
+        if (token != null) {
+          List<dynamic> result = await _apiService.getRecommendations(token);
 
-      //Filter recipes to exclude what the user has marked as 'Dislike'
-      List<Map<String, dynamic>> recipes = snapshot.docs
-          .map((doc) {
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            data['recetaId'] = doc.id; // Add the document ID to the data
-            return data;
-          })
-          .where((recipe) => !dislikedRecipeIds.contains(recipe['recetaId']))
-          .toList();
-      if (mounted) {
-        setState(() {
-          _recipes = recipes;
-        });
+          if (result.isEmpty) {
+            return; // Do not continue if there are no results
+          }
+
+          // We convert a list of maps
+          List<Map<String, dynamic>> recommendedRecipesFromApi =
+              List<Map<String, dynamic>>.from(result.map((item) {
+            return {
+              'id': item['id'],
+              'name': item['name'],
+              'puntuation': item['puntuation'],
+            };
+          }));
+
+          //Filter recipes to exclude what the user has marked with 'Dislike'
+          List<Map<String, dynamic>> filteredRecipesFromApi =
+              recommendedRecipesFromApi.where((recipe) {
+            return !dislikedRecipeIds.contains(recipe['id']);
+          }).toList();
+
+          // Verify if there are recommended recipes filtered
+          if (filteredRecipesFromApi.isEmpty) {
+            return;
+          }
+
+          // Get complete recipes from Firestore in a single query
+          List<Map<String, dynamic>> recommendedRecipes =
+              await _firestoreService.getRecipesByIds(filteredRecipesFromApi
+                  .map((recipe) => recipe['id'] as String)
+                  .toList());
+          for (var recipe in recommendedRecipes) {
+            var matchedRecipe = recommendedRecipesFromApi.firstWhere(
+              (item) => item['id'] == recipe['id'],
+              orElse: () => {'id': recipe['id'], 'puntuation': 0},
+            );
+            recipe['puntuation'] =
+                matchedRecipe['puntuation'] ?? 0; //Be sure to use?To avoid null
+          }
+
+          // Sort the recipes by score (from highest to lowest)
+          recommendedRecipes.sort((a, b) {
+            final puntuationA = a['puntuation']?.toDouble() ?? 0.0;
+            final puntuationB = b['puntuation']?.toDouble() ?? 0.0;
+            return puntuationB.compareTo(puntuationA);
+          });
+          if (mounted) {
+            setState(() {
+              _recipes = recommendedRecipes;
+            });
+          }
+        }
       }
+    } catch (e) {
+      throw ('Error al obtener las recomendaciones: $e');
     }
   }
 
@@ -120,7 +165,7 @@ class _DishHomeState extends State<DishHome> {
                     itemExtent: itemHeight, // Responsively adjusts height
                     itemCount: _recipes.length,
                     itemBuilder: (context, index) {
-                      final String recetaId = _recipes[index]['recetaId'];
+                      final String recetaId = _recipes[index]['id'] ?? '';
                       return Container(
                         margin: EdgeInsets.symmetric(
                           vertical: constraints.maxHeight * 0.05,

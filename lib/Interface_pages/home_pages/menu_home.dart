@@ -26,16 +26,14 @@ class _MenuHomeState extends State<MenuHome> {
   late final DatabaseService _firestoreService;
 
   final Map<String, List<Map<String, dynamic>>> _filteredRecipesByCategory = {
-    //'Bolillo': [],
-    'timestamp': [],
+    'created_at': [],
     'Recetas Simples': []
   };
 
   Future<void> _fetchRecipesD() async {
-    //List<Map<String, dynamic>> recipes = await _firestoreService.getRecipes(10);
     QuerySnapshot recentRecipesSnapshot = await FirebaseFirestore.instance
         .collection('Recetas')
-        .where('timestamp',
+        .where('created_at',
             isGreaterThan: DateTime.now().subtract(const Duration(days: 5)))
         .get();
 
@@ -47,19 +45,8 @@ class _MenuHomeState extends State<MenuHome> {
       };
     }).toList();
 
-    /*for (var recipe in recipes) {
-      List<String> categories = List<String>.from(recipe['ingredients'] ?? []);
-
-      if (categories.contains('Bolillo')) {
-        _filteredRecipesByCategory['Bolillo']!.add(recipe);
-      }
-    }*/
     // Store recent recipes
-    _filteredRecipesByCategory['timestamp'] = recentRecipes;
-
-    // setState(() {
-    //   // Trigger UI update with filtered recipes
-    // });
+    _filteredRecipesByCategory['created_at'] = recentRecipes;
   }
 
   Future<void> _fetchSimpleRecipes() async {
@@ -288,15 +275,15 @@ class _MenuHomeState extends State<MenuHome> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
       ),
-      body: _filteredRecipesByCategory['timestamp']!.isEmpty &&
+      body: _filteredRecipesByCategory['created_at']!.isEmpty &&
               _filteredRecipesByCategory['Recetas Simples']!.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  if (_filteredRecipesByCategory['timestamp']!.isNotEmpty)
+                  if (_filteredRecipesByCategory['created_at']!.isNotEmpty)
                     buildCategoryListView('Nuevas recetas',
-                        _filteredRecipesByCategory['timestamp']!),
+                        _filteredRecipesByCategory['created_at']!),
                   if (_filteredRecipesByCategory['Recetas Simples']!.isNotEmpty)
                     buildCategoryListView('Cocinar con 5 Ingredientes o menos',
                         _filteredRecipesByCategory['Recetas Simples']!),
