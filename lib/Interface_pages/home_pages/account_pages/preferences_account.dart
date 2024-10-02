@@ -108,8 +108,11 @@ class PreferencesAccountState extends State<PreferencesAccount> {
       case 'Omnívoro':
         break;
       case 'Vegano':
-        updatedValues
-            .addAll({'Azúcares_y_dulces': -1, 'Carnes_pescado_y_huevos': -1});
+        updatedValues.addAll({
+          'Azúcares_y_dulces': -1,
+          'Carnes_pescado_y_huevos': -1,
+          'Lacteos': -1
+        });
         break;
       case 'Vegetariano':
         updatedValues
@@ -121,16 +124,14 @@ class PreferencesAccountState extends State<PreferencesAccount> {
         updatedValues.addAll({'Azúcares_y_dulces': -1});
         break;
       case 'Ovo-lacto Vegetariana':
-        updatedValues.addAll({'Azúcares_y_dulces': -11});
+        updatedValues
+            .addAll({'Azúcares_y_dulces': -1, 'Carnes_pescado_y_huevos': -1});
         break;
       case 'Carnívora':
         updatedValues.addAll({
           'Azúcares_y_dulces': -1,
           'Cereales_y_tuberculos': -1,
-          'Condimentos_y_salsas': -1,
           'Frutas': -1,
-          'Grasas_y_aceites': -1,
-          'Lacteos': -1,
           'Legumbres_y_frutos_secos': -1,
           'Verduras_y_hortalizas': -1
         });
