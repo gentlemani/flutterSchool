@@ -432,7 +432,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
         step = recipeSteps.length + 1;
         _filteredIngredients = List<String>.from(data['ingredients']
             .map((ingredient) => ingredient.replaceAll('_', ' ')));
-        originalDiners = data['diners'] ?? 1;
+        originalDiners = data['diner'] ?? 1;
         counterDiners = originalDiners;
         selectedIngredients = List<Map<String, dynamic>>.generate(
           data['portions'].length,
@@ -486,7 +486,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                 .get())['image'], // Upload image if it changed
         'description': updatedDescription, // Unite steps with "."
         'ingredients': updatedIngredients, // Update ingredients
-        'diners': counterDiners, // Update diners
+        'diner': counterDiners, // Update diners
         'portions': updatedPortions // Update amounts
       });
       if (mounted) {

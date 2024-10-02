@@ -17,48 +17,49 @@ class ApiService {
       String description,
       List<String> ingredients,
       List<String> portions,
+      String diners,
       File imageFile,
       String token) async {
-    var uri = Uri.parse('${dotenv.get('HOST')}/api/v1/recipe');
-    print('${dotenv.get('HOST')}/api/v1/recipe');
+    try {
+      var uri = Uri.parse('${dotenv.get('HOST')}/api/v1/recipe');
 
-    var request = http.MultipartRequest('POST', uri);
+      var request = http.MultipartRequest('POST', uri);
 
-    request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Authorization'] = 'Bearer $token';
 
-    var imageStream = http.ByteStream(imageFile.openRead());
-    var imageLength = await imageFile.length();
-    var multipartFile = http.MultipartFile(
-      'image',
-      imageStream,
-      imageLength,
-      filename: imageFile.path.split('/').last,
-    );
-    request.files.add(multipartFile);
-    request.fields['name'] = name;
-    request.fields['description'] = description;
-    // // Add ingredients as separate fields
-    // for (String ingredient in ingredients) {
-    //   request.fields.addAll({'ingredients': ingredient});
-    // }
+      var imageStream = http.ByteStream(imageFile.openRead());
+      var imageLength = await imageFile.length();
+      var multipartFile = http.MultipartFile(
+        'image',
+        imageStream,
+        imageLength,
+        filename: imageFile.path.split('/').last,
+      );
+      request.files.add(multipartFile);
+      request.fields['name'] = name;
+      request.fields['description'] = description;
+      request.fields['diners'] = diners;
+      // // Add ingredients as separate fields
+      // for (String ingredient in ingredients) {
+      //   request.fields.addAll({'ingredients': ingredient});
+      // }
 
-    // // Add portions as separate fields with the same key 'portions'
-    // for (String portion in portions) {
-    //   request.fields.addAll({'portions': portion});
-    // }
-    request.fields['ingredients'] = jsonEncode(ingredients);
-    request.fields['portions'] = jsonEncode(portions);
-    print('Request fields:');
-    request.fields.forEach((key, value) {
-      print('$key: $value');
-    });
-    var response = await request.send();
-
-    if (response.statusCode == 201) {
-      print('Upload successful');
-    } else {
-      print(
-          'Failed to upload: ${response.statusCode} - ${await response.stream.bytesToString()}');
+      // // Add portions as separate fields with the same key 'portions'
+      // for (String portion in portions) {
+      //   request.fields.addAll({'portions': portion});
+      // }
+      request.fields['ingredients'] = jsonEncode(ingredients);
+      request.fields['portions'] = jsonEncode(portions);
+      request.fields.forEach((key, value) {});
+      var response = await request.send();
+      if (response.statusCode == 201) {
+        print('Receta creada correctamente');
+      } else {
+        String errorResponse = await response.stream.bytesToString();
+        throw Exception('Error ${response.statusCode}: $errorResponse');
+      }
+    } catch (e) {
+      throw Exception('Error al intentar subir la receta: $e');
     }
   }
 }

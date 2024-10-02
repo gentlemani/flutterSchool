@@ -46,7 +46,7 @@ class _RecipesHomeState extends State<RecipesHome> {
         step = recipeSteps.length;
         _filteredIngredients = List<String>.from(data['ingredients']
             .map((ingredient) => ingredient.replaceAll('_', ' ')));
-        originalDiners = data['diners'] ?? 1;
+        originalDiners = data['diner'] ?? 1;
         counterDiners = originalDiners;
         selectedIngredients = List<Map<String, dynamic>>.generate(
           data['portions'].length,
