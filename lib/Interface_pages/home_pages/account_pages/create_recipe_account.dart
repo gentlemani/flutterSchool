@@ -216,36 +216,44 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   }
 
   Future<void> createRecipe(File image) async {
-    String? token = await AuthService().getUserToken();
-    if (token != null) {
-      String recipeDescription =
-          recipeSteps.map((step) => step.replaceAll('\n', '').trim()).join(" ");
+    try {
+      String? token = await AuthService().getUserToken();
+      if (token != null) {
+        String recipeDescription = recipeSteps
+            .map((step) => step.replaceAll('\n', '').trim())
+            .join(" ");
 
-      List<String> newIngredients = selectedIngredients.map((ingredient) {
-        return '${ingredient['name'].replaceAll(' ', '_')}';
-      }).toList();
+        List<String> newIngredients = selectedIngredients.map((ingredient) {
+          return '${ingredient['name'].replaceAll(' ', '_')}';
+        }).toList();
 
-      List<String> portions = selectedIngredients.map((ingredientData) {
-        return '${ingredientData['quantity']} ${ingredientData['unit']}';
-      }).toList();
-      print(token);
-      _apiService.createRecipe(_title.text, recipeDescription, newIngredients,
-          portions, image, token);
+        List<String> portions = selectedIngredients.map((ingredientData) {
+          return '${ingredientData['quantity']} ${ingredientData['unit']}';
+        }).toList();
+        _apiService.createRecipe(_title.text, recipeDescription, newIngredients,
+            portions, counterDiners.toString(), image, token);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Receta subida exitosamente')),
+        );
+      }
+      setState(() {
+        _title.clear();
+        selectedIngredients.clear();
+        recipeSteps.clear();
+        _imageFile = null;
+        counterDiners = 0;
+        step = 1;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al subir la receta: $e')),
+        );
+      }
     }
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Receta subida exitosamente')),
-      );
-    }
-    setState(() {
-      _title.clear();
-      selectedIngredients.clear();
-      recipeSteps.clear();
-      _imageFile = null;
-      counterDiners = 0;
-      step = 1;
-    });
   }
 
   void _deleteStep(int index) {
