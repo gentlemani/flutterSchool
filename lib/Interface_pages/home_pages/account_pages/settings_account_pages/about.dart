@@ -2,6 +2,8 @@ import 'package:eatsily/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class AboutEatsily extends StatelessWidget {
+  const AboutEatsily({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

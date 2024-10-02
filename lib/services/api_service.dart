@@ -62,4 +62,23 @@ class ApiService {
       throw Exception('Error al intentar subir la receta: $e');
     }
   }
+
+  Future<List<dynamic>> getRecommendations(String token) async {
+    try {
+      var uri = Uri.parse('${dotenv.get('HOST')}/api/v1/recommendation');
+      var response = await http.get(uri, headers: {
+        'Authorization': 'Bearer $token',
+      });
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        print('Recomendaciones obtenidas correctamente');
+        return jsonResponse['recommendations'];
+      } else {
+        throw Exception('Error ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error al obtener las recomendaciones: $e');
+    }
+  }
 }
