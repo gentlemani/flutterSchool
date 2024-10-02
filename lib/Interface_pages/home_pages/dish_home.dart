@@ -1,4 +1,6 @@
 import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
+import 'package:eatsily/services/api_service.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
@@ -32,6 +34,8 @@ class _DishHomeState extends State<DishHome> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final user = FirebaseAuth.instance.currentUser;
+  final ApiService _apiService = ApiService();
+  List<dynamic> recommendations = [];
 /*     |----------------|
        |    Functions   |
        |----------------|
@@ -42,10 +46,99 @@ class _DishHomeState extends State<DishHome> {
     super.initState();
     if (user != null) {
       _firestoreService = DatabaseService(uid: user!.uid);
-      _fetchRecipes(); // Only if it is authenticated the recipes are charged
+      //_fetchRecipes(); // Only if it is authenticated the recipes are charged
+      _fetchRecommendations();
     } else {
       handleLogout(context, redirectTo: const WidgetTree());
       // Redirect the user to the login screen
+    }
+  }
+
+  Future<void> _fetchRecommendations() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Obtén los IDs de las recetas que el usuario ha marcado como 'Dislike'
+        List<String> dislikedRecipeIds =
+            await _firestoreService.getDislikedRecipeIds(user.uid);
+
+        String? token = await AuthService().getUserToken();
+        if (token != null) {
+          List<dynamic> result = await _apiService.getRecommendations(token);
+
+          // Verifica el resultado obtenido
+          print('Resultado de la API: $result');
+          if (result.isEmpty) {
+            print('No se encontraron recomendaciones.');
+            return; // No continuar si no hay resultados
+          }
+
+          // Convertimos result en una lista de mapas
+          List<Map<String, dynamic>> recommendedRecipesFromApi =
+              List<Map<String, dynamic>>.from(result.map((item) {
+            return {
+              'id': item['id'],
+              'name': item['name'],
+              'puntuation': item['puntuation'],
+            };
+          }));
+
+          // Extraemos los IDs de las recetas recomendadas
+          List<String> recommendedRecipeIds =
+              recommendedRecipesFromApi.map((recipe) {
+            return recipe['id'] as String;
+          }).toList();
+
+          // Filtra las recetas recomendadas para excluir las que el usuario ha marcado con 'Dislike'
+          List<String> filteredRecipeIds = recommendedRecipeIds
+              .where((id) => !dislikedRecipeIds.contains(id))
+              .toList();
+
+          // Verifica si hay recetas recomendadas filtradas
+          if (filteredRecipeIds.isEmpty) {
+            print('No hay recetas recomendadas después del filtrado.');
+            return;
+          }
+
+          print('IDs filtrados: $filteredRecipeIds');
+
+          // Obtener las recetas completas desde Firestore en un solo query
+          List<Map<String, dynamic>> recommendedRecipes =
+              await _firestoreService.getRecipesByIds(filteredRecipeIds);
+
+          // Verifica el resultado de Firestore
+          print('Recetas obtenidas de Firestore: $recommendedRecipes');
+
+          for (var recipe in recommendedRecipes) {
+            var matchedRecipe = recommendedRecipesFromApi.firstWhere(
+              (item) => item['id'] == recipe['id'],
+              orElse: () => {'id': recipe['id'], 'puntuation': 0},
+            );
+            recipe['puntuation'] =
+                matchedRecipe['puntuation']; // Añade la puntuación a la receta
+          }
+
+          // Ordenar las recetas por puntuación (de mayor a menor)
+          recommendedRecipes.sort((a, b) {
+            final puntuationA = a['puntuation'] ?? 0;
+            final puntuationB = b['puntuation'] ?? 0;
+            return (puntuationB as int).compareTo(puntuationA as int);
+          });
+
+          if (mounted) {
+            setState(() {
+              _recipes = recommendedRecipes;
+            });
+          }
+
+          // Muestra las recetas recomendadas en la consola
+          for (var recipe in _recipes) {
+            print('Receta: ${recipe['name']} - Likes: ${recipe['likes']}');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error al obtener las recomendaciones: $e');
     }
   }
 

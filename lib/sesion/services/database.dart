@@ -50,6 +50,19 @@ class DatabaseService {
     return _db.collection('Recetas').doc(recetaId).snapshots();
   }
 
+  Future<List<Map<String, dynamic>>> getRecipesByIds(List<String> ids) async {
+    QuerySnapshot query = await _db
+        .collection('Recetas')
+        .where(FieldPath.documentId, whereIn: ids)
+        .get();
+
+    return query.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      data['recetaId'] = doc.id;
+      return data;
+    }).toList();
+  }
+
   Future<List<Map<String, dynamic>>> getRecipes(int limit) async {
     QuerySnapshot snapshot = await _db.collection('Recetas').limit(limit).get();
 
