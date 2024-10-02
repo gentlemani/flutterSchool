@@ -51,16 +51,23 @@ class DatabaseService {
   }
 
   Future<List<Map<String, dynamic>>> getRecipesByIds(List<String> ids) async {
-    QuerySnapshot query = await _db
+    List<Map<String, dynamic>> recipes = [];
+
+    final snapshots = await FirebaseFirestore.instance
         .collection('Recetas')
         .where(FieldPath.documentId, whereIn: ids)
         .get();
 
-    return query.docs.map((doc) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      data['recetaId'] = doc.id;
-      return data;
-    }).toList();
+    for (var snapshot in snapshots.docs) {
+      Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        data['id'] = snapshot.id;
+        recipes.add(data);
+      }
+    }
+
+    return recipes;
   }
 
   Future<List<Map<String, dynamic>>> getRecipes(int limit) async {

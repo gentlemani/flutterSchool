@@ -46,7 +46,6 @@ class _DishHomeState extends State<DishHome> {
     super.initState();
     if (user != null) {
       _firestoreService = DatabaseService(uid: user!.uid);
-      //_fetchRecipes(); // Only if it is authenticated the recipes are charged
       _fetchRecommendations();
     } else {
       handleLogout(context, redirectTo: const WidgetTree());
@@ -58,7 +57,7 @@ class _DishHomeState extends State<DishHome> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Obtén los IDs de las recetas que el usuario ha marcado como 'Dislike'
+        // Get the IDs of the recipes that the user has marked as 'Dislike'
         List<String> dislikedRecipeIds =
             await _firestoreService.getDislikedRecipeIds(user.uid);
 
@@ -66,14 +65,11 @@ class _DishHomeState extends State<DishHome> {
         if (token != null) {
           List<dynamic> result = await _apiService.getRecommendations(token);
 
-          // Verifica el resultado obtenido
-          print('Resultado de la API: $result');
           if (result.isEmpty) {
-            print('No se encontraron recomendaciones.');
-            return; // No continuar si no hay resultados
+            return; // Do not continue if there are no results
           }
 
-          // Convertimos result en una lista de mapas
+          // We convert a list of maps
           List<Map<String, dynamic>> recommendedRecipesFromApi =
               List<Map<String, dynamic>>.from(result.map((item) {
             return {
@@ -83,89 +79,46 @@ class _DishHomeState extends State<DishHome> {
             };
           }));
 
-          // Extraemos los IDs de las recetas recomendadas
-          List<String> recommendedRecipeIds =
-              recommendedRecipesFromApi.map((recipe) {
-            return recipe['id'] as String;
+          //Filter recipes to exclude what the user has marked with 'Dislike'
+          List<Map<String, dynamic>> filteredRecipesFromApi =
+              recommendedRecipesFromApi.where((recipe) {
+            return !dislikedRecipeIds.contains(recipe['id']);
           }).toList();
 
-          // Filtra las recetas recomendadas para excluir las que el usuario ha marcado con 'Dislike'
-          List<String> filteredRecipeIds = recommendedRecipeIds
-              .where((id) => !dislikedRecipeIds.contains(id))
-              .toList();
-
-          // Verifica si hay recetas recomendadas filtradas
-          if (filteredRecipeIds.isEmpty) {
-            print('No hay recetas recomendadas después del filtrado.');
+          // Verify if there are recommended recipes filtered
+          if (filteredRecipesFromApi.isEmpty) {
             return;
           }
 
-          print('IDs filtrados: $filteredRecipeIds');
-
-          // Obtener las recetas completas desde Firestore en un solo query
+          // Get complete recipes from Firestore in a single query
           List<Map<String, dynamic>> recommendedRecipes =
-              await _firestoreService.getRecipesByIds(filteredRecipeIds);
-
-          // Verifica el resultado de Firestore
-          print('Recetas obtenidas de Firestore: $recommendedRecipes');
-
+              await _firestoreService.getRecipesByIds(filteredRecipesFromApi
+                  .map((recipe) => recipe['id'] as String)
+                  .toList());
           for (var recipe in recommendedRecipes) {
             var matchedRecipe = recommendedRecipesFromApi.firstWhere(
               (item) => item['id'] == recipe['id'],
               orElse: () => {'id': recipe['id'], 'puntuation': 0},
             );
             recipe['puntuation'] =
-                matchedRecipe['puntuation']; // Añade la puntuación a la receta
+                matchedRecipe['puntuation'] ?? 0; //Be sure to use?To avoid null
           }
 
-          // Ordenar las recetas por puntuación (de mayor a menor)
+          // Sort the recipes by score (from highest to lowest)
           recommendedRecipes.sort((a, b) {
-            final puntuationA = a['puntuation'] ?? 0;
-            final puntuationB = b['puntuation'] ?? 0;
-            return (puntuationB as int).compareTo(puntuationA as int);
+            final puntuationA = a['puntuation']?.toDouble() ?? 0.0;
+            final puntuationB = b['puntuation']?.toDouble() ?? 0.0;
+            return puntuationB.compareTo(puntuationA);
           });
-
           if (mounted) {
             setState(() {
               _recipes = recommendedRecipes;
             });
           }
-
-          // Muestra las recetas recomendadas en la consola
-          for (var recipe in _recipes) {
-            print('Receta: ${recipe['name']} - Likes: ${recipe['likes']}');
-          }
         }
       }
     } catch (e) {
-      print('Error al obtener las recomendaciones: $e');
-    }
-  }
-
-  Future<void> _fetchRecipes() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // Obtain recipe ids that the user has marked as 'Dislike'
-      List<String> dislikedRecipeIds =
-          await _firestoreService.getDislikedRecipeIds(user.uid);
-
-      // Get recipes
-      QuerySnapshot snapshot = await _firestoreService.getRecipes2(30);
-
-      //Filter recipes to exclude what the user has marked as 'Dislike'
-      List<Map<String, dynamic>> recipes = snapshot.docs
-          .map((doc) {
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            data['recetaId'] = doc.id; // Add the document ID to the data
-            return data;
-          })
-          .where((recipe) => !dislikedRecipeIds.contains(recipe['recetaId']))
-          .toList();
-      if (mounted) {
-        setState(() {
-          _recipes = recipes;
-        });
-      }
+      throw ('Error al obtener las recomendaciones: $e');
     }
   }
 
@@ -212,7 +165,7 @@ class _DishHomeState extends State<DishHome> {
                     itemExtent: itemHeight, // Responsively adjusts height
                     itemCount: _recipes.length,
                     itemBuilder: (context, index) {
-                      final String recetaId = _recipes[index]['recetaId'];
+                      final String recetaId = _recipes[index]['id'] ?? '';
                       return Container(
                         margin: EdgeInsets.symmetric(
                           vertical: constraints.maxHeight * 0.05,
