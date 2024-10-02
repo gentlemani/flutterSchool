@@ -20,6 +20,7 @@ class ApiService {
       File imageFile,
       String token) async {
     var uri = Uri.parse('${dotenv.get('HOST')}/api/v1/recipe');
+    print('${dotenv.get('HOST')}/api/v1/recipe');
 
     var request = http.MultipartRequest('POST', uri);
 

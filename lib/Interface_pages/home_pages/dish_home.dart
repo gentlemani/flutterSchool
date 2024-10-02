@@ -32,8 +32,6 @@ class _DishHomeState extends State<DishHome> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
   final user = FirebaseAuth.instance.currentUser;
-  
-
 /*     |----------------|
        |    Functions   |
        |----------------|
@@ -59,7 +57,7 @@ class _DishHomeState extends State<DishHome> {
           await _firestoreService.getDislikedRecipeIds(user.uid);
 
       // Get recipes
-      QuerySnapshot snapshot = await _firestoreService.getRecipes2(10);
+      QuerySnapshot snapshot = await _firestoreService.getRecipes2(30);
 
       //Filter recipes to exclude what the user has marked as 'Dislike'
       List<Map<String, dynamic>> recipes = snapshot.docs

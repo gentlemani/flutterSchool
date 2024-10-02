@@ -5,7 +5,6 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredie
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
 import 'package:eatsily/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +19,6 @@ class CreateRecipeAccount extends StatefulWidget {
 }
 
 class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _title =
       TextEditingController(text: "Ingresa un nombre para tu receta");
   final FocusNode _focusNodeTitle = FocusNode();
@@ -220,12 +218,34 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   Future<void> createRecipe(File image) async {
     String? token = await AuthService().getUserToken();
     if (token != null) {
-      List<String> ingredients = ['sal','harina','tartas'];
-      List<String> portions = ['200gr','1 taza'];
+      String recipeDescription =
+          recipeSteps.map((step) => step.replaceAll('\n', '').trim()).join(" ");
+
+      List<String> newIngredients = selectedIngredients.map((ingredient) {
+        return '${ingredient['name'].replaceAll(' ', '_')}';
+      }).toList();
+
+      List<String> portions = selectedIngredients.map((ingredientData) {
+        return '${ingredientData['quantity']} ${ingredientData['unit']}';
+      }).toList();
       print(token);
-      _apiService.createRecipe(
-          'name', 'description', ingredients, portions, image, token);
+      _apiService.createRecipe(_title.text, recipeDescription, newIngredients,
+          portions, image, token);
     }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Receta subida exitosamente')),
+      );
+    }
+    setState(() {
+      _title.clear();
+      selectedIngredients.clear();
+      recipeSteps.clear();
+      _imageFile = null;
+      counterDiners = 0;
+      step = 1;
+    });
   }
 
   void _deleteStep(int index) {
@@ -312,7 +332,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     }
   }
 
-  Future<void> uploadRecipe(String imageUrl) async {
+  /*Future<void> uploadRecipe(String imageUrl) async {
     // Create a new document in the "Recipes" collection
     String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -359,7 +379,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
         );
       }
     }
-  }
+  }*/
 
   void _incrementCounter() {
     setState(() {
