@@ -4,21 +4,22 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/ingredient.dart
 import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredient_delegate.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
-import 'package:eatsily/services/auth_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:eatsily/services/api_service.dart';
 
-class CreateRecipeAccount extends StatefulWidget {
-  const CreateRecipeAccount({super.key});
+class EditRecipeAccount extends StatefulWidget {
+  final String recipeId; // Recipe id that is going to be edited
+
+  const EditRecipeAccount({required this.recipeId, super.key});
 
   @override
-  State<CreateRecipeAccount> createState() => _CreateRecipeAccountState();
+  State<EditRecipeAccount> createState() => _EditRecipeAccountState();
 }
 
-class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
+class _EditRecipeAccountState extends State<EditRecipeAccount> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _title =
       TextEditingController(text: "Ingresa un nombre para tu receta");
   final FocusNode _focusNodeTitle = FocusNode();
@@ -29,7 +30,8 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
   List<String> recipeSteps = [];
   int step = 1;
   int counterDiners = 0;
-  final ApiService _apiService = ApiService();
+  String? _recipeImageUrl;
+  int originalDiners = 1;
 
   Future<void> _showQuantityDialog(String ingredient) async {
     Map<String, dynamic>? existingIngredient = selectedIngredients.firstWhere(
@@ -109,7 +111,6 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               onPressed: () {
                 setState(() {
                   if (quantityController.text.isEmpty) {
-                    // Show an error message if the amount is empty
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Por favor, ingrese una cantidad'),
@@ -123,10 +124,11 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                     existingIngredient['quantity'] = quantityController.text;
                     existingIngredient['unit'] = selectedUnit;
                   } else {
-                    // If it does not exist, add it to the list
+                    // If do not exist, add it to the list
                     selectedIngredients.add({
                       'name': ingredient,
                       'quantity': quantityController.text,
+                      'originalQuantity': quantityController.text,
                       'unit': selectedUnit,
                     });
                   }
@@ -167,6 +169,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
               onPressed: () {
                 setState(() {
                   recipeSteps.add("Paso $step. ${stepController.text}");
+                  step++;
                   _renumberSteps();
                 });
                 Navigator.of(context).pop();
@@ -215,59 +218,17 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     );
   }
 
-  Future<void> createRecipe(File image) async {
-    try {
-      String? token = await AuthService().getUserToken();
-      if (token != null) {
-        String recipeDescription = recipeSteps
-            .map((step) => step.replaceAll('\n', '').trim())
-            .join(" ");
-
-        List<String> newIngredients = selectedIngredients.map((ingredient) {
-          return '${ingredient['name'].replaceAll(' ', '_')}';
-        }).toList();
-
-        List<String> portions = selectedIngredients.map((ingredientData) {
-          return '${ingredientData['quantity']} ${ingredientData['unit']}';
-        }).toList();
-        _apiService.createRecipe(_title.text, recipeDescription, newIngredients,
-            portions, counterDiners.toString(), image, token);
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Receta subida exitosamente')),
-        );
-      }
-      setState(() {
-        _title.clear();
-        selectedIngredients.clear();
-        recipeSteps.clear();
-        _imageFile = null;
-        counterDiners = 0;
-        step = 1;
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir la receta: $e')),
-        );
-      }
-    }
-  }
-
   void _deleteStep(int index) {
     setState(() {
       recipeSteps.removeAt(index); // Eliminate the step
       step--; // Decree the steps counter
-      _renumberSteps(); // Renumerate all steps after elimination
+      _renumberSteps(); //Renumerate all steps after elimination
     });
   }
 
-  //Function to reume all the steps on the list
   void _renumberSteps() {
     for (int i = 0; i < recipeSteps.length; i++) {
-      // Renumerate every step
+      // Renumerate every stepep
       recipeSteps[i] = "Paso ${i + 1}. ${recipeSteps[i].split('. ')[1]}";
     }
   }
@@ -340,74 +301,54 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     }
   }
 
-  /*Future<void> uploadRecipe(String imageUrl) async {
-    // Create a new document in the "Recipes" collection
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    try {
-      String recipeDescription =
-          recipeSteps.map((step) => step.replaceAll('\n', '').trim()).join(" ");
-
-      List<String> newIngredients = selectedIngredients.map((ingredient) {
-        return '${ingredient['name'].replaceAll(' ', '_')}';
-      }).toList();
-
-      List<String> portions = selectedIngredients.map((ingredientData) {
-        return '${ingredientData['quantity']} ${ingredientData['unit']}';
-      }).toList();
-
-      await _firestore.collection('Recetas').add({
-        'name': _title.text,
-        'ingredients': newIngredients,
-        'description': recipeDescription,
-        'portions': portions,
-        'diners': counterDiners,
-        'image': imageUrl,
-        'likes': 0,
-        'dislikes': 0,
-        'created_by': uid
-      });
-      setState(() {
-        _title.clear();
-        selectedIngredients.clear();
-        recipeSteps.clear();
-        _imageFile = null;
-        counterDiners = 0;
-        step = 1;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Receta subida exitosamente')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir la receta: $e')),
-        );
-      }
-    }
-  }*/
-
   void _incrementCounter() {
     setState(() {
       counterDiners++;
+      _updateIngredientQuantities();
     });
   }
 
   void _decrementCounter() {
     setState(() {
-      if (counterDiners > 0) counterDiners--;
+      if (counterDiners > 1) {
+        counterDiners--;
+        _updateIngredientQuantities();
+      }
     });
   }
 
-  Widget diners() {
-    String textDiners;
-    if (counterDiners == 1) {
-      textDiners = "Comensal";
-    } else {
-      textDiners = "Comensales";
+  void _updateIngredientQuantities() {
+    setState(() {
+      for (var ingredient in selectedIngredients) {
+        // Update the amount according to the proportion of diners
+        double originalQuantity =
+            _parseQuantity(ingredient['originalQuantity']);
+        double newQuantity =
+            (originalQuantity / originalDiners) * counterDiners;
+        ingredient['quantity'] = _formatQuantity(newQuantity);
+      }
+    });
+  }
+
+  double _parseQuantity(String quantity) {
+    // Handle fractions such as "1/2", "1/4", etc.
+    if (quantity.contains('/')) {
+      List<String> parts = quantity.split('/');
+      return double.parse(parts[0]) / double.parse(parts[1]);
     }
+    return double.tryParse(quantity) ?? 1.0; // Default to 1 if you can't stand
+  }
+
+  String _formatQuantity(double quantity) {
+    if (quantity == quantity.roundToDouble()) {
+      return quantity.toStringAsFixed(0); // If it is a whole number
+    } else {
+      return quantity.toStringAsFixed(2); // Show two decimals for fractions
+    }
+  }
+
+  Widget diners() {
+    String textDiners = counterDiners == 1 ? "Comensal" : "Comensales";
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -454,15 +395,113 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                   fit: BoxFit.cover,
                 ),
               )
-            : const Center(
-                child: Icon(
-                  Icons.add,
-                  size: 40,
-                  color: Colors.grey,
-                ),
-              ),
+            : (_recipeImageUrl != null
+                ? Image.network(_recipeImageUrl!,
+                    fit: BoxFit
+                        .cover) // Shows the image stored in Firestore if there is
+                : const Center(
+                    child: Icon(
+                      Icons.add,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  )),
       ),
     );
+  }
+
+  Future<void> _fetchRecipeData() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('Recetas').doc(widget.recipeId).get();
+
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Load the data in the controllers and lists
+        _title.text = data['name'] ?? '';
+        _recipeImageUrl = data['image'];
+        String description = data['description'] as String;
+
+        description.split('Paso').forEach((part) {
+          if (part.trim().isNotEmpty) {
+            recipeSteps
+                .add('Paso ${part.trim()}\n'); // Add line jump and numbering
+          }
+        });
+        step = recipeSteps.length + 1;
+        _filteredIngredients = List<String>.from(data['ingredients']
+            .map((ingredient) => ingredient.replaceAll('_', ' ')));
+        originalDiners = data['diner'] ?? 1;
+        counterDiners = originalDiners;
+        selectedIngredients = List<Map<String, dynamic>>.generate(
+          data['portions'].length,
+          (index) {
+            final portion = data['portions'][index];
+            final parts = portion.split(' ');
+            final quantity = parts[0];
+            final unit = parts.sublist(1).join(' ');
+
+            return {
+              'name': _filteredIngredients[index],
+              'quantity': quantity,
+              'originalQuantity': quantity,
+              'unit': unit,
+            };
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Error al obtener los datos de la receta')),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateRecipeData() async {
+    try {
+      String updatedDescription = recipeSteps
+          .map((step) =>
+              step.replaceAll('\n', '').trim()) // Eliminate line and space jump
+          .join(" ");
+
+      List<String> updatedIngredients = selectedIngredients.map((ingredient) {
+        return '${ingredient['name'].replaceAll(' ', '_')}';
+      }).toList();
+
+      List<String> updatedPortions = selectedIngredients.map((ingredientData) {
+        return '${ingredientData['quantity']} ${ingredientData['unit']}';
+      }).toList();
+
+      await _firestore.collection('Recetas').doc(widget.recipeId).update({
+        'name': _title.text,
+        'image': _imageFile != null
+            ? await uploadRecipeImage(_imageFile!, _title.text)
+            : (await _firestore
+                .collection('Recetas')
+                .doc(widget.recipeId)
+                .get())['image'], // Upload image if it changed
+        'description': updatedDescription, // Unite steps with "."
+        'ingredients': updatedIngredients, // Update ingredients
+        'diner': counterDiners, // Update diners
+        'portions': updatedPortions // Update amounts
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Receta actualizada exitosamente')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Error al obtener los datos de la receta')),
+        );
+      }
+    }
   }
 
   @override
@@ -470,6 +509,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     super.initState();
     step = 1;
     _fetchIngredients();
+    _fetchRecipeData();
     _focusNodeTitle.addListener(() {
       if (!_focusNodeTitle.hasFocus && _title.text.isEmpty) {
         setState(() {
@@ -484,11 +524,11 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
     return Scaffold(
         appBar: AppBar(
           titleTextStyle: headingTextStyle,
-          title: const Text("Crea tu receta"),
+          title: const Text("Edita tu receta"),
           elevation: 10,
           leading: IconButton(
               onPressed: () {
-                FocusScope.of(context).unfocus();
+                FocusScope.of(context).unfocus(); // Close the keyboard
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back)),
@@ -556,30 +596,31 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                                   // Show the steps with the option of editing and deleting
                                   ...recipeSteps.asMap().entries.map((entry) {
                                     int index = entry.key;
-                                    String steep = entry.value;
+                                    String stepe = entry.value;
 
                                     return Row(
                                       children: [
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () async {
-                                              await _editStep(index, steep);
+                                              await _editStep(index, stepe);
                                             },
-                                            child: Text(steep),
+                                            child: Text(stepe),
                                           ),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () async {
                                             await _editStep(index,
-                                                steep); // Function to edit the step
+                                                stepe); // Function to edit the step
                                           },
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete),
                                           onPressed: () {
                                             setState(() {
-                                              _deleteStep(index);
+                                              _deleteStep(
+                                                  index); // Eliminate step
                                             });
                                           },
                                         ),
@@ -634,19 +675,7 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
                     width: double.infinity,
                     child: ElevatedButton(
                         onPressed: () async {
-                          if (_imageFile != null) {
-                            // String imageUrl = await uploadRecipeImage(
-                            //     _imageFile!, _title.text);
-                            createRecipe(_imageFile!);
-                          } else {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Porfavor inserte una imagen')),
-                              );
-                            }
-                          }
+                          _updateRecipeData();
                         },
                         child: Text(
                           "Subir receta",

@@ -1,3 +1,4 @@
+import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account_pages/about.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/utils/auth.helpers.dart';
@@ -129,7 +130,12 @@ class _SettingsAccountState extends State<SettingsAccount> {
               icon: Icons.info_outline,
               title: 'Sobre Eatsily',
               color: Colors.teal,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutEatsily()),
+                );
+              },
             ),
             _buildSettingCard(
               icon: Icons.contact_mail,

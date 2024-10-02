@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:eatsily/Interface_pages/home_pages/dish_home.dart';
 import 'package:eatsily/Interface_pages/home_pages/menu_home.dart';
 import 'home_pages/account_home.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

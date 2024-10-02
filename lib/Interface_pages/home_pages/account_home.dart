@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/create_recipe_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/edit_account.dart';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/preferences_account.dart';
 import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account.dart';
+import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +111,14 @@ class _AccountHomeState extends State<AccountHome> {
 
   Widget _buttonPref() {
     return FloatingActionButton.extended(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const PreferencesAccount(),
+          ),
+        );
+      },
       elevation: 2,
       backgroundColor: const Color.fromARGB(255, 230, 227, 228),
       label: Row(
@@ -241,21 +250,48 @@ class _AccountHomeState extends State<AccountHome> {
               return const Center(child: Text('No se encontraron recetas.'));
             }
 
-            return ListView(
-              children: recipeSnapshot.data!.docs.map((doc) {
-                return ListTile(
-                  title: Text(
-                    doc['name'],
-                    style: instrucctionTextStyle,
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: 0.75),
+              itemCount: recipeSnapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                final doc = recipeSnapshot.data!.docs[index];
+                final recipeId = doc.id;
+                return Card(
+                  elevation: 4,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RecipesHome(recetaId: recipeId),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            doc['image'], // URL de la imagen
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                            doc['name'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Receta seleccionada: ${doc['name']}')),
-                    );
-                  },
                 );
-              }).toList(),
+              },
             );
           },
         );
@@ -264,10 +300,10 @@ class _AccountHomeState extends State<AccountHome> {
   }
 
   Widget _buildCreadas() {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
     return SafeArea(
         child: Column(
       children: [
-        // Botón "Agregar Receta"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ElevatedButton(
@@ -296,46 +332,72 @@ class _AccountHomeState extends State<AccountHome> {
             ),
           ),
         ),
-        const SizedBox(height: 20), // Espacio entre el botón y el grid
-        // Grid de recetas
+        const SizedBox(height: 20),
         Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Número de columnas en el grid
-              crossAxisSpacing: 10.0, // Espaciado entre columnas
-              mainAxisSpacing: 10.0, // Espaciado entre filas
-              childAspectRatio: 1 / 0.9, // Relación de aspecto
-            ),
-            padding: const EdgeInsets.all(8.0),
-            itemCount: 4, // Número de recetas
-            itemBuilder: (context, index) {
-              return Card(
-                elevation: 4.0,
-                child: InkWell(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Receta seleccionada")),
-                    );
-                  },
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.fastfood,
-                          size: 50), // Icono o imagen de la receta
-                      SizedBox(height: 10),
-                      Text(
-                        "d", // Nombre de la receta
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+            child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('Recetas')
+              .where('created_by', isEqualTo: uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text('No has creado recetas.'));
+            }
+
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Number of columns in the Grid
+                crossAxisSpacing: 10.0, // Spacing between columns
+                mainAxisSpacing: 10.0, // Spacing between rows
+                childAspectRatio: 1 / 0.9, // Appearance relationship
+              ),
+              padding: const EdgeInsets.all(8.0),
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                var doc = snapshot.data!.docs[index];
+                final recipeId = doc.id;
+                return Card(
+                  elevation: 4.0,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RecipesHome(recetaId: recipeId),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            doc['image'], // Image URL
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            doc['name'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ),
+                );
+              },
+            );
+          },
+        )),
       ],
     ));
   }
