@@ -5,7 +5,6 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredie
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
 import 'package:eatsily/services/auth_service.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -324,70 +323,6 @@ class _CreateRecipeAccountState extends State<CreateRecipeAccount> {
       _filteredIngredients = ingredientsList;
     });
   }
-
-  Future<String> uploadRecipeImage(File imageFile, String recipeName) async {
-    try {
-      Reference ref =
-          FirebaseStorage.instance.ref().child('Img recetas/$recipeName');
-
-      UploadTask uploadTask = ref.putFile(imageFile);
-      TaskSnapshot snapshot = await uploadTask;
-
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  /*Future<void> uploadRecipe(String imageUrl) async {
-    // Create a new document in the "Recipes" collection
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    try {
-      String recipeDescription =
-          recipeSteps.map((step) => step.replaceAll('\n', '').trim()).join(" ");
-
-      List<String> newIngredients = selectedIngredients.map((ingredient) {
-        return '${ingredient['name'].replaceAll(' ', '_')}';
-      }).toList();
-
-      List<String> portions = selectedIngredients.map((ingredientData) {
-        return '${ingredientData['quantity']} ${ingredientData['unit']}';
-      }).toList();
-
-      await _firestore.collection('Recetas').add({
-        'name': _title.text,
-        'ingredients': newIngredients,
-        'description': recipeDescription,
-        'portions': portions,
-        'diners': counterDiners,
-        'image': imageUrl,
-        'likes': 0,
-        'dislikes': 0,
-        'created_by': uid
-      });
-      setState(() {
-        _title.clear();
-        selectedIngredients.clear();
-        recipeSteps.clear();
-        _imageFile = null;
-        counterDiners = 0;
-        step = 1;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Receta subida exitosamente')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir la receta: $e')),
-        );
-      }
-    }
-  }*/
 
   void _incrementCounter() {
     setState(() {
