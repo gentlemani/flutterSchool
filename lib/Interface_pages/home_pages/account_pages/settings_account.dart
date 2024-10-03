@@ -111,12 +111,6 @@ class _SettingsAccountState extends State<SettingsAccount> {
           mainAxisSpacing: 16.0,
           children: [
             _buildSettingCard(
-              icon: Icons.straighten,
-              title: 'Unidades de medida',
-              color: Colors.green,
-              onTap: () {},
-            ),
-            _buildSettingCard(
               icon: Icons.star_rate,
               title: 'Valora Eatsily',
               color: Colors.orange,
@@ -126,12 +120,6 @@ class _SettingsAccountState extends State<SettingsAccount> {
                   MaterialPageRoute(builder: (context) => Rating()),
                 );
               },
-            ),
-            _buildSettingCard(
-              icon: Icons.share,
-              title: 'Comparte Eatsily',
-              color: Colors.pink,
-              onTap: () {},
             ),
             _buildSettingCard(
               icon: Icons.info_outline,
