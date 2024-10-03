@@ -1,7 +1,7 @@
-import 'package:eatsily/Interface_pages/home_page.dart';
 import 'package:eatsily/services/auth_service.dart';
 import 'package:eatsily/sesion/passwd_reset_page.dart';
 import 'package:eatsily/sesion/register_page.dart';
+import 'package:eatsily/widget_tree.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -189,7 +189,7 @@ class _SignInPageState extends State<SignInPage> {
             if (mounted) {
               if (isAuthenticated) {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  MaterialPageRoute(builder: (context) => const WidgetTree()),
                 );
               }
             } else {
