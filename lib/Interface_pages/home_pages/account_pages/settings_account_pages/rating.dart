@@ -1,3 +1,4 @@
+import 'package:eatsily/constants/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -107,7 +108,12 @@ class RatingState extends State<Rating> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _submitRating,
-                    child: Text('Enviar Valoración'),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: colorYellowOrange),
+                    child: Text(
+                      'Enviar Valoración',
+                      style: buttomTextStyle,
+                    ),
                   ),
                 ],
               ),
