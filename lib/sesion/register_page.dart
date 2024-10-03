@@ -102,6 +102,22 @@ class _SignUpPageState extends State<SignUpPage> {
           if (passwd == null || passwd.isEmpty) {
             return 'Por favor, ingresa una contraseña';
           }
+          // Minimum length validation
+          if (passwd.length < 6) {
+            return 'La contraseña debe tener al menos 6 caracteres';
+          }
+          // Validation to include at least one capital letter
+          if (!passwd.contains(RegExp(r'[A-Z]'))) {
+            return 'La contraseña debe contener al menos una letra mayúscula';
+          }
+          //Validation of including at least one number
+          if (!passwd.contains(RegExp(r'[0-9]'))) {
+            return 'La contraseña debe contener al menos un número';
+          }
+          //Validation of including at least a special character
+          if (!passwd.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>+-]'))) {
+            return 'La contraseña debe contener al menos un carácter especial';
+          }
           return null;
         },
         onChanged: (passwd) {
