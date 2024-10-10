@@ -90,7 +90,6 @@ class _DishHomeState extends State<DishHome> {
             return;
           }
 
-          // Get complete recipes from Firestore in a single query
           List<Map<String, dynamic>> recommendedRecipes =
               await _firestoreService.getRecipesByIds(filteredRecipesFromApi
                   .map((recipe) => recipe['id'] as String)
@@ -163,7 +162,7 @@ class _DishHomeState extends State<DishHome> {
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     itemExtent: itemHeight, // Responsively adjusts height
-                    itemCount: _recipes.length,
+                    itemCount: _recipes.length < 5 ? _recipes.length : 5,
                     itemBuilder: (context, index) {
                       final String recetaId = _recipes[index]['id'] ?? '';
                       return Container(

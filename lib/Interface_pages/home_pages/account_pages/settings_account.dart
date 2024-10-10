@@ -1,4 +1,6 @@
 import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account_pages/about.dart';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account_pages/contact.dart';
+import 'package:eatsily/Interface_pages/home_pages/account_pages/settings_account_pages/rating.dart';
 import 'package:eatsily/widget_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/utils/auth.helpers.dart';
@@ -109,22 +111,15 @@ class _SettingsAccountState extends State<SettingsAccount> {
           mainAxisSpacing: 16.0,
           children: [
             _buildSettingCard(
-              icon: Icons.straighten,
-              title: 'Unidades de medida',
-              color: Colors.green,
-              onTap: () {},
-            ),
-            _buildSettingCard(
               icon: Icons.star_rate,
               title: 'Valora Eatsily',
               color: Colors.orange,
-              onTap: () {},
-            ),
-            _buildSettingCard(
-              icon: Icons.share,
-              title: 'Comparte Eatsily',
-              color: Colors.pink,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Rating()),
+                );
+              },
             ),
             _buildSettingCard(
               icon: Icons.info_outline,
@@ -141,7 +136,12 @@ class _SettingsAccountState extends State<SettingsAccount> {
               icon: Icons.contact_mail,
               title: 'Contacto',
               color: Colors.amber,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Contact()),
+                );
+              },
             ),
             _buildSettingCard(
               icon: Icons.exit_to_app,

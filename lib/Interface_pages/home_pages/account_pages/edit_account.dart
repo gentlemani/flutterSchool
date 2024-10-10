@@ -63,7 +63,7 @@ class _EditAccountState extends State<EditAccount> {
           final currentPasswordError =
               validateFields(controllerPass.text, 'password');
           final newPasswordError =
-              validateFields(controllerPassNew.text, 'password');
+              validateFields(controllerPassNew.text, 'passwordNew');
           if (currentPasswordError != null) {
             if (mounted) {
               showSimpleSnackBar(context, currentPasswordError);
@@ -147,17 +147,34 @@ class _EditAccountState extends State<EditAccount> {
       } else if (value.length > 12) {
         return 'Nombre de usuario demasiado largo';
       }
-    } else if (fieldType == 'password') {
+    } else if (fieldType == 'passwordNew') {
       if (value == null || value.isEmpty) {
         return 'Por favor ingresa una contraseña';
-      } else if (value.length < 6) {
+      }
+      if (value.length < 6) {
         return 'Se requieren al menos 6 caracteres';
+      }
+      if (!value.contains(RegExp(r'[A-Za-z]'))) {
+        return 'La contraseña debe contener al menos una letra';
+      }
+      if (!value.contains(RegExp(r'\d'))) {
+        return 'La contraseña debe contener al menos un número';
+      }
+      const specialCharacters = '!@#\$%^&*(),.?":{}|<>+-';
+      bool hasSpecialCharacter =
+          value.split('').any((char) => specialCharacters.contains(char));
+      if (!hasSpecialCharacter) {
+        return 'La contraseña debe contener al menos un carácter especial';
       }
     } else if (fieldType == 'email') {
       if (value == null || value.isEmpty) {
         return 'Por favor ingresa un correo electrónico';
       } else if (!EmailValidator.validate(value)) {
         return 'Correo electrónico inválido';
+      }
+    } else if (fieldType == 'password') {
+      if (value == null || value.isEmpty) {
+        return 'Por favor ingresa tu contraseña';
       }
     }
     return null;
@@ -327,7 +344,7 @@ class _EditAccountState extends State<EditAccount> {
                               controller: controllerPassNew,
                               labelText: "Contraseña nueva",
                               isPassword: true,
-                              fieldType: "password"),
+                              fieldType: "passwordNew"),
                           SizedBox(height: screenHeight * 0.02),
                           _buttonUpdateAll(),
                         ]),
