@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatsily/Interface_pages/home_pages/menu_home_page/all_recipes.dart';
 import 'package:eatsily/Interface_pages/home_pages/recipes_page/recipes.dart';
+import 'package:eatsily/services/api_service.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/sesion/services/database.dart';
@@ -24,55 +26,108 @@ class MenuHome extends StatefulWidget {
 
 class _MenuHomeState extends State<MenuHome> {
   late final DatabaseService _firestoreService;
+  final ApiService _apiService = ApiService();
 
   final Map<String, List<Map<String, dynamic>>> _filteredRecipesByCategory = {
     'created_at': [],
     'Recetas Simples': []
   };
+  Future<void> _fetchRecentRecommendedRecipes() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Obtain recent recipes created in the last 5 days
+        QuerySnapshot recentRecipesSnapshot = await FirebaseFirestore.instance
+            .collection('Recetas')
+            .where('created_at',
+                isGreaterThan: DateTime.now().subtract(const Duration(days: 5)))
+            .get();
 
-  Future<void> _fetchRecipesD() async {
-    QuerySnapshot recentRecipesSnapshot = await FirebaseFirestore.instance
-        .collection('Recetas')
-        .where('created_at',
-            isGreaterThan: DateTime.now().subtract(const Duration(days: 5)))
-        .get();
+        List<Map<String, dynamic>> recentRecipes =
+            recentRecipesSnapshot.docs.map((doc) {
+          return {
+            'recetaId': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          };
+        }).toList();
+        String? token = await AuthService().getUserToken();
+        if (token != null) {
+          List<dynamic> result = await _apiService.getRecommendations(token);
+          if (result.isEmpty) {
+            return;
+          }
+          // Filter the recipes recommended by recent recipes
+          List<Map<String, dynamic>> recentRecommendedRecipes =
+              recentRecipes.where((recipe) {
+            return result
+                .any((recommended) => recommended['id'] == recipe['recetaId']);
+          }).toList();
+          if (recentRecommendedRecipes.isEmpty) {
+            return;
+          }
 
-    List<Map<String, dynamic>> recentRecipes =
-        recentRecipesSnapshot.docs.map((doc) {
-      return {
-        'recetaId': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      };
-    }).toList();
-
-    // Store recent recipes
-    _filteredRecipesByCategory['created_at'] = recentRecipes;
+          if (mounted) {
+            setState(() {
+              _filteredRecipesByCategory['created_at'] =
+                  recentRecommendedRecipes; // Update recipes in the state
+            });
+          }
+        }
+      }
+    } catch (e) {
+      throw ('Error al obtener las recetas recomendadas: $e');
+    }
   }
 
-  Future<void> _fetchSimpleRecipes() async {
-    // Consult Firestore to obtain all recipes
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('Recetas').get();
+  Future<void> _fetchRecommendedSimpleRecipes() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String? token = await AuthService().getUserToken();
+        if (token != null) {
+          List<dynamic> result = await _apiService.getRecommendations(token);
 
-    List<Map<String, dynamic>> simpleRecipes = [];
+          if (result.isEmpty) {
+            return;
+          }
 
-    for (var doc in snapshot.docs) {
-      Map<String, dynamic> recipeData = doc.data() as Map<String, dynamic>;
+          QuerySnapshot snapshot =
+              await FirebaseFirestore.instance.collection('Recetas').get();
 
-      List<String> ingredients =
-          List<String>.from(recipeData['ingredients'] ?? []);
+          List<Map<String, dynamic>> simpleRecommendedRecipes = [];
 
-      if (ingredients.length <= 5) {
-        simpleRecipes.add({
-          ...recipeData,
-          'recetaId': doc.id, // Includes the Document ID in the data
-        });
+          for (var doc in snapshot.docs) {
+            Map<String, dynamic> recipeData =
+                doc.data() as Map<String, dynamic>;
+
+            List<String> ingredients =
+                List<String>.from(recipeData['ingredients'] ?? []);
+
+            // Verify if the recipe is simple (5 or less ingredients) and if recommended
+            if (ingredients.length <= 5 &&
+                result.any((recommended) => recommended['id'] == doc.id)) {
+              simpleRecommendedRecipes.add({
+                ...recipeData,
+                'recetaId': doc.id, // Includes the Document ID in the data
+                'puntuation': result.firstWhere(
+                  (recommended) => recommended['id'] == doc.id,
+                  orElse: () => {'puntuation': 0},
+                )['puntuation'],
+              });
+            }
+          }
+
+          if (mounted) {
+            setState(() {
+              _filteredRecipesByCategory['Recetas Simples'] =
+                  simpleRecommendedRecipes; // Update the State
+            });
+          }
+        }
       }
+    } catch (e) {
+      throw ('Error al obtener las recetas recomendadas simples: $e');
     }
-
-    setState(() {
-      _filteredRecipesByCategory['Recetas Simples'] = simpleRecipes;
-    });
   }
 
   BoxDecoration boxDecoration() {
@@ -254,8 +309,8 @@ class _MenuHomeState extends State<MenuHome> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _firestoreService = DatabaseService(uid: user.uid);
-      _fetchRecipesD(); //Load the usual recipes
-      _fetchSimpleRecipes(); //Load recipes with 5 ingredients or less
+      _fetchRecentRecommendedRecipes(); //Load the usual recipes
+      _fetchRecommendedSimpleRecipes(); //Load recipes with 5 ingredients or less
     }
   }
 

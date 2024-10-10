@@ -39,18 +39,8 @@ class ApiService {
       request.fields['name'] = name;
       request.fields['description'] = description;
       request.fields['diners'] = diners;
-      // // Add ingredients as separate fields
-      // for (String ingredient in ingredients) {
-      //   request.fields.addAll({'ingredients': ingredient});
-      // }
-
-      // // Add portions as separate fields with the same key 'portions'
-      // for (String portion in portions) {
-      //   request.fields.addAll({'portions': portion});
-      // }
       request.fields['ingredients'] = jsonEncode(ingredients);
       request.fields['portions'] = jsonEncode(portions);
-      request.fields.forEach((key, value) {});
       var response = await request.send();
       if (response.statusCode == 201) {
       } else {
@@ -77,6 +67,35 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Error al obtener las recomendaciones: $e');
+    }
+  }
+
+  Future<List<String>> updateRecipe(
+      List<String> ingredients, String token) async {
+    try {
+      var uri = Uri.parse('${dotenv.get('HOST')}/api/v1/category');
+
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['ingredients'] = jsonEncode(ingredients);
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseData = await http.Response.fromStream(response);
+        var responseBody = responseData.body;
+        var jsonResponse = jsonDecode(responseBody);
+        if (jsonResponse['Categories'] != null) {
+          List<String> category = List<String>.from(jsonResponse['Categories']);
+          return category;
+        } else {
+          throw Exception('La respuesta no contiene el campo "categories"');
+        }
+      } else {
+        throw Exception(
+            'Failed to upload. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error al intentar editar la receta: $e');
     }
   }
 }
