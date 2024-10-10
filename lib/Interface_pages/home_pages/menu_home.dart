@@ -53,7 +53,6 @@ class _MenuHomeState extends State<MenuHome> {
         String? token = await AuthService().getUserToken();
         if (token != null) {
           List<dynamic> result = await _apiService.getRecommendations(token);
-          print(result);
           if (result.isEmpty) {
             return;
           }
