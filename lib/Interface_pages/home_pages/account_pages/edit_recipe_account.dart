@@ -4,6 +4,8 @@ import 'package:eatsily/Interface_pages/home_pages/account_pages/ingredient.dart
 import 'package:eatsily/Interface_pages/home_pages/account_pages/search_ingredient_delegate.dart';
 import 'package:eatsily/common_widgets/seasonal_background.dart';
 import 'package:eatsily/constants/constants.dart';
+import 'package:eatsily/services/api_service.dart';
+import 'package:eatsily/services/auth_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +34,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
   int counterDiners = 0;
   String? _recipeImageUrl;
   int originalDiners = 1;
+  final ApiService _apiService = ApiService();
 
   Future<void> _showQuantityDialog(String ingredient) async {
     Map<String, dynamic>? existingIngredient = selectedIngredients.firstWhere(
@@ -463,32 +466,39 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
 
   Future<void> _updateRecipeData() async {
     try {
-      String updatedDescription = recipeSteps
-          .map((step) =>
-              step.replaceAll('\n', '').trim()) // Eliminate line and space jump
-          .join(" ");
+      String? token = await AuthService().getUserToken();
+      if (token != null) {
+        List<String> newIngredients = selectedIngredients.map((ingredient) {
+          return '${ingredient['name'].replaceAll(' ', '_')}';
+        }).toList();
+        String recipeDescription = recipeSteps
+            .map((step) => step
+                .replaceAll('\n', '')
+                .trim()) // Eliminate line and space jump
+            .join(" ");
 
-      List<String> updatedIngredients = selectedIngredients.map((ingredient) {
-        return '${ingredient['name'].replaceAll(' ', '_')}';
-      }).toList();
+        List<String> portions = selectedIngredients.map((ingredientData) {
+          return '${ingredientData['quantity']} ${ingredientData['unit']}';
+        }).toList();
 
-      List<String> updatedPortions = selectedIngredients.map((ingredientData) {
-        return '${ingredientData['quantity']} ${ingredientData['unit']}';
-      }).toList();
+        List<String> categories =
+            await _apiService.updateRecipe(newIngredients, token);
 
-      await _firestore.collection('Recetas').doc(widget.recipeId).update({
-        'name': _title.text,
-        'image': _imageFile != null
-            ? await uploadRecipeImage(_imageFile!, _title.text)
-            : (await _firestore
-                .collection('Recetas')
-                .doc(widget.recipeId)
-                .get())['image'], // Upload image if it changed
-        'description': updatedDescription, // Unite steps with "."
-        'ingredients': updatedIngredients, // Update ingredients
-        'diner': counterDiners, // Update diners
-        'portions': updatedPortions // Update amounts
-      });
+        await _firestore.collection('Recetas').doc(widget.recipeId).update({
+          'name': _title.text,
+          'image': _imageFile != null
+              ? await uploadRecipeImage(_imageFile!, _title.text)
+              : (await _firestore
+                  .collection('Recetas')
+                  .doc(widget.recipeId)
+                  .get())['image'], // Upload image if it changed
+          'description': recipeDescription, // Unite steps with "."
+          'ingredients': newIngredients, // Update ingredients
+          'diner': counterDiners, // Update diners
+          'portions': portions, // Update amounts
+          'category': categories
+        });
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Receta actualizada exitosamente')),
@@ -498,7 +508,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Error al obtener los datos de la receta')),
+              content: Text('Error al editar los datos de la receta')),
         );
       }
     }

@@ -25,13 +25,14 @@ class AllRecipes extends StatefulWidget {
 class _AllRecipesState extends State<AllRecipes> {
   late final DatabaseService _firestoreService;
   List<Map<String, dynamic>> _recipes = [];
+  late final FirebaseAuth _auth;
 
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _firestoreService = DatabaseService(uid: user.uid);
+    _auth = FirebaseAuth.instance;
+    if (_auth.currentUser != null) {
+      _firestoreService = DatabaseService(uid: _auth.currentUser!.uid);
       _fetchRecipes(); // Only if it is authenticated the recipes are charged
     }
   }
@@ -65,6 +66,10 @@ class _AllRecipesState extends State<AllRecipes> {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         data['recetaId'] = doc.id; // Add the document ID to the data
         return data;
+      }).toList();
+      recipes = recipes.where((recipe) {
+        return recipe['created_by'] == null ||
+            recipe['created_by'] == _auth.currentUser!.uid;
       }).toList();
 
       setState(() {

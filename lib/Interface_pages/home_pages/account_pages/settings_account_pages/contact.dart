@@ -2,8 +2,35 @@ import 'package:eatsily/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class Contact extends StatelessWidget {
+class Contact extends StatefulWidget {
   const Contact({super.key});
+
+  @override
+  ContactState createState() => ContactState();
+}
+
+class ContactState extends State<Contact> {
+  Widget _buildContactInfo() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SelectableText(
+          'Para consultas, envía un correo a: fluttermodular21@outlook.com\n\n'
+          'Asunto: Consulta desde la app\n\n'
+          'Mensaje:\n'
+          'Hola,\n'
+          'Me gustaría hacer la siguiente consulta:\n'
+          '_____________________________________\n'
+          'Escribe aquí tu mensaje...',
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +64,7 @@ class Contact extends StatelessWidget {
                               'Me gustaría hacer la siguiente consulta:\n'
                               '_____________________________________\n'
                               'Escribe aquí tu mensaje...'),
-                    ).then((_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text('Información copiada al portapapeles')),
-                      );
-                    });
+                    ).then((_) {});
                   },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 16),
@@ -59,28 +80,6 @@ class Contact extends StatelessWidget {
               )
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactInfo() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SelectableText(
-          'Para consultas, envía un correo a: fluttermodular21@outlook.com\n\n'
-          'Asunto: Consulta desde la app\n\n'
-          'Mensaje:\n'
-          'Hola,\n'
-          'Me gustaría hacer la siguiente consulta:\n'
-          '_____________________________________\n'
-          'Escribe aquí tu mensaje...',
-          style: TextStyle(fontSize: 16),
         ),
       ),
     );
