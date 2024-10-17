@@ -44,24 +44,40 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
     TextEditingController quantityController = TextEditingController(
       text: existingIngredient.isNotEmpty ? existingIngredient['quantity'] : '',
     );
+
+    final Map<String, String> unitMap = {
+      'gramo': 'gramos',
+      'porción': 'porciones',
+      'taza': 'tazas',
+      'mililitro': 'mililitros',
+      'cucharada': 'cucharadas',
+      'paquete': 'paquetes',
+      'unidad': 'unidades',
+      'loncha': 'lonchas',
+      'rama': 'ramas',
+      'cucharadita': 'cucharaditas',
+      'pizca': 'pizcas',
+      'rebanada': 'rebanadas',
+    };
+    String? getSingularUnit(String unit) {
+      // Look for the (singular) key whose (plural) value coincides with `unit`
+      String? singular = unitMap.keys.firstWhere(
+        (key) =>
+            unitMap[key] ==
+            unit, // If the value coincides with `Unit`, returns the key
+        orElse: () => unit, // If it is not found, it returns `unit` as it is
+      );
+      return singular;
+    }
+
     String? selectedUnit = existingIngredient.isNotEmpty
-        ? existingIngredient['unit']
-        : "gramos"; // Default or existing unit
-    List<String> units = [
-      'gramos',
-      'porciones',
-      'tazas',
-      'mililitros',
-      'cucharadas',
-      'paquetes',
-      'unidades',
-      'lonchas',
-      'ramas',
-      'cucharadtias',
-      'pizcas',
-      'cantidad al gusto',
-      'rebanadas'
-    ]; // List of units
+        ? getSingularUnit(existingIngredient['unit'])
+        : "gramo";
+
+    String pluralizeUnit(String unit, int quantity) {
+      return quantity == 1 ? unit : unitMap[unit] ?? unit;
+    } // List of units
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -87,10 +103,10 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                   labelText: "unidad",
                   border: OutlineInputBorder(),
                 ),
-                items: units.map((String unit) {
+                items: unitMap.keys.map((String unit) {
                   return DropdownMenuItem<String>(
                     value: unit,
-                    child: Text(unit),
+                    child: Text(unitMap[unit]!),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -122,17 +138,19 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                     );
                     return;
                   }
+                  int quantity = int.parse(quantityController.text);
+                  String finalUnit = pluralizeUnit(selectedUnit!, quantity);
                   if (existingIngredient.isNotEmpty) {
                     // If the ingredient already existed, modify its values
                     existingIngredient['quantity'] = quantityController.text;
-                    existingIngredient['unit'] = selectedUnit;
+                    existingIngredient['unit'] = finalUnit;
                   } else {
                     // If do not exist, add it to the list
                     selectedIngredients.add({
                       'name': ingredient,
                       'quantity': quantityController.text,
                       'originalQuantity': quantityController.text,
-                      'unit': selectedUnit,
+                      'unit': finalUnit,
                     });
                   }
                 });
@@ -171,7 +189,10 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               child: const Text("Agregar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps.add("Paso $step. ${stepController.text}");
+                  String inputText = stepController.text;
+                  String cleanedText = inputText.replaceAll(
+                      RegExp(r'(Paso\s*\d+\.?\s*)', caseSensitive: false), '');
+                  recipeSteps.add("Paso $step. $cleanedText");
                   step++;
                   _renumberSteps();
                 });
@@ -209,8 +230,10 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
               child: const Text("Guardar"),
               onPressed: () {
                 setState(() {
-                  recipeSteps[index] =
-                      "Paso ${index + 1}. ${stepController.text}";
+                  String inputText = stepController.text;
+                  String cleanedText = inputText.replaceAll(
+                      RegExp(r'(Paso\s*\d+\.?\s*)', caseSensitive: false), '');
+                  recipeSteps[index] = "Paso ${index + 1}. $cleanedText";
                 });
                 Navigator.of(context).pop();
               },
@@ -429,7 +452,7 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
         description.split('Paso').forEach((part) {
           if (part.trim().isNotEmpty) {
             recipeSteps
-                .add('Paso ${part.trim()}\n'); // Add line jump and numbering
+                .add('Paso ${part.trim()}'); // Add line jump and numbering
           }
         });
         step = recipeSteps.length + 1;
@@ -567,7 +590,9 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                             focusNode: _focusNodeTitle,
                             style: instrucctionTextStyle,
                             decoration: const InputDecoration(
-                                border: OutlineInputBorder()),
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: colorWhite),
                             onTap: () {
                               if (_title.text ==
                                   "Ingresa un nombre para tu receta") {
@@ -592,9 +617,9 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                             onTap: _addStep,
                             child: Container(
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: colorWhite),
                               padding: const EdgeInsets.all(8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,6 +679,8 @@ class _EditRecipeAccountState extends State<EditRecipeAccount> {
                             style: instrucctionTextStyle,
                             readOnly: true,
                             decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: colorWhite,
                               border: OutlineInputBorder(),
                               hintText: 'Agregar ingredientes',
                             ),
