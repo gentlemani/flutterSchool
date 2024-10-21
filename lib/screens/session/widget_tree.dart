@@ -1,5 +1,5 @@
-import 'package:eatsily/sesion/sign_in_page.dart';
-import 'package:eatsily/sesion/verify_email_page.dart';
+import 'package:eatsily/screens/session/sign_in_page.dart';
+import 'package:eatsily/screens/session/verify_email_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 class WidgetTree extends StatefulWidget {

@@ -1,8 +1,8 @@
+import 'package:eatsily/screens/session/sign_in_page.dart';
+import 'package:eatsily/widgets/common_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:eatsily/common_widgets/common_widgets.dart';
 
 class PasswdReset extends StatefulWidget {
   const PasswdReset({super.key});

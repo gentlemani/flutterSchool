@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:eatsily/Interface_pages/home_page.dart';
-import 'package:eatsily/widget_tree.dart';
+import 'package:eatsily/screens/home/home_page.dart';
+import 'package:eatsily/screens/session/widget_tree.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/utils/auth.helpers.dart';
