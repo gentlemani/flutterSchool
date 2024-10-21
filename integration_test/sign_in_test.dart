@@ -1,7 +1,7 @@
-import 'package:eatsily/Interface_pages/home_page.dart';
-import 'package:eatsily/Interface_pages/home_pages/dish_home.dart';
+import 'package:eatsily/screens/home/home_page.dart';
+import 'package:eatsily/screens/home/dish_home/dish_home.dart';
 import 'package:eatsily/main.dart';
-import 'package:eatsily/sesion/sign_in_page.dart';
+import 'package:eatsily/screens/session/sign_in_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';

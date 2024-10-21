@@ -31,3 +31,15 @@ final TextStyle buttomTextStyle =
     GoogleFonts.poppins(color: Colors.black, fontSize: 18);
 final TextStyle instrucctionTextStyle =
     GoogleFonts.nunito(color: Colors.black, fontSize: 16);
+
+  // constants/constants.dart
+const double kPaddingValue = 18.0;
+const double kImageWidth = 400.0;
+const double kTextFontSize = 25.0;
+const double kImageHeight = 180.0;
+const double kBorderWidth = 3.0;
+const double kBorderRadius = 12.0;
+const Color kBackgroundColor = Color.fromARGB(255, 255, 255, 255);
+const Color kBorderColor = Color.fromARGB(255, 0, 0, 0);
+const Color kShadowColor = Color.fromARGB(255, 54, 50, 50);
+
