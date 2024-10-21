@@ -1,35 +1,61 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:eatsily/services/user_service.dart';
 
 class AuthService {
-  final FirebaseAuth _firebaseAuth;
-  AuthService({FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  User? get currentUser => _firebaseAuth.currentUser;
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-
-  Future<void> signInWithEmailAndPassword({
+  Future<bool> signInWithEmailAndPassword({
     required String email,
     required String password,
+    required Function(String) onError,
   }) async {
-    await _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      onError(mapErrorCode(e.code));
+      return false;
+    }
   }
 
-  Future<void> createUserWithEmailAndPassword({
+  Future<User?> createUserWithEmailAndPassword({
     required String email,
     required String password,
+    required String name,
+    required Function(String) onError,
   }) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final UserService userService =
+          UserService(user: userCredential.user, firebaseAuth: _auth, db: _db);
+      userService.initializeUserFrequencyRecord(name: name);
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      onError(mapErrorCode(e.code));
+      return null;
+    }
   }
 
-  Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+  String mapErrorCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return 'Formato de correo incorrecto';
+      case 'email-already-in-use':
+        return 'Usuario ya existente';
+      default:
+        return 'Correo o contraseña incorrecta';
+    }
+  }
+    Future<void> signOut() async {
+    await _auth.signOut();
   }
   Future<String?> getUserToken() async {
-      return await currentUser?.getIdToken();
+      return await _auth.currentUser?.getIdToken();
   }
 }

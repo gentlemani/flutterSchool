@@ -43,6 +43,6 @@ void main() async {
       await tester.pumpAndSettle();
       expect(find.text('Error'), findsNothing);
       expect(find.text('Ingresa un correo válido'), findsNothing);
-      expect(find.byType(SignInPage), findsNothing);
+      expect(find.byType(SignUpPage), findsNothing);
     });
 }

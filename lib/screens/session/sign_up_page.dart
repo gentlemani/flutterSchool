@@ -24,7 +24,7 @@ class _SignUpPageState extends State<SignUpPage> {
       User? user = await _auth.createUserWithEmailAndPassword(
           email: _controllerEmail.text,
           password: _controllerPassword.text,
-          name: _controllerName.text,
+          name:_controllerName.text,
           onError: (String error) {
             setState(() {
               errorMessage = error; // Display the error message in the UI
