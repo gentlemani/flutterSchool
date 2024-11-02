@@ -126,5 +126,14 @@ class DatabaseService {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchRecipeData(String recetaId) async {
+    try {
+      DocumentSnapshot doc = await _db.collection('Recetas').doc(recetaId).get();
+      return doc.exists ? doc.data() as Map<String, dynamic>? : null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }
 
