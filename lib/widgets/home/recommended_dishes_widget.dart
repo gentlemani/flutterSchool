@@ -12,10 +12,10 @@ Widget recommendedDishes(
               : ListView.builder(
                   itemCount: recipes.length < 5 ? recipes.length : 5,
                   itemBuilder: (context, index) {
-                    final recetaId = recipes[index]['id'] ?? '';
+                    final recipeId = recipes[index]['id'] ?? '';
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                      child: foodInformation(recetaId,user.uid),
+                      child: FoodInformation(recipeId: recipeId,userId:  user.uid),
                     );
                   },
                 ),

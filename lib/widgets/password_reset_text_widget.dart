@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class PasswordResetText extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const PasswordResetText({required this.onPressed, Key? key}) : super(key: key);
+  const PasswordResetText({required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {

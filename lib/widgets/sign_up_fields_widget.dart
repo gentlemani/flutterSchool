@@ -34,7 +34,7 @@ class EmailField extends StatelessWidget {
   final TextEditingController controller;
   final Function(String?)? onChanged;
 
-  const EmailField({Key? key, required this.controller, this.onChanged}) : super(key: key);
+  const EmailField({super.key, required this.controller, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,7 @@ class PasswordField extends StatelessWidget {
   final TextEditingController controller;
   final Function(String?)? onChanged;
 
-  const PasswordField({Key? key, required this.controller, this.onChanged}) : super(key: key);
+  const PasswordField({super.key, required this.controller, this.onChanged});
 
   @override
   Widget build(BuildContext context) {

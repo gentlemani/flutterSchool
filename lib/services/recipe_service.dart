@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatsily/models/recipe_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RecipeService {
   final FirebaseFirestore _db;
@@ -21,7 +22,8 @@ class RecipeService {
     for (String id in ids) {
       DocumentSnapshot doc = await recipeCollection.doc(id).get();
       if (doc.exists) {
-        recipes.add(RecipeModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
+        recipes.add(
+            RecipeModel.fromMap(doc.id, doc.data() as Map<String, dynamic>));
       }
     }
     return recipes;
@@ -37,11 +39,8 @@ class RecipeService {
 
   // Votar una receta (Like/Dislike)
   Future<void> voteRecipe(String recetaId, String userId, bool vote) async {
-    DocumentReference userVoteRef = _db
-        .collection('Users')
-        .doc(userId)
-        .collection('Vote')
-        .doc(recetaId);
+    DocumentReference userVoteRef =
+        _db.collection('Users').doc(userId).collection('Vote').doc(recetaId);
     DocumentSnapshot userVoteSnapshot = await userVoteRef.get();
     DocumentReference recipeRef = recipeCollection.doc(recetaId);
 
@@ -81,8 +80,22 @@ class RecipeService {
 
   // Obtener la URL de una imagen desde Firestore Storage
   Future<String> getImageUrl(String imagePath) async {
-    // Aquí debes usar Firebase Storage para obtener la URL de la imagen
-    // Por ejemplo: FirebaseStorage.instance.ref(imagePath).getDownloadURL();
-    return imagePath; // Ajusta con la lógica real si usas Storage
+    try {
+      if (imagePath.isEmpty) {
+        throw 'La ruta de la imagen es vacía';
+      }
+
+      // If the image already has the complete url (that is, the public URL), you do not need to use storage
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+
+      //If the image is just the path, get the URL from Firebase Storage
+      final ref = FirebaseStorage.instance.ref().child(imagePath);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      return '';
+    }
   }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class RegisterButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const RegisterButton({Key? key, required this.onPressed}) : super(key: key);
+  const RegisterButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class RegisterButton extends StatelessWidget {
 }
 
 class LinkLogin extends StatelessWidget {
-  const LinkLogin({Key? key}) : super(key: key);
+  const LinkLogin({super.key});
 
   @override
   Widget build(BuildContext context) {

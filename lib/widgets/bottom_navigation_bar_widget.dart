@@ -7,8 +7,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({
     required this.currentIndex,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

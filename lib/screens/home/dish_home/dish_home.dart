@@ -5,10 +5,7 @@ import 'package:eatsily/utils/auth.helpers.dart';
 import 'package:eatsily/constants/constants.dart';
 import 'package:eatsily/widgets/home/recommended_dishes_widget.dart';
 import 'package:eatsily/services/database_service.dart';
-import 'package:eatsily/services/user_service.dart'; 
-import 'package:eatsily/services/recipe_service.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatsily/models/recipe_model.dart';
 
 class DishHome extends StatefulWidget {
@@ -23,25 +20,13 @@ class _DishHomeState extends State<DishHome> {
   List<Map<String, dynamic>> _recipes = [];
   final User? user = FirebaseAuth.instance.currentUser;
   final ApiService _apiService = ApiService();
-  late final UserService _userService;
 
   @override
   void initState() {
     super.initState();
     if (user != null) {
       // Initialize services
-      _userService = UserService(
-        firebaseAuth: FirebaseAuth.instance,
-        db: FirebaseFirestore.instance,
-        user: user,
-      );
-      final recipeService = RecipeService(
-        db: FirebaseFirestore.instance,
-      );
-      _firestoreService = DatabaseService(
-        userService: _userService,
-        recipeService: recipeService,
-      );
+      _firestoreService = DatabaseService();
       _fetchRecommendations();
     } else {
       handleLogout(context, redirectTo: const WidgetTree());
@@ -53,7 +38,7 @@ class _DishHomeState extends State<DishHome> {
       if (user != null) {
         List<String> dislikedRecipeIds =
             await _firestoreService.userService.getDislikedRecipeIds();
-        String? token = await _userService.getUserToken();
+        String? token = await _firestoreService.userService.getUserToken();
 
         if (token != null) {
           List<dynamic> result = await _apiService.getRecommendations(token);
@@ -95,7 +80,6 @@ class _DishHomeState extends State<DishHome> {
             final puntuationB = b['puntuation']?.toDouble() ?? 0.0;
             return puntuationB.compareTo(puntuationA);
           });
-
           if (mounted) {
             setState(() {
               _recipes = recommendedRecipes;

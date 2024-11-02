@@ -31,7 +31,7 @@ class EntryEmailField extends StatelessWidget {
 class EntryPasswordField extends StatelessWidget {
   final TextEditingController controller;
 
-  const EntryPasswordField({required this.controller});
+  const EntryPasswordField({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
