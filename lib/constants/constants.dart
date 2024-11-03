@@ -43,3 +43,23 @@ const Color kBackgroundColor = Color.fromARGB(255, 255, 255, 255);
 const Color kBorderColor = Color.fromARGB(255, 0, 0, 0);
 const Color kShadowColor = Color.fromARGB(255, 54, 50, 50);
 
+final BoxDecoration ingredientDecoration = BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(12),
+  boxShadow: const [
+    BoxShadow(
+      color: Colors.black12,
+      blurRadius: 6,
+      offset: Offset(0, 3),
+    ),
+  ],
+);
+const TextStyle ingredientTextStyle = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w500,
+);
+final TextStyle quantityTextStyle = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w500,
+  color: Colors.grey[600],
+);

@@ -1,11 +1,11 @@
 import 'package:eatsily/screens/session/passwd_reset_page.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/services/auth_service.dart';
-import 'package:eatsily/widgets/common_widget.dart';
-import 'package:eatsily/widgets/sign_in_fields_widget.dart';
-import 'package:eatsily/widgets/sign_in_button_widget.dart';
-import 'package:eatsily/widgets/register_button_widget.dart';
-import 'package:eatsily/widgets/password_reset_text_widget.dart';
+import 'package:eatsily/widgets/login/common_widget.dart';
+import 'package:eatsily/widgets/login/sign_in_fields_widget.dart';
+import 'package:eatsily/widgets/login/sign_in_button_widget.dart';
+import 'package:eatsily/widgets/login/register_button_widget.dart';
+import 'package:eatsily/widgets/login/password_reset_text_widget.dart';
 import 'package:eatsily/screens/session/sign_up_page.dart';
 
 class SignInPage extends StatefulWidget {

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:eatsily/constants/constants.dart';
 
 class DinersCounter extends StatefulWidget {
   const DinersCounter({super.key});
 
   @override
-  _DinersCounterState createState() => _DinersCounterState();
+  DinersCounterState createState() => DinersCounterState();
 }
 
-class _DinersCounterState extends State<DinersCounter> {
+class DinersCounterState extends State<DinersCounter> {
   int counterDiners = 1;
 
   void _incrementCounter() {
@@ -24,15 +25,22 @@ class _DinersCounterState extends State<DinersCounter> {
 
   @override
   Widget build(BuildContext context) {
+    String textDiners = counterDiners == 1 ? "Comensal" : "Comensales";
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
             onPressed: _decrementCounter,
-            icon: const Icon(Icons.remove_circle_outlined)),
-        Text("$counterDiners Comensal(es)"),
+            icon: const Icon(
+              Icons.remove_circle_outlined,
+              color: Colors.red,
+            )),
+        Text("$counterDiners $textDiners"),
         IconButton(
-            onPressed: _incrementCounter, icon: const Icon(Icons.add_circle)),
+          onPressed: _incrementCounter,
+          icon: const Icon(Icons.add_circle),
+          color: colorGreen,
+        ),
       ],
     );
   }

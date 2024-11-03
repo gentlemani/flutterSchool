@@ -1,9 +1,9 @@
 import 'package:eatsily/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:eatsily/widgets/common_widget.dart';
-import 'package:eatsily/widgets/sign_up_buttons_widget.dart';
-import 'package:eatsily/widgets/sign_up_fields_widget.dart';
+import 'package:eatsily/widgets/login/common_widget.dart';
+import 'package:eatsily/widgets/login/sign_up_buttons_widget.dart';
+import 'package:eatsily/widgets/login/sign_up_fields_widget.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

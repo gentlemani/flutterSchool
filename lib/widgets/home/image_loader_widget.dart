@@ -2,7 +2,7 @@ import 'package:eatsily/services/recipe_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eatsily/utils/box_decoration.dart';
 import 'package:eatsily/constants/constants.dart';
-import 'package:eatsily/screens/home/dish_home/recipes_home.dart';
+import 'package:eatsily/screens/home/dish_home/recipe_detail.dart';
 
 class ImageLoader extends StatelessWidget {
   final String imagePath;
@@ -18,7 +18,7 @@ class ImageLoader extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RecipesHome(recetaId: recipeId),
+            builder: (context) => RecipeDetail(recetaId: recipeId),
           ),
         );
       },

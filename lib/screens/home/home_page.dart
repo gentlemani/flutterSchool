@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:eatsily/widgets/bottom_navigation_bar_widget.dart';
+import 'package:eatsily/widgets/login/bottom_navigation_bar_widget.dart';
 import 'package:eatsily/services/navigation_home_service.dart';
 
 class HomePage extends StatefulWidget {
