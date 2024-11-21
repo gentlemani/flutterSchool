@@ -1,4 +1,5 @@
 import 'package:eatsily/constants/constants.dart';
+import 'package:eatsily/widgets/home/back_button_icon_recipe.dart';
 import 'package:eatsily/widgets/home/recipe_steps_widget.dart';
 import 'package:eatsily/widgets/home/vote_section_widget.dart';
 import 'package:eatsily/widgets/home/diners_counter_widget.dart';
@@ -57,6 +58,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            leading: BackButtonIconRecipe(onPressed: () => Navigator.pop(context),),
             expandedHeight: 250,
             flexibleSpace: FlexibleSpaceBar(
               background: recipeImageUrl != null
