@@ -44,3 +44,4 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: pre-tester
           file: build/app/outputs/apk/release/app-release.apk
+
