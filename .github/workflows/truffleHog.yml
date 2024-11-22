@@ -1,0 +1,13 @@
+name: TruffleHog Scan
+
+on:
+  push:
+    branches:
+      - '**'  
+jobs:
+  trufflehog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run TruffleHog scan
+        uses: trufflesecurity/trufflehog@v3.84.0
