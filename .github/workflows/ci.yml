@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Setup Java 17
+      # Setup Java 17 with the latest setup-java action (v3)
       - uses: actions/setup-java@v3
         with:
           distribution: "zulu"
@@ -30,12 +30,10 @@ jobs:
           firebase_options_dart: ${{ secrets.FIREBASE_OPTION }}
         run: echo "$firebase_options_dart" > lib/firebase_options.dart
 
-      # Set up .env file
+      # Set up .env file with HOST secret
       - name: Set up .env file
         run: |
           echo "HOST=${{ secrets.HOST }}" > .env
-          # Add any other environment variables if necessary
-          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
 
       # Set up Flutter (using the latest stable version)
       - uses: subosito/flutter-action@v2
